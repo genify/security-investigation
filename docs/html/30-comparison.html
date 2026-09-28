@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>对比与差异分析 · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="对比与差异分析 — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>对比与差异分析</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">30.0 本章方法与对比的可比性声明</a></li>
+<li class="lvl2"><a href="#sec-5">30.1 三组对比的定位</a></li>
+<li class="lvl2"><a href="#sec-9">30.2 对比度 1：证据可见度与文档开放度</a></li>
+<li class="lvl2"><a href="#sec-13">30.3 对比度 2：鉴权与授权形态（核心维度）</a></li>
+<li class="lvl2"><a href="#sec-17">30.4 对比度 3：硬件根信任与密码栈</a></li>
+<li class="lvl2"><a href="#sec-21">30.5 对比度 4：监管驱动 vs 市场驱动</a></li>
+<li class="lvl2"><a href="#sec-24">30.6 对比度 5：开放策略与生态位</a></li>
+<li class="lvl2"><a href="#sec-27">30.7 对比度 6：安全治理与披露生态</a></li>
+<li class="lvl2"><a href="#sec-30">30.8 国内外差异的归因分析</a></li>
+<li class="lvl2"><a href="#sec-38">30.9 "与通用分层技术方案的差异"专节（对应调研目标第二条）</a></li>
+<li class="lvl2"><a href="#sec-45">30.10 对比结论（12 条，每条标明类型）</a></li>
+<li class="lvl2"><a href="#sec-46">30.11 本章待补证清单</a></li>
+<li class="lvl2"><a href="#sec-47">30.12 本章小结</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<blockquote><p><strong>本章定位</strong>：本章是 TRA-1 报告的第 5 部分，覆盖验收标准 <strong>AC-6「国内外技术路线差异对比」</strong>（至少 5 个维度的对比矩阵 + 差异归因），同时为 AC-8（区分公开信息与合理推测）与 AC-11（客观中立）提供集中兑现。</p><p><strong>本章的唯一事实底座</strong>：<code>docs/sources/source-dossier.md</code>（下称"信源档案"）。本章出现的每一个数字、日期、URL、标准号、车企事实，均须能在信源档案中找到对应条目；凡本报告自行推导者，一律显式标注为「本报告判断（推测，非事实）」。</p><p><strong>前置声明（必读，覆盖本章全部结论）</strong>：本报告是<strong>公开信息调研</strong>，<strong>未对任何在售车型做任何实车测试、漏洞挖掘、渗透、逆向或攻击</strong>。本章所有"对比"针对的是<strong>公开发布的技术文档与规范文本所描述的方案形态</strong>，不是对任何车辆、云端系统、密钥或密码实现的实际验证结果。任何把本章读作"安全测评结论"的用法都是误读。</p></blockquote>
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>30.0 本章方法与对比的可比性声明</h2></div>
+<h3 id="sec-1">30.0.1 本章要回答的问题</h3>
+<p>AC-6 要求给出"国内外技术路线差异对比"，包含至少 5 个维度的对比矩阵与差异归因。本章把这一要求拆成 6 个对比维度（30.2–30.7），加 1 个归因分析专节（30.8），再加 1 个"与通用分层技术方案的差异"专节（30.9，对应调研目标的第二条），最后给出结论（30.10）与待补证清单（30.11）。本章要回答的核心问题是：</p>
+<ol><li><strong>可观测到的技术方案形态</strong>在"通用方案 / 已落地方案"之间、"国内路线 / 国际路线"之间、"车企与车企"之间，到底有哪些<strong>结构性差异</strong>？</li><li>这些差异里，哪些是<strong>证据层面的差异</strong>（只是"没公开"），哪些是<strong>方案层面的差异</strong>（确实选了不同的做法）？</li><li>造成这些差异的<strong>可能成因</strong>是什么，能否给出<strong>可检验的推断</strong>与<strong>检验方法</strong>，以便后续 RFI 补证？</li></ol>
+<h3 id="sec-2">30.0.2 关键声明：证据密度不均衡导致的可比性偏差（本章最重要的方法论前提）</h3>
+<p>本章<strong>首先且必须</strong>说明一个会支配全部结论的可比性偏差：</p>
+<ul><li><strong>本次取证的条件</strong>（见信源档案 §0）：检索工具 <code>web_search</code> / <code>web_extract</code> 全程额度耗尽（Firecrawl 402/429），公开搜索引擎全部不可用（Bing 地理重定向、Baidu/Sogou/360 验证码、Google 机器人墙、DuckDuckGo 验证码），部分权威站点被区域封锁或 Cloudflare 拦截（<code>bmw.com</code>、<code>bmwgroup.com</code>、<code>rivian.com</code>、<code>unece.org</code>、<code>iso.org</code>、<code>autosar.org</code>、<code>trustedcomputinggroup.org</code>），且 <code>open.xiaopeng.com</code> 对所有请求返回 403。因此本次调研<strong>无法做开放网络发现</strong>，只能"直取已知权威 URL"。</li><li><strong>由此产生的证据密度极端不均衡</strong>：<ul><li><strong>文档公开充分者</strong>：<strong>Tesla</strong>（<code>developer.tesla.com</code> 证据最厚）、<strong>Mercedes-Benz</strong>（<code>developer.mercedes-benz.com</code>）——这两家本次取得了<strong>接口级</strong>的一手文档，包括鉴权流程、scope 清单、令牌参数、错误语义。</li><li><strong>取证受限者</strong>：<strong>BMW</strong>（站点返回占位页"no content deployed"）、<strong>Rivian</strong>（CloudFront 区域封锁）——本次<strong>未取得任何授权文档</strong>。</li><li><strong>九家国内车企</strong>：<strong>9 家全部未取得关于「国密 SM2/SM3/SM4」「mTLS 双向证书」「证书轮换」「HSM/SE/TEE」的任何官方一手来源</strong>（信源档案 §7.10 第 5 条）。仅蔚来、比亚迪两家取得了<strong>服务层</strong>的鉴权形态（且均非 OAuth），小米取得了 IoT 平台与信任中心认证信息。</li></ul></li><li><strong>本章的核心纪律——把"证据可见度"与"安全水平"严格区分</strong>：<ul><li><strong>证据可见度（documentation visibility / evidence density）</strong>：一个主体<strong>对外公开了多少可检索的技术文档</strong>。这是<strong>披露策略、商业定位、语言与渠道</strong>的函数，与安全能力无必然关系。</li><li><strong>安全水平（security level）</strong>：一个主体<strong>实际实现的安全控制强度</strong>。这是<strong>工程、算法、硬件、流程</strong>的函数，<strong>在本次条件下基本不可直接观测</strong>。</li><li><strong>两者的关系不是单调的</strong>：文档公开充分的 Tesla 与文档几乎不可见的国内某车企，其<strong>实际安全水平</strong>在本报告的证据里<strong>无法排序</strong>——因为排序所需要的观测数据（文档）在一侧充足、在另一侧缺失。<strong>把"证据可见度"误当"安全水平"排序，是本章乃至全报告最需要防范的推理错误。</strong></li></ul></li><li><strong>因此，本章的比较对象被严格限定为</strong>：<ul><li>✅ <strong>可观测到的技术方案形态</strong>：即"文档里写出来的架构、协议、参数、命名、流程"。</li><li>❌ <strong>不比较"安全水平"</strong>：本章<strong>不给任何车企的安全能力强弱打分、排序或暗示</strong>。</li><li>凡涉及"某车企是否具备某能力"的断言，一律写为「<strong>未找到公开来源 / 本次未取证</strong>」，并声明<strong>这不等同于能力缺失</strong>（对齐审计计划 §3.2 第 4 条红线）。</li></ul></li></ul>
+<h3 id="sec-3">30.0.3 三类证据状态在本章的记号（沿用审计计划 §3.1）</h3>
+<div class="table-wrap"><table><thead><tr><th>记号</th><th>含义</th><th>本章的用法</th></tr></thead><tbody><tr><td><strong>[A]</strong></td><td>官方一手（标准正文 / OEM 官方开发者文档 / 官方漏洞政策）</td><td>直接作为"文档明载"引用</td></tr><tr><td><strong>[B]</strong></td><td>权威第三方（联盟规范页 / 权威媒体 / SDK 仓库）</td><td>作为"据…"引用</td></tr><tr><td><strong>[C]</strong></td><td>二手（自媒体 / 博客 / 论坛）</td><td>只作"有报道称"引用，不单独支撑事实</td></tr><tr><td><strong>[未验证]</strong></td><td>站点可达性已确认但正文未取到</td><td>只作方向性陈述，<strong>不给条款号/数字</strong></td></tr><tr><td><strong>未找到公开来源</strong></td><td>已检索指定对象无果</td><td>写为"缺口"，<strong>禁止反向读作"不具备"</strong></td></tr><tr><td><strong>本报告判断（推测，非事实）</strong></td><td>由已知架构/规范推导</td><td>与事实物理分段，供后续检验</td></tr></tbody></table></div>
+<h3 id="sec-4">30.0.4 本章不做的三件事</h3>
+<ol><li><strong>不排名</strong>：不给车企的安全能力排名，不给技术路线打分。</li><li><strong>不臆造</strong>：不补全任何未取证的数字、条款号、密码套件清单、硬件型号。</li><li><strong>不归纳过度</strong>：不把"两家国内车企不是 OAuth"归纳为"国内车企不做 OAuth"。</li></ol>
+<hr>
+</section>
+<section class="rep-section" id="sec-5">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>30.1 三组对比的定位</h2></div>
+<p>本章的对比不是"一条轴"，而是<strong>三组不同性质的对比</strong>。混在一起会导致"苹果对橙子"的错误。三组对比如下：</p>
+<h3 id="sec-6">A 组：通用方案 vs 已落地方案</h3>
+<ul><li><strong>对比物</strong>：<code>docs/02-general-layered-security.md</code> 描述的<strong>六层通用参考模型</strong>（硬件 → 通信 → 授权 → 应用平台 → 生命周期/合规，包含 TEE/HSM、mTLS、OAuth 2.x 族、UPTANE/SUIT 等规范层能力） vs 本次<strong>已取得一手文档的落地实现</strong>（Tesla Fleet API、Mercedes-Benz Developer Platform 的授权形态）。</li><li><strong>性质</strong>：<strong>"规范应有的控制"对"某实现实际公开的控制"</strong>。用于识别"通用方案里被落地实现的点"与"公开文档未覆盖的点"。</li><li><strong>风险</strong>：落地实现只取到了 2 家的公开细节，因此 A 组结论的适用面<strong>仅限这 2 家 + 规范层</strong>，不能外推为"行业实态"。</li><li><strong>落点</strong>：30.9 专节。</li></ul>
+<h3 id="sec-7">B 组：国内路线 vs 国际路线</h3>
+<ul><li><strong>对比物</strong>：中国<strong>监管与标准制度</strong>（GB/GB/T 强制与推荐国标族、数据出境与重要数据制度、国密算法族） vs 国际<strong>监管与标准制度</strong>（UN R155/R156 型式认证、GDPR、EU Data Act、ISO/SAE 21434 族）。</li><li><strong>性质</strong>：<strong>"制度驱动"对"制度驱动"</strong>——两侧都是<strong>规范层</strong>的对比，不是车企实现层。</li><li><strong>风险</strong>：国际侧的法规模块本次<strong>均未取得正文</strong>（R155/R156 标 [未验证]，GDPR/Data Act 标 [C]），因此 B 组只能对比<strong>名称与方向</strong>，不给条款与时间表。</li><li><strong>落点</strong>：30.5 专节。</li></ul>
+<h3 id="sec-8">C 组：车企之间的方案形态差异</h3>
+<ul><li><strong>对比物</strong>：<strong>被取证主体之间的方案形态</strong>（Tesla、Mercedes-Benz、BYD、NIO、Volkswagen/CARIAD、Xiaomi 等有公开材料者），涵盖鉴权形态、scope 命名、令牌参数、开放生态位、披露政策。</li><li><strong>性质</strong>：<strong>"可观测形态"对"可观测形态"</strong>——这是三组里<strong>最接近"实证"</strong>的一组，但受 30.0.2 的可比性偏差支配最严重（每个主体的可观测面大小不同）。</li><li><strong>风险</strong>：<strong>把"某主体文档多"误读为"该主体方案更完整"</strong>。</li><li><strong>落点</strong>：30.2、30.3、30.4、30.6、30.7 五个专节。</li></ul>
+<p><strong>三组对比的定位对照</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>组</th><th>对比两侧</th><th>对比层面</th><th>主要风险</th><th>对应小节</th></tr></thead><tbody><tr><td>A</td><td>通用方案 ↔ 已落地方案</td><td>规范层 ↔ 实现层</td><td>落地样本只有 2 家可读</td><td>30.9</td></tr><tr><td>B</td><td>国内制度 ↔ 国际制度</td><td>规范层 ↔ 规范层</td><td>国际法规模块本次未取证正文</td><td>30.5</td></tr><tr><td>C</td><td>主体 ↔ 主体</td><td>实现层 ↔ 实现层</td><td>可比性偏差（证据密度不均）</td><td>30.2–30.4、30.6、30.7</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-9">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>30.2 对比度 1：证据可见度与文档开放度</h2></div>
+<p>本节把 30.0.2 的"可比性偏差"落到<strong>可量化的表格</strong>上：对每一个被检主体，列出其<strong>公开文档的可观测面</strong>。这张表的用途<strong>不是评价主体</strong>，而是<strong>给出后面所有对比的"可见度基线"</strong>——提醒读者：任何跨主体的形态差异，都先要扣除"文档公开度不同"这一层。</p>
+<h3 id="sec-10">30.2.1 证据可见度大表（14 行）</h3>
+<p><strong>填表纪律</strong>：只填<strong>本次取证到的内容</strong>；未取证写「未取证」；不补全任何未载参数。证据等级列给出该主体在<strong>开放文档面</strong>上的最高等级。</p>
+<div class="table-wrap"><table><thead><tr><th>主体</th><th>开发者门户</th><th>鉴权文档</th><th>scope 清单</th><th>令牌参数</th><th>硬件/密码公开度</th><th>OTA 公开度</th><th>证据等级</th></tr></thead><tbody><tr><td><strong>Tesla</strong></td><td>developer.tesla.com（公开，含全套接口文档）</td><td>有（OAuth authorization_code 流程逐步文档 + 三类令牌模型）</td><td><strong>有（12 个 scope 全清单）</strong></td><td>有（刷新令牌一次性 + 3 个月 + 24h 宽限；访问令牌 TTL 未获证实）</td><td>部分（虚拟密钥须 prime256v1/P-256；TEE/HSM 未载）</td><td>未载（有 Fleet Telemetry 固件前置版本，OTA 签名机制未载）</td><td><strong>[A]</strong></td></tr><tr><td><strong>Mercedes-Benz</strong></td><td>developer.mercedes-benz.com（公开）</td><td>有（Authorization Code Flow + Client Credentials Flow）</td><td>部分（示例 <code>mb:vehicle:mbdata:fuelstatus</code>）</td><td>有（<code>expires_in</code> 默认 3599 秒；刷新令牌一次性）</td><td>未载</td><td>未载</td><td><strong>[A]</strong></td></tr><tr><td><strong>Volkswagen / CARIAD</strong></td><td>cariad.technology（自述营销页，<strong>非开发者门户</strong>）</td><td>无</td><td>无</td><td>无</td><td>未载</td><td>未载（仅自述"支持安全关键更新的 OTA 下发"）</td><td><strong>[A，公司自述口径]</strong></td></tr><tr><td><strong>BMW</strong></td><td>developer.bmwgroup.com 返回占位页"no content deployed"</td><td>无</td><td>无</td><td>无</td><td>未载</td><td>未载</td><td><strong>[A，直接观测]</strong></td></tr><tr><td><strong>Rivian</strong></td><td>rivian.com 区域封锁；developer.rivian.com 无 DNS</td><td>无</td><td>无</td><td>无</td><td>未载</td><td>未载</td><td><strong>[A，直接观测]</strong></td></tr><tr><td><strong>比亚迪 BYD</strong></td><td>open.byd.com（i迪桥，<strong>企业级 ESB，非车控</strong>）</td><td>有（APIKey 接入文档，文档发布 2024-01-23）</td><td>无（非 OAuth，无 scope 概念）</td><td>无（无令牌参数）</td><td>未载</td><td>未载</td><td><strong>[A]</strong></td></tr><tr><td><strong>蔚来 NIO</strong></td><td>developer.nio.com（GitBook 托管 Open NSC）</td><td>有但受限（app-id + secret；接口规范正文需向文档提供人索取 token）</td><td>无</td><td>无</td><td>未载</td><td>未载</td><td><strong>[A，文档标注 2019-08-13]</strong></td></tr><tr><td><strong>小米 Xiaomi</strong></td><td>iot.mi.com（IoT 平台，<strong>面向硬件模组厂商，非车云</strong>）</td><td>无（车云）；IoT 平台面向模组</td><td>无</td><td>无</td><td>仅 ISO/IEC 27001 认证编号（IS 831552）</td><td>未载</td><td><strong>[A]</strong></td></tr><tr><td><strong>理想 Li Auto</strong></td><td>无开放平台（<code>open.lixiang.com</code>、<code>developer.lixiang.com</code> 均无 DNS）</td><td>无</td><td>无</td><td>无</td><td>未载</td><td>未载（仅隐私政策，生效 2026-01-22）</td><td><strong>[A，仅隐私政策]</strong></td></tr><tr><td><strong>小鹏 XPeng</strong></td><td>open.xiaopeng.com（<strong>403 Forbidden / openresty 拒访</strong>）</td><td>不可验证</td><td>不可验证</td><td>不可验证</td><td>未载</td><td>未载</td><td><strong>[A，403 观测]</strong></td></tr><tr><td><strong>极氪 ZEEKR</strong></td><td>open.zeekrlife.com（<strong>HTTP 500 空页</strong>）</td><td>不可验证</td><td>不可验证</td><td>不可验证</td><td>未载</td><td>未载</td><td><strong>[A，500 观测]</strong></td></tr><tr><td><strong>零跑 Leapmotor</strong></td><td>无（<code>developer./dev./open.leapmotor.com</code> 均无 DNS）</td><td>无</td><td>无</td><td>无</td><td>未载</td><td>未载</td><td><strong>未找到公开来源</strong></td></tr><tr><td><strong>奇瑞 Chery</strong></td><td>无开放平台；官网设「网络产品安全漏洞」专栏</td><td>无</td><td>无</td><td>无</td><td>未载</td><td>未载</td><td><strong>[A，仅漏洞专栏]</strong></td></tr><tr><td><strong>华为鸿蒙智行 HIMA</strong></td><td>developer.huawei.com（Wallet Kit 数字车钥匙文档返回 JS 空壳页）</td><td>不可验证</td><td>不可验证</td><td>不可验证</td><td>未载</td><td>未载</td><td><strong>[未验证]</strong></td></tr></tbody></table></div>
+<p><strong>读表要点</strong>：</p>
+<ol><li><strong>只有 2 家达到"scope 清单可见"</strong>（Tesla、Mercedes-Benz），且只有 1 家达到"完整 scope + 完整令牌参数"（Tesla）。<strong>这一层的可见度落差，是后面所有对比必须扣除的首层偏差。</strong></li><li><strong>国内 9 家中有 2 家（蔚来、比亚迪）取得了鉴权形态</strong>（均为<strong>服务层</strong>，均<strong>非 OAuth</strong>），其余 7 家在鉴权文档列上或"不可验证"、或"无"、或"未取证"。</li><li><strong>"门户存在"不等于"文档可用"</strong>：小鹏（403）、极氪（500）、华为（JS 空壳）都是"域名/站点存在但内容不可取"，与"无门户"是不同性质的缺口——前者是<strong>可达性缺口</strong>，后者是<strong>披露缺口</strong>。</li><li><strong>"未取证"密集不等于"能力弱"</strong>：本表右列的密集"未取证"与"未找到公开来源"，直接来自 30.0.2 的取证条件，与各主体实际能力无因果关系。</li></ol>
+<h3 id="sec-11">30.2.2 开放度分级模型（L0–L3）</h3>
+<p>为把上表的结构化，本报告提出一个<strong>开放度分级模型</strong>（<strong>本报告构造的分析框架，属 [合理推测] 框架，非任何标准</strong>）：</p>
+<pre><code>L3  完整接口级公开文档
+    —— 鉴权流程 + scope 清单 + 令牌参数 + 错误语义，均可公开检索
+    —— 开发者可自助接入
+
+L2  接口级文档但受限
+    —— 有接口规范，但需注册 / 商务渠道 / 文档访问 token，或文档明显陈旧
+
+L1  仅公开&quot;合规与治理&quot;文件
+    —— 门户/信任中心/隐私政策/漏洞专栏存在，但无接口级技术文档
+
+L0  无公开文档
+    —— 无开发者入口，或入口不可达（占位页 / 区块封锁 / 403 / 500）</code></pre>
+<p><strong>按此模型对本次取证主体的归类</strong>（<strong>归类依据均为上表的已取证事实；归类本身为 [合理推测]，且 L 值描述的是"公开度"，不是"安全性"</strong>）：</p>
+<div class="table-wrap"><table><thead><tr><th>级别</th><th>主体</th><th>归类依据（已取证事实）</th></tr></thead><tbody><tr><td><strong>L3</strong></td><td>Tesla、Mercedes-Benz</td><td>均有公开的鉴权流程文档与 scope 示例；Tesla 进一步公开了完整 scope 清单与令牌参数（[A]）</td></tr><tr><td><strong>L2</strong></td><td>比亚迪、蔚来</td><td>比亚迪有 APIKey 接入文档（[A]）；蔚来有 app-id+secret 说明，但正文需 token 且文档停在 2019（[A]）</td></tr><tr><td><strong>L1</strong></td><td>Volkswagen/CARIAD、小米、理想、奇瑞</td><td>CARIAD 有自述页（[A，自述口径]）；小米有信任中心与 ISO 27001 编号（[A]）；理想有隐私政策（[A]）；奇瑞有漏洞专栏（[A]）</td></tr><tr><td><strong>L0</strong></td><td>BMW、Rivian、小鹏、极氪、零跑、华为鸿蒙智行</td><td>BMW 占位页；Rivian 区域封锁；小鹏 403；极氪 500；零跑无 DNS；华为 JS 空壳（均 [A]/[未验证] 观测）</td></tr></tbody></table></div>
+<p><strong>关于该模型的三条纪律</strong>：</p>
+<ol><li><strong>L0–L3 是"公开度"刻度，不是"安全性"刻度</strong>。一个 L0 主体完全可能拥有比 L3 主体更强的实际安全实现——只是本次无法观测。<strong>把 L 值当"安全等级"读，是本章禁止的推理。</strong></li><li><strong>L 值有"可达性噪声"</strong>：BMW/Rivian 的 L0 来自<strong>区域封锁</strong>（本报告出口 IP 受限），小鹏/极氪的 L0 来自<strong>站点拒绝服务</strong>——这些是<strong>本次的观测失败</strong>，不是主体的披露选择。</li><li><strong>该模型的用途是"补证排序"</strong>：L0 主体应优先用"换出口 IP / 沙箱账号 / RFI"补证（对齐信源档案 §8），而非据 L0 下任何结论。</li></ol>
+<h3 id="sec-12">30.2.3 从开放度看"三类开放性来源"</h3>
+<p>把 L1–L3 的取证来源分类，可以看到<strong>开放度不是单一维度的</strong>——不同主体开放的是<strong>不同种类</strong>的东西：</p>
+<div class="table-wrap"><table><thead><tr><th>开放种类</th><th>已取证主体</th><th>特征</th><th>与安全的关系</th></tr></thead><tbody><tr><td><strong>开放"接入"</strong>（接口级文档）</td><td>Tesla、Mercedes-Benz、比亚迪、蔚来</td><td>文档面向"如何接入"</td><td>可直接观测授权形态</td></tr><tr><td><strong>开放"合规"</strong>（信任中心/隐私政策/认证）</td><td>小米（ISO/IEC 27001）、理想（隐私政策）</td><td>文档面向"合规承诺"</td><td>只能观测治理承诺，不能观测技术实现</td></tr><tr><td><strong>开放"披露"</strong>（漏洞专栏/赏金）</td><td>奇瑞（漏洞专栏）、Tesla（Bugcrowd，见 30.7）</td><td>文档面向"安全问题上报"</td><td>可观测披露成熟度，不直接反映技术实现</td></tr></tbody></table></div>
+<p><strong>本报告判断（推测，非事实）</strong>：<strong>"越靠近车辆物理安全，越不公开"</strong> 这一模式在信源档案 §7 与 <code>docs/16-authz-60-cn-oem.md</code> §16.3.4 的缺口聚类中已被观察——合规层（易公开）、平台层（较易公开）的公开度高于硬件层、通信层（基本不公开）。<strong>检验方法</strong>：对同一主体，分别检索其"信任中心/隐私政策"与"mTLS/密码套件文档"，比较两者的可获取性。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-13">
+  <div class="sec-head"><span class="sec-badge">04</span><h2>30.3 对比度 2：鉴权与授权形态（核心维度）</h2></div>
+<p>这是 AC-6 最重要的对比维度，也是全报告授权章节（第 3 部分）的横向收敛点。本节把被取证主体的鉴权形态并置，<strong>只在"可观测形态"层面</strong>比较。</p>
+<h3 id="sec-14">30.3.1 三种形态对照：APIKey/ESB × App-ID+Secret × OAuth 授权码体系</h3>
+<p>本次取证恰好覆盖了<strong>三种不同的鉴权形态</strong>，各有一个<strong>已取证实例</strong>：</p>
+<ul><li><strong>形态 X：APIKey / ESB（网关密钥）</strong> —— 已取证实例：<strong>比亚迪 i迪桥</strong>（<code>open.byd.com</code>）。文档载明"用户创建应用 → 审核后生成 appKey 作为调用者身份识别"，请求头 <code>x-Gateway-APIKey</code> 传 appKey，示例域名 <code>esb.byd.com.cn</code>（[A]，文档发布 2024-01-23）。</li><li><strong>形态 Y：App-ID + Secret（双凭证）</strong> —— 已取证实例：<strong>蔚来 Open NSC</strong>（<code>developer.nio.com</code>）。文档载明"app-id 和 secret 是系统对接调用的唯一凭证……通过商务渠道获取"（[A]）。</li><li><strong>形态 Z：OAuth 授权码体系（用户代理授权）</strong> —— 已取证实例：<strong>Tesla Fleet API</strong>（<code>authorization_code</code> 流，代表车主行事，[A]）与 <strong>Mercedes-Benz</strong>（Authorization Code Flow，代表终端用户，[A]）。</li></ul>
+<p><strong>五维对照表</strong>（每格只填已取证内容；未取证写"未取证"）：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>X：APIKey/ESB（比亚迪 i迪桥，[A]）</th><th>Y：App-ID+Secret（蔚来 Open NSC，[A]）</th><th>Z：OAuth 授权码（Tesla / Mercedes-Benz，[A]）</th></tr></thead><tbody><tr><td><strong>表达能力</strong></td><td>无 scope 概念；权限 = 已订阅的服务清单（应用被整体授信）</td><td>无 scope 概念；权限 = 约定的对接服务范围（应用被整体授信）</td><td>有 scope 枚举：Tesla 12 个 scope（<code>vehicle_cmds</code>、<code>vehicle_location</code> 等）；Mercedes 以 <code>mb:</code> 命名空间表达（<code>mb:vehicle:mbdata:fuelstatus</code>）。<strong>可按资源类别表达权限</strong></td></tr><tr><td><strong>可撤销粒度</strong></td><td>撤销 = 回收/更换应用凭证（<strong>应用级</strong>）；逐车主撤销未取证</td><td>撤销 = 更换/回收 secret（<strong>应用级</strong>）；逐车主撤销未取证</td><td>可按授权撤销：Tesla 车主可经 <code>auth.tesla.com/user/revoke/consent</code> 撤销（[A]）；刷新令牌一次性 + 轮换使旧令牌失效；Mercedes 经同意界面管理（[A]）</td></tr><tr><td><strong>逐车主同意能力</strong></td><td>未取证（信源档案 §7.6 记"未取证（B 端场景）"）</td><td>未取证（身份对象 = 合作方应用）</td><td><strong>有</strong>：<code>authorization_code</code> 流以车主/终端用户为资源所有者；Mercedes 明示因涉及 GDPR 个人数据而需终端用户同意（[A]）</td></tr><tr><td><strong>与资源级策略的兼容性</strong></td><td>结构上不内建（如需资源级控制须在网关另行实现，未取证）</td><td>结构上不内建（同上）</td><td>内建扩展点：RFC 9396（结构化权限 <code>authorization_details</code>）、RFC 8705（mTLS 证书绑定令牌）、Tesla 的 <code>granular_access.hide_private</code> 双层收窄（[A]）</td></tr><tr><td><strong>可审计性</strong></td><td>取决于网关日志（未取证）</td><td>取决于平台日志（未取证）</td><td>有标准接口可依：RFC 7662（令牌内省）、RFC 7009（吊销）、RFC 8414（授权服务器元数据）；Tesla 实测发布 <code>.well-known/openid-configuration</code>（[A]）</td></tr></tbody></table></div>
+<blockquote><p><strong>强制声明（本节的中立性底线）</strong>：<strong>上表是本次取证的横截面，不是技术能力排名。</strong> 三种形态各见于不同<strong>业务定位</strong>的平台——X/Y 见于<strong>服务层/企业集成</strong>平台（蔚来服务云、比亚迪企业 ESB），Z 见于<strong>车控/数据开放</strong>平台（Tesla、Mercedes）。<strong>形态与业务定位强相关，与主体能力无因果</strong>。本次<strong>未取得</strong>任何一家国内车企的<strong>车控开放平台</strong>文档，因此<strong>不能</strong>把"国内实测为 X/Y"读作"国内不具备 Z"。<strong>检验方法</strong>：探测国内车企域名是否发布 RFC 8414 授权服务器元数据。</p></blockquote>
+<h3 id="sec-15">30.3.2 scope 命名空间设计对比（Tesla 平坦命名 vs Mercedes <code>mb:</code> 三段式）</h3>
+<p>两个 L3 主体采用了<strong>两种不同的 scope 命名范式</strong>，本报告以四维矩阵对照（<strong>矩阵为分析框架，属 [合理推测]；每格的事实锚点标注如下</strong>）：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Tesla：平坦英文枚举（如 <code>vehicle_cmds</code>、<code>energy_device_data</code>）</th><th>Mercedes-Benz：<code>mb:</code> 三段式（如 <code>mb:vehicle:mbdata:fuelstatus</code>）</th></tr></thead><tbody><tr><td><strong>可读性</strong></td><td><strong>高</strong>：单个词即语义，开发者一眼可读（[A] 文档原文名称）</td><td><strong>中高</strong>：需理解"产品-域-资源"分层，但命名自解释（<code>mb:</code> 命名空间式约定，[A]）</td></tr><tr><td><strong>可治理性</strong></td><td><strong>中</strong>：类别分层靠命名前缀约定（<code>vehicle_*</code>、<code>energy_*</code>、<code>enterprise_*</code>），无强制层级；企业侧大量 scope 靠文档约定聚合</td><td><strong>高</strong>：命名空间天然支持"按域授权、按资源聚合"，<code>mb:vehicle:mbdata:*</code> 可作通配治理（<strong>本报告判断，推测，非事实</strong>）</td></tr><tr><td><strong>向后兼容</strong></td><td><strong>有明文策略</strong>：Scope 缩减仅对新签发的访问令牌生效，且兼容既有刷新令牌；新增 scope 需以 <code>prompt_missing_scopes=true</code> 重新 <code>/authorize</code>（[A]）</td><td><strong>未载</strong>：信源档案未记载 Mercedes 的 scope 变更/兼容策略</td></tr><tr><td><strong>迁移成本</strong></td><td><strong>低</strong>：扁平命名映射直接，新旧 scope 可并存</td><td><strong>中高</strong>：命名空间调整涉及层级语义，迁移需重映射"产品-域-资源"三级（<strong>本报告判断，推测，非事实</strong>）</td></tr></tbody></table></div>
+<p><strong>读表要点</strong>：</p>
+<ol><li><strong>两种范式各有优势</strong>：Tesla 的平坦命名<strong>利于开发者理解与快速集成</strong>；Mercedes 的命名空间<strong>利于平台侧的权限治理与产品线聚合</strong>。<strong>这不是优劣，是设计取向</strong>（对齐 30.0.2 的"只比形态、不比安全水平"）。</li><li><strong>"向后兼容"一列暴露了一个可见度差</strong>：Tesla 公开了明确的 scope 变更策略，而 Mercedes 本次<strong>未取得</strong>其兼容策略——<strong>这仍是"披露差"，不是"Mercedes 无策略"</strong>。</li><li>两种范式<strong>都未采用</strong> RFC 9396（结构化权限对象 <code>authorization_details</code>）作为一等公民——<strong>本次无任何车企公开采用 RAR/GNAP 的一手证据</strong>（对齐 <code>docs/19-authz-90-reference-tables.md</code> §19.6）。因此<strong>"资源级授权的规范层能力"超前于"已落地的 scope 形态"</strong>，这是通用方案与落地方案之间的一处结构差（见 30.9）。</li></ol>
+<h3 id="sec-16">30.3.3 令牌生命周期参数对比表（15 行，仅使用已取证值）</h3>
+<p>本表严格并列<strong>两个 L3 主体已取证的令牌参数</strong>。<strong>空格 = 信源档案未载，不等于该主体无此机制</strong>（对齐 AC-8）。</p>
+<div class="table-wrap"><table><thead><tr><th>参数项</th><th>Tesla（[A]）</th><th>Mercedes-Benz（[A]）</th></tr></thead><tbody><tr><td>授权流</td><td><code>authorization_code</code>（代表车主行事）</td><td>Authorization Code Flow / Client Credentials Flow（两种）</td></tr><tr><td>授权端点</td><td><code>https://auth.tesla.com/oauth2/v3/authorize</code>（必填 <code>response_type=code</code>、<code>client_id</code>、<code>redirect_uri</code>、<code>scope</code>、<code>state</code>）</td><td><code>https://ssoalpha.dvb.corpinter.net/v1/auth</code>（示例）</td></tr><tr><td>令牌端点</td><td><code>POST https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/token</code>（与 API 端点分属不同主机）</td><td><code>https://ssoalpha.dvb.corpinter.net/v1/token</code></td></tr><tr><td>刷新令牌使用次数</td><td><strong>一次性使用（single use only）</strong></td><td><strong>一次性使用</strong>；刷新返回新的访问令牌与新的刷新令牌</td></tr><tr><td>刷新令牌有效期</td><td><strong>3 个月后过期</strong></td><td>未载</td></tr><tr><td>宽限期</td><td><strong>最近一次使用的刷新令牌在 24 小时内仍有效</strong>（覆盖持久化失败场景）</td><td>未载</td></tr><tr><td>访问令牌 TTL</td><td><strong>未获证实</strong>（信源档案明确标记；已证实的仅为刷新令牌 3 个月 + 24h 宽限）</td><td><code>expires_in</code> <strong>默认 3599 秒（≈1 小时）</strong></td></tr><tr><td>刷新失败语义</td><td><code>401 login_required</code>（刷新令牌过期/被挤出，或用户已重置密码）</td><td>「The given refresh token is not valid or was already used」</td></tr><tr><td>scope 无效语义</td><td>未载</td><td><code>invalid_scope</code> →「No registered scope value for this client has been requested」</td></tr><tr><td>授权码无效语义</td><td>未载</td><td>「Invalid grant」（授权码无效或已被使用）</td></tr><tr><td>重定向不一致语义</td><td>未载</td><td>「Invalid redirect URL」（<code>redirect_uri</code> 与注册值不一致）</td></tr><tr><td>客户端认证方式</td><td>未载明确方式（文档载 <code>client_secret</code> 为 <code>/token</code> 调用参数，且有 <code>audience</code> 必填）</td><td><strong>HTTP Basic</strong>（<code>clientId:clientSecret</code> BASE64 置于 Authorization 头）</td></tr><tr><td>必填/特殊 scope</td><td><code>openid</code>（登录）、<code>offline_access</code>（取刷新令牌）</td><td><code>openid</code>（获有效令牌所必需）、<code>offline_access</code>（获刷新令牌所必需）</td></tr><tr><td>车主撤销入口</td><td><code>auth.tesla.com/user/revoke/consent?revoke_client_id=…</code></td><td>未取证（仅知同意界面展示 scope 与 purpose URL）</td></tr><tr><td>发现元数据</td><td><code>.well-known/openid-configuration</code> 已发布（对应 RFC 8414 / OIDC Discovery）</td><td>未载</td></tr></tbody></table></div>
+<p><strong>读表要点</strong>：</p>
+<ol><li><strong>两侧共享一条强约束</strong>：<strong>刷新令牌一次性 + 轮换</strong>。Tesla 进一步公开了<strong>3 个月有效期 + 24 小时复用宽限</strong>的量化设计；Mercedes 只公开了"一次性 + 轮换返回新令牌"，<strong>未载有效期与宽限</strong>。这是一处<strong>可见度差</strong>（不是策略差）。</li><li><strong>Tesla 访问令牌 TTL 是本次全报告的"著名空缺"</strong>：文档已读页面<strong>未获证实</strong>（信源档案 §7.1 明确标注）。<strong>本报告拒绝用"约 8 小时"等通行说法填补</strong>（对齐审计计划 §3.2 第 3 条）。Mercedes 的 3599 秒是唯一<strong>量化</strong>的访问令牌 TTL。</li><li><strong>Mercedes 的错误语义密度更高</strong>：公开了 <code>invalid_scope</code>、<code>Invalid grant</code>、<code>Invalid redirect URL</code>、已用刷新令牌报错四类错误语义（[A]）；Tesla 公开了 <code>401 login_required</code> 与位置拒绝 <code>403 location access not granted</code>（[A]）。<strong>错误语义的公开度同样受披露策略影响</strong>。</li><li><strong>表中"未载"集中出现在 Tesla 侧（撤销/错误/客户端认证）与 Mercedes 侧（TTL/宽限/发现元数据）交替</strong>——说明<strong>两家各有取舍</strong>，不存在"一家更完整"的简单结论。</li></ol>
+<hr>
+</section>
+<section class="rep-section" id="sec-17">
+  <div class="sec-head"><span class="sec-badge">05</span><h2>30.4 对比度 3：硬件根信任与密码栈</h2></div>
+<p>本节对比"国际 PKI/密码栈"与"中国合规密码栈"在<strong>规范层</strong>的差异。<strong>必须先声明本节最重要的边界</strong>：<strong>关于九家国内车企是否已采用国密/mTLS/HSM/SE，本次未取得任何官方一手来源，不得断言</strong>（信源档案 §7.10 第 5 条）。</p>
+<h3 id="sec-18">30.4.1 国际栈 vs 中国合规栈：逐项对照表（15 行）</h3>
+<div class="table-wrap"><table><thead><tr><th>对照项</th><th>国际栈（规范层，[A]/[B]）</th><th>中国合规栈（规范层，[A]）</th><th>备注</th></tr></thead><tbody><tr><td><strong>椭圆曲线公钥算法</strong></td><td>ECDSA/ECDH（RFC 6090、RFC 5480）；<strong>Tesla 虚拟密钥实测用 prime256v1/P-256</strong>（[A]）</td><td>SM2（GB/T 32918.1~.5）</td><td>中国侧"车企实际采用 SM2"<strong>未取证</strong></td></tr><tr><td><strong>杂凑算法</strong></td><td>SHA-2 族（国际通行；本次未单列其 FIPS 条目）</td><td>SM3（GB/T 32905-2016）</td><td>—</td></tr><tr><td><strong>对称算法</strong></td><td>AES（FIPS 197）</td><td>SM4（GB/T 32907-2016）</td><td>—</td></tr><tr><td><strong>数字签名标准</strong></td><td>FIPS 186-5（DSS）</td><td>SM2 签名（GB/T 32918.2）+ GB/T 35276-2017（使用规范）</td><td>—</td></tr><tr><td><strong>报文/消息语法</strong></td><td>X.509（RFC 5280）</td><td>GB/T 35275-2017（SM2 密码算法加密签名消息语法规范）</td><td>CMS（RFC 5652）本次未单列取证</td></tr><tr><td><strong>TLS 传输</strong></td><td>TLS 1.3（RFC 8446）</td><td>国密 TLS 套件（RFC 8998：SM2 签名 + AEAD_SM4_GCM/CCM + SM3）</td><td>RFC 8998 是国密 TLS 在<strong>国际标准层的唯一落点</strong>（[A]）</td></tr><tr><td><strong>证书体系</strong></td><td>X.509 PKI（RFC 5280）+ OCSP（RFC 6960）</td><td>GB/T 45112-2024（基于 LTE 的车联网无线通信技术 安全证书管理系统技术要求）</td><td>中国 C-V2X 证书管理体系</td></tr><tr><td><strong>mTLS 客户端认证</strong></td><td>RFC 8705（OAuth 2.0 Mutual-TLS 客户端认证 + 证书绑定令牌）</td><td>GB/T 45112-2024（证书管理）；<strong>车企实际采用 mTLS 未取证</strong></td><td>—</td></tr><tr><td><strong>可信执行环境（TEE）</strong></td><td>GlobalPlatform TEE System Architecture v1.3（GPD_SPE_009）、OP-TEE、ARM TrustZone</td><td>中国侧<strong>未见对应国标</strong>；未取证</td><td>—</td></tr><tr><td><strong>车载 HSM</strong></td><td>EVITA 项目分级（Full / Medium / Light）</td><td>未取证</td><td>—</td></tr><tr><td><strong>密码模块认证</strong></td><td>FIPS 140-3（HSM 认证基线）</td><td>中国侧对应认证基线<strong>未取证</strong></td><td>—</td></tr><tr><td><strong>安全元件（SE）</strong></td><td>GlobalPlatform 规范库（SE 分类）</td><td>GB/T 44402.1-2024（卡及身份识别安全设备）</td><td>数字钥匙密钥载体，两侧均有</td></tr><tr><td><strong>数字钥匙</strong></td><td>CCC Digital Key Release 3.0（<strong>BLE + UWB</strong>，NFC 强制备用，<strong>密钥存于 SE</strong>，2021-04-21 发布，[A]）</td><td>GB/T 44402.1-2024《数字钥匙系统 第 1 部分：参考架构》（2024-08-23 发布、2025-03-01 实施，[A]）</td><td>中国侧实施 2025-03-01</td></tr><tr><td><strong>OTA 更新框架</strong></td><td>Uptane 2.1.0（Director + Image 双仓库）、TUF（Root/Targets/Snapshot/Timestamp 四角色）、SUIT（RFC 9019/9124）</td><td>GB 44496-2024（强制）+ GB/T 47325-2026（推荐）</td><td>—</td></tr><tr><td><strong>SBOM / 供应链</strong></td><td>SPDX、CycloneDX、SLSA v1.0、in-toto</td><td>中国侧对应<strong>未取证</strong></td><td>—</td></tr></tbody></table></div>
+<p><strong>读表要点</strong>：</p>
+<ol><li><strong>两侧"对等项"清晰</strong>：公钥/杂凑/对称/签名/语法/TLS/证书/OTA 有<strong>一一对应的规范</strong>。差异主要在<strong>算法族（SM 系列 vs ECC/AES 系列）与证书体系（GB/T 45112 vs X.509 PKI）</strong>。</li><li><strong>国际栈有、中国栈本次未见对应国标者</strong>：TEE、车载 HSM 分级、密码模块认证（FIPS 140-3）、SBOM 体系。<strong>这不代表中国无对应实践</strong>——只是<strong>本次未取得对应的公开国标条目</strong>（对齐"未找到公开来源 ≠ 能力缺失"）。</li><li><strong>唯一"车企实测绘"落在国际侧</strong>：prime256v1/P-256 是<strong>唯一由车企文档直接明载的曲线约束</strong>（Tesla 虚拟密钥文档，[A]）。中国侧<strong>无任何车企密码实现的一手证据</strong>。</li></ol>
+<h3 id="sec-19">30.4.2 迁移/互操作代价分析（全部标注为推测）</h3>
+<blockquote><p><strong>本节全部为 [合理推测]（本报告判断，非事实）</strong>，目的是为"双栈并存"的工程后果提供假设，供后续 RFI 检验。<strong>不对应任何车企的实际实现。</strong></p></blockquote>
+<ul><li><strong>推测 M-1（双栈共存代价）</strong>：若某主体需同时面向国内与海外市场，其车云链路<strong>可能需要同时支持国密 TLS（RFC 8998）与标准 TLS（RFC 8446）两套套件</strong>，导致：证书链需要双套、握手需按对端能力协商、密钥托管需支持 SM2 与 ECDSA 两种曲线。<strong>可检验推断</strong>：若双栈存在，则应能在对外文档中观察到"支持的加密套件列表"或"证书类型"章节的并列。<strong>检验方法</strong>：向车企索取 TLS 配置说明或做一次 TLS 探测（本次不做，属范围外）。</li><li><strong>推测 M-2（消息语法转换代价）</strong>：SM2 消息语法（GB/T 35275-2017）与 X.509/CMS 语法的互转，是跨栈互操作的<strong>报文层代价</strong>。<strong>可检验推断</strong>：跨栈网关应存在"签名/证书格式转换"组件。<strong>检验方法</strong>：查跨域数据交换网关的产品文档。</li><li><strong>推测 M-3（数字钥匙双体系代价）</strong>：CCC 3.0（国际，密钥存 SE）与 GB/T 44402.1（国内参考架构）<strong>并行</strong>时，同一辆车可能需支持两套数字钥匙凭证体系。<strong>GB/T 44402.1 的编号为「.1：参考架构」，说明其为多部分标准</strong>，后续部分本次<strong>未取证</strong>，本报告不推测其内容。<strong>检验方法</strong>：跟踪 GB/T 44402 系列后续部分的发布。</li><li><strong>推测 M-4（算法迁移的存量成本）</strong>：算法族切换涉及<strong>已签发证书、已配对密钥、已上线固件</strong>的存量，迁移成本随装机量线性上升。<strong>这是"合规起点不同导致架构分叉"的工程根因之一</strong>（呼应 30.5）。</li></ul>
+<h3 id="sec-20">30.4.3 本节的强制边界声明（重复强调）</h3>
+<p><strong>关于九家国内车企是否已采用国密/mTLS/HSM/SE，本次未取得任何官方一手来源，不得断言。</strong> 具体地：</p>
+<ul><li>本报告<strong>不写</strong>"某国内车企使用 SM2/SM3/SM4"，除非有官方一手来源（本次<strong>没有</strong>）。</li><li>本报告<strong>不写</strong>"某国内车企使用 mTLS 双向证书"，除非有官方一手来源（本次<strong>没有</strong>）。</li><li>本报告<strong>不写</strong>"某国内车企使用 HSM/SE/TEE"，除非有官方一手来源（本次<strong>没有</strong>）。</li><li>本节凡涉及国内车企者，一律写作「<strong>规范层可选</strong>」或「<strong>未取证</strong>」。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-21">
+  <div class="sec-head"><span class="sec-badge">06</span><h2>30.5 对比度 4：监管驱动 vs 市场驱动</h2></div>
+<p>本节对比<strong>中国制度</strong>与<strong>国际制度</strong>两条"合规起点"。<strong>硬性约束</strong>：<strong>UN R155/R156、GDPR、EU Data Act 本次均未取得正文</strong>（R155/R156 标 [未验证]，GDPR/Data Act 标 [C]），因此<strong>只能写名称与方向，不给条款号与时间表</strong>（对齐信源档案 §1.4 的写作纪律提示）。</p>
+<h3 id="sec-22">30.5.1 制度对照表</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>中国侧</th><th>国际侧</th></tr></thead><tbody><tr><td><strong>强制性基线</strong></td><td>GB 44495-2024《汽车整车信息安全技术要求》、GB 44496-2024《汽车软件升级通用技术要求》——发布 2024-08-23，<strong>2026-01-01 实施</strong>，对新车型强制适用（[A]）</td><td>UN R155（CSMS 网络安全管理体系）、R156（SUMS 软件更新管理体系）——<strong>本次未取得正文</strong>（[未验证]），仅知性质为型式认证类法规</td></tr><tr><td><strong>推荐性标准族</strong></td><td>GB/T 40855/40856/40857-2021（远程服务/信息交互/网关）、GB/T 38628-2020、GB/T 47324-2026（平台）、GB/T 47325-2026（OTA）、GB/T 47467-2026（接口）（均 [A]）</td><td>ISO/SAE 21434:2021（网络安全工程，[未验证]）、SAE J3061（前身，[B]）、ISO 24089:2023（软件更新工程，[未验证]）</td></tr><tr><td><strong>数据制度</strong></td><td>《汽车数据安全管理若干规定（试行）》（网信办等五部门令第 7 号，2021-10-01 施行，[A]）：重要数据目录、境内存储、年度报送、出境评估；GB/T 41871-2022、GB/T 44464-2024（[A]）</td><td>欧盟 GDPR（Regulation (EU) 2016/679，[C]）；欧盟 Data Act（Regulation (EU) 2023/2854，车辆数据可携权/互联产品数据访问权，[C]）</td></tr><tr><td><strong>数据重心</strong></td><td><strong>本地化 + 出境评估</strong>：强调数据不违规出境</td><td><strong>可携权 / 可访问权</strong>：强调用户对自身数据的取用与迁移</td></tr><tr><td><strong>合规入口</strong></td><td><strong>强标型式</strong>（GB 44495/44496 对整车企业构成强制基线）</td><td><strong>型式认证</strong>（R155/R156）+ <strong>数据保护</strong>（GDPR）双层</td></tr><tr><td><strong>驱动形态（推测）</strong></td><td><strong>本报告判断（推测，非事实）</strong>：合规定下限，商务需求定上限</td><td><strong>据 Mercedes 自述</strong>：以"GDPR 合规 + 用户信任"为授权码流的理由（[A]）</td></tr></tbody></table></div>
+<h3 id="sec-23">30.5.2 "合规起点不同导致的架构分叉"分析（全部标注为推测）</h3>
+<ul><li><strong>分叉 F-1（授权语义的分叉）</strong>：<strong>本报告判断（推测，非事实）</strong>：国内若从"数据不出境"出发，授权层的重心会落在<strong>地域与流向控制</strong>（谁能取、取后去哪）；国际若从 GDPR/Data Act 出发，重心会落在<strong>用户授权可视化与撤销</strong>（Tesla 的 <code>revoke/consent</code> 入口、Mercedes 的同意界面展示 scope 与 purpose URL，均为已取证实例 [A]）。<strong>可检验推断</strong>：国内主体的授权 UI/文档应出现更多"数据流向/地域"字段；国际主体应出现更多"用户同意管理"入口。<strong>检验方法</strong>：对比两侧 OAuth 授权的同意界面文档。</li><li><strong>分叉 F-2（披露动因的分叉）</strong>：<strong>本报告判断（推测，非事实）</strong>：市场驱动路线下，公开开发者文档是<strong>建立生态的资产</strong>（故 Tesla/Mercedes 文档充分）；合规驱动路线下，披露常被视作<strong>合规义务而非获客手段</strong>（故可能"满足最低披露即止"）。<strong>可检验推断</strong>：观察 2026-01-01（GB 44495/44496 实施）之后，国内是否出现类似 <code>developer.tesla.com</code> 的完整公开授权文档。<strong>检验方法</strong>：定期检索国内车企域名的接口文档。</li><li><strong>分叉 F-3（时间点的分叉）</strong>：中国侧有一个<strong>硬节点 2026-01-01</strong>，其合规压力是<strong>集中式</strong>的；国际侧（R155/R156 的生效时间表）<strong>本次未取证</strong>，故本报告<strong>不比较时间点</strong>，只指出"中国侧的强制时间点已明确、国际侧的本次未取证"这一<strong>可见度事实</strong>。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-24">
+  <div class="sec-head"><span class="sec-badge">07</span><h2>30.6 对比度 5：开放策略与生态位</h2></div>
+<p>本节按<strong>开放的内容</strong>把已取证主体分成<strong>三类生态位</strong>，并对照其商业模式与安全责任分配。<strong>生态位分类为本报告构造的分析框架（[合理推测]），事实锚点逐格标注。</strong></p>
+<h3 id="sec-25">30.6.1 三类生态位对照表</h3>
+<div class="table-wrap"><table><thead><tr><th>生态位</th><th>代表（已取证）</th><th>开放对象</th><th>身份对象</th><th>商业模式（已取证/推测）</th><th>安全责任分配（推测，非事实）</th></tr></thead><tbody><tr><td><strong>服务云开放</strong></td><td><strong>蔚来 Open NSC</strong>（[A]）、<strong>比亚迪 i迪桥 ESB</strong>（[A]）</td><td>合作方 / 企业（商务渠道、公司组织认证）</td><td><strong>应用</strong>（合作方应用被整体授信）</td><td>商务渠道对接；服务履约类（加电/维保/供应链等）（[A]）</td><td>应用凭证（app-id+secret / appKey）由平台签发，<strong>平台 + 合作方共担</strong>凭证保管责任</td></tr><tr><td><strong>车控开放</strong></td><td><strong>Tesla Fleet API</strong>（[A]）</td><td>第三方应用开发者（自助注册 + OAuth）</td><td><strong>车主 + 应用</strong>（OAuth 代表车主行事）</td><td><strong>按用量计费</strong>（月度周期、每账号上限默认 0、超限暂停 API，[A]）</td><td>平台控<strong>虚拟密钥门禁</strong>（公钥须由可信用户加入车辆）；<strong>私钥由应用服务器托管</strong>，故开发者承担私钥保管责任（[A]）</td></tr><tr><td><strong>数据开放</strong></td><td><strong>Mercedes-Benz 产品化数据 API</strong>（[A]）</td><td>开发者（代表终端用户）</td><td><strong>终端用户（车主）</strong></td><td>产品化数据订阅（如 Fuel Status 等，[A]；计费模式<strong>未取证</strong>）</td><td>平台控<strong>同意</strong>（同意界面展示 scope 与 purpose URL）；<strong>客户端凭证须存后端</strong>，不得暴露给客户端（[A]）</td></tr></tbody></table></div>
+<h3 id="sec-26">30.6.2 生态位的三个结构性观察</h3>
+<ol><li><strong>"开放什么"决定"身份对象"</strong>：服务云开放（X/Y 形态）的身份对象是<strong>应用</strong>；车控/数据开放（Z 形态）的身份对象是<strong>用户 + 应用</strong>。<strong>身份对象的差异直接决定是否需要"逐车主同意"机制</strong>（呼应 30.3.1）。</li><li><strong>"开放什么"决定"安全责任重心"</strong>：<ul><li>服务云：重心在<strong>应用凭证保管</strong>与<strong>服务范围订阅</strong>。</li><li>车控：重心在<strong>密钥门禁 + 资源级策略</strong>（Tesla 的虚拟密钥 + <code>granular_access.hide_private</code> 双层控制，[A]）。</li><li>数据：重心在<strong>同意管理 + 凭证不落客户端</strong>（Mercedes 明确"不得向客户端暴露任何客户端凭证"，[A]）。</li></ul></li><li><strong>"钱从哪里来"影响"文档开放度"</strong>：<strong>本报告判断（推测，非事实）</strong>：按用量计费的车控开放（Tesla）更可能公开完整文档（文档 = 获客漏斗）；商务渠道的服务云开放（蔚来/比亚迪）更可能定向提供文档（文档 = 合同的附件）。<strong>这为 30.2 的可比性偏差提供了一个可能的成因解释</strong>（<strong>推测，需检验</strong>）。</li></ol>
+<hr>
+</section>
+<section class="rep-section" id="sec-27">
+  <div class="sec-head"><span class="sec-badge">08</span><h2>30.7 对比度 6：安全治理与披露生态</h2></div>
+<p>本节对比<strong>漏洞披露与安全治理生态</strong>。<strong>只能就已取证事实说话</strong>：国际侧有 Tesla Bugcrowd 的详细取证（[A]/[B]）；国内侧<strong>仅奇瑞的官网漏洞专栏</strong>为已取证事实（[A]）。</p>
+<h3 id="sec-28">30.7.1 披露成熟度对照表（仅就取证事实）</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Tesla（已取证，[A]/[B]）</th><th>国内车企（奇瑞已取证，[A]；其余未取证）</th></tr></thead><tbody><tr><td><strong>披露载体</strong></td><td>Bugcrowd 平台的漏洞赏金项目（<code>bugcrowd.com/engagements/tesla</code>）</td><td>官网「网络产品安全漏洞」专栏（<code>www.chery.cn/others/networksecurity/</code>，页面可达）</td></tr><tr><td><strong>存在时间</strong></td><td>项目<strong>启动于 2015-08-04</strong>，状态 in progress（[A/B]）</td><td>专栏存在（[A]）；是否存在赏金项目、启动时间<strong>未取证</strong></td></tr><tr><td><strong>档位设置</strong></td><td>Critical $50,000–$100,000；High $20,000–$50,000；Moderate $10,000–$20,000；Low $500–$10,000（[B]）</td><td>未取证</td></tr><tr><td><strong>硬件研究前提</strong></td><td>车辆/能源产品问题须邮件报至专邮并使用 Tesla GPG 公钥，<strong>不走 Bugcrowd 网页表单</strong>；硬件研究须先向 Tesla 登记车辆/Powerwall（[A]）</td><td>未取证</td></tr><tr><td><strong>披露规则</strong></td><td>若访问到不属于自己的数据须在 24 小时内停止并披露；<strong>未经 Tesla 批准不得公开披露已确认未修复漏洞</strong>；超级充电及相关基础设施不在范围内（[B]）</td><td>未取证</td></tr><tr><td><strong>范围外说明</strong></td><td>涉及第三方库的漏洞可能被转给厂商而不通知研究者（[B]）</td><td>未取证</td></tr></tbody></table></div>
+<h3 id="sec-29">30.7.2 本节能说与不能说的</h3>
+<ul><li><strong>能说（事实）</strong>：Tesla 的披露项目<strong>启动于 2015-08-04</strong>、有<strong>四档明码赏金</strong>、有<strong>硬件预登记</strong>要求、有<strong>未修复不得公开披露</strong>规则——这些是本次一手/权威第三方取证到的<strong>披露治理具体事实</strong>。</li><li><strong>能说（事实）</strong>：国内侧本次<strong>仅取得奇瑞的漏洞专栏存在</strong>这一事实（[A]）；<strong>其余八家本次未取得披露政策的一手来源</strong>。</li><li><strong>不能说</strong>：<strong>不得</strong>据"国内仅 1 家取得披露政策"得出"国内披露生态不成熟"的结论——这<strong>违反可比性纪律</strong>（30.0.2）。国内披露通道<strong>可能</strong>存在于 SRC、应急响应平台、行业协会等<strong>本次未检索或不可达</strong>的载体上（信源档案 §8 已列此为缺口）。</li><li><strong>可检验推断（推测，非事实）</strong>：Tesla 的"硬件研究须先登记"与"未修复不得公开披露"两条规则，反映的是<strong>披露伦理与法律风险的治理成熟度</strong>；国内若存在同类规则，应能在车企 SRC 或安全专栏的规则页中观察到。<strong>检验方法</strong>：逐家检索车企官网"漏洞/安全应急"栏目并比对规则条款。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-30">
+  <div class="sec-head"><span class="sec-badge">09</span><h2>30.8 国内外差异的归因分析</h2></div>
+<p>本节把前文的差异读作<strong>现象</strong>，并为每个现象给出一条<strong>可能成因（推测）</strong>、一条<strong>可检验的推断</strong>、一条<strong>检验方法</strong>。<strong>全部归因均为 [合理推测]，与事实物理分段。</strong>共 7 个归因维度（超出 AC-6 的"至少 5 个"要求）。</p>
+<h3 id="sec-31">归因 1：监管时序</h3>
+<ul><li><strong>现象</strong>：中国侧 GB 44495/44496 于 <strong>2026-01-01 实施</strong>（硬节点，[A]）；国际侧 UN R155/R156 的时间表<strong>本次未取证</strong>。</li><li><strong>可能成因（推测）</strong>：中国的强制国标体系倾向"设一个集中的强制时间点"以快速确立基线；国际型式认证体系的时间表本次未能核验。</li><li><strong>可检验的推断（推测，非事实）</strong>：中国的合规压力在 <strong>2025–2026</strong> 年呈<strong>集中释放</strong>，可能在 2026 年后推动一批授权/OTA 基线文档的公开。</li><li><strong>检验方法</strong>：跟踪 2026-01-01 前后国内车企官网/开放平台的文档更新频率。</li></ul>
+<h3 id="sec-32">归因 2：数据主权</h3>
+<ul><li><strong>现象</strong>：中国侧制度核心是"境内存储 + 出境评估"（[A]）；国际侧（欧盟）核心是"可携/可访问"（Data Act，[C]）。</li><li><strong>可能成因（推测）</strong>：数据主权制度的取向差异，塑造了授权层<strong>不同优先级</strong>的控制点（流向控制 vs 用户同意可视化）。</li><li><strong>可检验的推断（推测，非事实）</strong>：国内主体的授权审计日志应更强调"数据流向/地域"；国际主体的授权界面应更强调"用户同意管理"。</li><li><strong>检验方法</strong>：对比两侧 OAuth 同意界面与审计日志字段文档。</li></ul>
+<h3 id="sec-33">归因 3：生态成熟度</h3>
+<ul><li><strong>现象</strong>：Tesla 有公开完整开发者文档与按用量计费生态（[A]）；国内有取证平台多为服务层/企业集成（[A]）。</li><li><strong>可能成因（推测）</strong>：第三方开发者生态的成熟度影响"公开文档"的激励强度——生态越需要开发者，越倾向公开接入文档。</li><li><strong>可检验的推断（推测，非事实）</strong>：国内若开放车控，<strong>可能</strong>先以"伙伴制/商务定向"起步，再逐步走向自助式公开文档。</li><li><strong>检验方法</strong>：观察国内车企开放平台的接入方式是否从"商务渠道"转向"自助注册"。</li></ul>
+<h3 id="sec-34">归因 4：商业模式</h3>
+<ul><li><strong>现象</strong>：Tesla 车控开放按用量计费（[A]）；国内服务云平台以商务渠道对接（[A]）。</li><li><strong>可能成因（推测）</strong>：计费模式决定文档的"获客价值"——计费 API 的文档是获客漏斗的一部分，故公开度更高。</li><li><strong>可检验的推断（推测，非事实）</strong>：引入计费的国内平台<strong>可能</strong>逐步提升文档公开度。</li><li><strong>检验方法</strong>：观察国内平台服务目录是否引入"按用量/按订阅"的明码计费。</li></ul>
+<h3 id="sec-35">归因 5：手机生态依赖</h3>
+<ul><li><strong>现象</strong>：数字钥匙与近场授权中，CCC 3.0 明确"跨 OS 生态"并依赖手机侧 SE 存密钥（[A]）；小米宣称"人车家全生态"但车云 API 细节未取证（[A]）。</li><li><strong>可能成因（推测）</strong>：手机生态（Apple/Google/Android 阵营 vs 国内手机厂商阵营）决定数字钥匙的<strong>凭证载体与信任锚</strong>选择，进而影响车厂在数字钥匙上的技术路线。</li><li><strong>可检验的推断（推测，非事实）</strong>：国内数字钥匙实现<strong>可能</strong>更倾向"国标参考架构（GB/T 44402.1）+ 本土手机生态"的组合。</li><li><strong>检验方法</strong>：跟踪 GB/T 44402 系列后续部分，以及国内车企数字钥匙官方技术白皮书。</li></ul>
+<h3 id="sec-36">归因 6：供应链结构</h3>
+<ul><li><strong>现象</strong>：国际侧公开了 TEE/SE/HSM 的规范族与芯片生态站点存在（GlobalPlatform、EVITA、Infineon AURIX、NXP S32 等，[A]–[C]/[未验证]）；国内侧 TEE/SE/HSM 实现<strong>全部未取证</strong>。</li><li><strong>可能成因（推测）</strong>：芯片与安全元件的选型多为<strong>供应链内部信息</strong>，公开度天然低；不同供应链结构下，"可对外披露的安全元件"形态不同。</li><li><strong>可检验的推断（推测，非事实）</strong>：国内侧的安全元件信息<strong>更可能</strong>通过芯片厂 Design Win 公告、T-BOX 拆解或专利间接获得，而非车企自述。</li><li><strong>检验方法</strong>：检索芯片厂公开的汽车 Design Win 与安全元件产品公告；采用器件选型逆向（本次不做，属范围外）。</li></ul>
+<h3 id="sec-37">归因 7：人才与工程文化</h3>
+<ul><li><strong>现象</strong>：Tesla/Mercedes 的文档呈现"开发者导向"（错误语义、变更策略、发现元数据齐备，[A]）；国内有取证平台的文档更偏"对接说明"（[A]）。</li><li><strong>可能成因（推测）</strong>：文档风格反映<strong>面向的受众</strong>——面向第三方开发者的团队更倾向"开发者体验优先"的文档；面向企业内部/合作方的团队更倾向"对接流程优先"的文档。</li><li><strong>可检验的推断（推测，非事实）</strong>：随着第三方生态需求上升，国内文档<strong>可能</strong>向"开发者体验优先"演进。</li><li><strong>检验方法</strong>：对比两侧文档是否包含错误语义表、变更日志、<code>.well-known</code> 发现元数据等"开发者体验"要素。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-38">
+  <div class="sec-head"><span class="sec-badge">10</span><h2>30.9 "与通用分层技术方案的差异"专节（对应调研目标第二条）</h2></div>
+<p>本节对应调研目标的第二条——<strong>把"通用分层技术方案"（<code>docs/02-general-layered-security.md</code> 的六层参考模型）与"本次取证到的落地实现"逐层对照</strong>，识别"通用方案应有的控制 / 已落地的控制 / 差异与缺口"。<strong>通用方案侧为规范层能力（[A]）；落地实现侧仅含本次取得一手文档的主体。</strong>逐层一个子节，节末一张小结表。</p>
+<h3 id="sec-39">30.9.1 硬件安全层</h3>
+<ul><li><strong>通用方案应有的控制</strong>（[A]）：密钥与证书的硬件保管（TEE/SE/HSM）、安全启动与可信启动链、密码算法基线（国际 ECC/AES 或国密 SM 系列）、车载 HSM 分级（EVITA Full/Medium/Light）。</li><li><strong>本次取证到的落地实现</strong>：<ul><li><strong>Tesla</strong>：虚拟密钥须为 <strong>prime256v1（P-256 ECDSA）</strong>，<strong>公钥须托管于域名 <code>/.well-known/appspecific/com.tesla.3p.public-key.pem</code> 且长期可用，私钥绝不托管</strong>（[A]）；配对深链 <code>https://tesla.com/_ak/&lt;developer-domain.com&gt;</code>（[A]）。<strong>未见其 TEE/HSM 的一手文档。</strong></li><li><strong>Mercedes</strong>：<strong>未取得</strong>硬件根信任相关文档。</li><li><strong>国内侧</strong>：<strong>9 家全部未取得 TEE/SE/HSM 的一手来源</strong>（信源档案 §7.10 第 5 条）。</li></ul></li><li><strong>差异与缺口</strong>：<ul><li><strong>差异（事实）</strong>：通用方案的"TEE/HSM/安全启动"在<strong>已落地方案中几乎不可观测</strong>——Tesla 只公开了<strong>应用层密钥托管形态</strong>（虚拟密钥），未公开底层的 TEE/HSM。</li><li><strong>缺口（声明）</strong>：硬件层是<strong>全报告取证最薄的一层</strong>（呼应 <code>docs/16-authz-60-cn-oem.md</code> §16.3.4 的 C1 列取证率为 0）。<strong>这是披露缺口，不是能力缺口。</strong></li></ul></li></ul>
+<h3 id="sec-40">30.9.2 通信安全层</h3>
+<ul><li><strong>通用方案应有的控制</strong>（[A]）：mTLS 双向证书车云链路、TLS 1.3（RFC 8446）、证书全生命周期（签发/轮换/吊销）、防重放（时间戳 RFC 3161 / nonce）、分段与信任边界。</li><li><strong>本次取证到的落地实现</strong>：<ul><li><strong>Tesla</strong>：授权端点与令牌端点<strong>分属不同主机</strong>（<code>auth.tesla.com</code> vs <code>fleet-auth.prd.vn.cloud.tesla.com</code>，[A]）；Fleet Telemetry 要求开发者用仓库内 <code>tools/check_server_cert.sh</code> 校验主机与 CA 兼容性（[A]）；授权 <code>/authorize</code> 支持 <code>nonce</code>（文档描述为"用于防重放的随机值"）与 <code>state</code>（"用于校验的随机值"）（[A]）。</li><li><strong>Mercedes</strong>：<strong>未取得</strong> mTLS/证书固定文档。</li><li><strong>国内侧</strong>：<strong>9 家全部未取得 mTLS/证书轮换的一手来源</strong>。</li></ul></li><li><strong>差异与缺口</strong>：<ul><li><strong>差异（事实）</strong>：通用方案的"mTLS 双向证书"在<strong>已落地文档中未直接出现</strong>——Tesla 公开的是<strong>OAuth + 虚拟密钥</strong>的授权层控制，其<strong>链路加密细节</strong>（是否 mTLS）<strong>未取证</strong>。</li><li><strong>缺口（声明）</strong>：通信层与硬件层同样<strong>基本不可观测</strong>（C2 列取证率为 0）。<strong>mTLS 是否被采用，本次对任何主体均无一手证据。</strong></li></ul></li></ul>
+<h3 id="sec-41">30.9.3 授权与访问控制层</h3>
+<ul><li><strong>通用方案应有的控制</strong>（规范层，[A]）：OAuth 2.x 族（RFC 6749/6750/7636/8252/8705/9449/9396/8693…）、令牌生命周期治理（TTL/轮换/吊销）、资源级授权（RFC 9396 RAR）、发送方约束令牌（RFC 8705 mTLS 绑定 / RFC 9449 DPoP）。</li><li><strong>本次取证到的落地实现</strong>：<ul><li><strong>Tesla（[A]）</strong>：完整 <code>authorization_code</code> 流；12 个 scope；<strong>刷新令牌一次性 + 3 个月 + 24h 宽限</strong>；<code>.well-known/openid-configuration</code> 发布（对应 RFC 8414）；虚拟密钥的<strong>车端二次校验</strong>（车辆在执行命令前验证载荷签名）；<strong><code>granular_access.hide_private</code> 的双层收窄</strong>（授权被授予但资源级策略进一步收窄，403）；<code>vehicle_specs</code>/<code>vehicle_pricing_info</code> <strong>仅 Partner Token 可用且无需车主授权</strong>（授权控制例外）。</li><li><strong>Mercedes（[A]）</strong>：Authorization Code Flow + Client Credentials Flow；<code>mb:</code> 命名空间 scope；<code>expires_in</code> 默认 3599 秒；刷新令牌一次性 + 轮换；HTTP Basic 客户端认证；要求客户端凭证存后端、不得暴露给客户端。</li><li><strong>国内侧</strong>：比亚迪（APIKey+<code>x-Gateway-APIKey</code>，[A]）、蔚来（app-id+secret，[A]）——<strong>均为非 OAuth 的服务层形态</strong>。</li></ul></li><li><strong>差异与缺口</strong>：<ul><li><strong>差异（事实）</strong>：<strong>授权层是全报告取证最厚的一层</strong>（这正是第 3 部分占用 300K+ 字符的原因）。通用方案的多数控制点<strong>在 Tesla 侧可观测到落地</strong>；Mercedes 侧部分可观测。</li><li><strong>差异（事实）</strong>：<strong>RFC 9396（RAR）与 RFC 9449（DPoP）在已落地文档中均未出现</strong>——通用方案里"资源级授权"与"发送方约束令牌"的规范能力<strong>超前于</strong>已落地的 scope 形态（Tesla 以 <code>granular_access</code> 自定义实现收窄，尚未采用 RAR）。</li><li><strong>缺口（声明）</strong>：国内 9 家在<strong>车控层授权</strong>上<strong>全部未取证</strong>。</li></ul></li></ul>
+<h3 id="sec-42">30.9.4 应用与平台安全层</h3>
+<ul><li><strong>通用方案应有的控制</strong>（[A]）：最小权限、服务身份、多租户隔离、密钥托管、影响范围控制（blast radius）、入侵检测与审计。</li><li><strong>本次取证到的落地实现</strong>：<ul><li><strong>Tesla（[A]）</strong>：<strong>影响范围控制的多个具体工程手段</strong>——B2B 自动添加虚拟密钥的条件为"已配对密钥少于 20 把"（密钥数量上限）、单台车辆最多向 <strong>5 个第三方应用</strong>推流、限流按账号按设备计（实时数据 60 次/分、唤醒 3 次/分、设备命令 30 次/分，同账号多应用<strong>共享</strong>限额）、计费超限会暂停 API 并移除 Fleet Telemetry 配置。</li><li><strong>Mercedes（[A]）</strong>：明确"客户端凭证必须保存在后端服务器，应用不得向客户端暴露任何客户端凭证（client id、client secret、访问令牌）"。</li><li><strong>国内侧</strong>：蔚来的<strong>文档访问本身纳入授权控制</strong>（接口规范正文需"文档访问 token"，[A]）——这是一处<strong>平台治理</strong>的可观测实例。</li></ul></li><li><strong>差异与缺口</strong>：<ul><li><strong>差异（事实）</strong>：通用方案的"影响范围控制"在 Tesla 侧的<strong>量化落地最充分</strong>（密钥上限、推流上限、限流、计费上限四类）。</li><li><strong>缺口（声明）</strong>：国内侧的平台安全（多租户隔离、审计）<strong>未取证</strong>。</li></ul></li></ul>
+<h3 id="sec-43">30.9.5 OTA 与合规层</h3>
+<ul><li><strong>通用方案应有的控制</strong>（[A]）：OTA 更新框架（Uptane 2.1.0 双仓库 / TUF 四角色 / SUIT RFC 9019/9124）、SBOM（SPDX/CycloneDX）、供应链完整性（SLSA v1.0 / in-toto）、合规基线（国际 ISO/SAE 21434 / UN R155/R156，中国 GB 44495/44496）。</li><li><strong>本次取证到的落地实现</strong>：<ul><li><strong>Tesla</strong>：Fleet Telemetry 的<strong>固件前置版本</strong>（车辆固件 2024.26+ 等，[A]）——这是<strong>OTA 分发能力的间接证据</strong>（能升级到指定固件版本），但 <strong>OTA 签名链机制未取证</strong>。</li><li><strong>Volkswagen/CARIAD</strong>：自述"云支持安全关键更新的 OTA 下发"（[A，自述口径]）。</li><li><strong>国内侧</strong>：GB 44496-2024（强制 OTA 基线）、GB/T 47325-2026（推荐 OTA 标准）为<strong>规范层</strong>（[A]）；<strong>车企 OTA 实现未取证</strong>。</li></ul></li><li><strong>差异与缺口</strong>：<ul><li><strong>差异（事实）</strong>：通用方案的 OTA 安全框架（Uptane/TUF/SUIT）<strong>在已落地的公开文档中未见端到端描述</strong>——只观测到"能指定固件版本"这一<strong>能力面</strong>，观测不到"签名/回滚保护"这一<strong>机制面</strong>。</li><li><strong>缺口（声明）</strong>：OTA 签名链与 SBOM 实践对<strong>所有主体均未取证</strong>。</li></ul></li></ul>
+<h3 id="sec-44">30.9.6 逐层小结表（12 行）</h3>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用方案应有的控制（规范层，[A]）</th><th>本次取证到的落地实现</th><th>差异性质</th><th>缺口性质</th></tr></thead><tbody><tr><td>硬件</td><td>TEE / SE / HSM / 安全启动 / 算法基线</td><td>Tesla：P-256 虚拟密钥 + 公钥域名托管（[A]）</td><td>仅应用层密钥托管可见</td><td>底层硬件对全部主体未取证</td></tr><tr><td>硬件</td><td>车载 HSM 分级（EVITA）</td><td>未取证</td><td>—</td><td>披露缺口（非能力缺口）</td></tr><tr><td>通信</td><td>mTLS 双向证书</td><td>未取证（Tesla 链路是否 mTLS 未取证）</td><td>通用控制未在文档中直接出现</td><td>对全部主体未取证</td></tr><tr><td>通信</td><td>TLS 1.3（RFC 8446）/ 国密 TLS（RFC 8998）</td><td>未取证</td><td>规范并存、实现未取证</td><td>披露缺口</td></tr><tr><td>通信</td><td>防重放（nonce/时间戳）</td><td>Tesla：<code>nonce</code>、<code>state</code> 参数（[A]）</td><td>部分落地</td><td>—</td></tr><tr><td>授权</td><td>OAuth 2.x 族</td><td>Tesla/Mercedes：完整授权码流（[A]）</td><td>落地可与规范对齐</td><td>国内车控层未取证</td></tr><tr><td>授权</td><td>令牌生命周期治理</td><td>Tesla：一次性+3 月+24h；Mercedes：3599 秒+一次性（[A]）</td><td>落地良好</td><td>Tesla 访问令牌 TTL 未获证实</td></tr><tr><td>授权</td><td>资源级授权（RFC 9396 RAR）</td><td>未采用（Tesla 用自定义 <code>granular_access</code>）</td><td>规范超前于落地</td><td>—</td></tr><tr><td>授权</td><td>发送方约束令牌（RFC 8705/9449 DPoP）</td><td>未在文档中出现（Tesla 用虚拟密钥实现持有者约束）</td><td>规范超前于落地</td><td>—</td></tr><tr><td>授权</td><td>逐车主同意</td><td>Tesla 有撤销入口、Mercedes 有同意界面（[A]）</td><td>落地良好</td><td><code>vehicle_specs</code> 为授权控制例外（High）</td></tr><tr><td>应用平台</td><td>影响范围控制</td><td>Tesla：密钥≤20 把、推流≤5、限流 60/3/30 次分（[A]）</td><td>落地量化充分</td><td>国内未取证</td></tr><tr><td>OTA/合规</td><td>Uptane/TUF/SUIT + SBOM</td><td>仅观测到固件版本能力面（[A]）</td><td>机制面未观测</td><td>OTA 签名链/BOM 对全部主体未取证</td></tr></tbody></table></div>
+<p><strong>小结表读法</strong>：<strong>越靠上的层（硬件、通信），通用方案的控制在落地文档中越不可见；越靠中间的层（授权），落地文档越充分；越靠下的层（OTA/合规），规范层齐备但机制面落地不可见。</strong>这一"中间厚、两端薄"的分布，<strong>同时是取证条件（30.0.2）与披露规律（30.2.3）的产物</strong>，不宜读作真实的行业安全分布。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-45">
+  <div class="sec-head"><span class="sec-badge">11</span><h2>30.10 对比结论（12 条，每条标明类型）</h2></div>
+<blockquote><p><strong>类型标注规则</strong>：<strong>「事实型结论」</strong> = 由本次一手/权威第三方取证直接支撑（可回溯至信源档案）；<strong>「推测型结论」</strong> = 本报告由已知事实推导（[合理推测]，非事实，需检验）。<strong>两类严格分离，禁止把推测型写成事实型。</strong></p></blockquote>
+<ol><li><strong>【事实型结论】</strong> 本次取证的可比性存在结构性偏差：Tesla、Mercedes-Benz 达到接口级公开文档（L3），BMW、Rivian 与 7 家国内车企处于 L0，蔚来、比亚迪处于 L2（服务层）。<strong>任何跨主体比较必须先扣除这一层偏差</strong>（30.0.2、30.2.2）。</li><li><strong>【事实型结论】</strong> 本次取得一手文档的三种鉴权形态分别为：<strong>APIKey/ESB（比亚迪）</strong>、<strong>App-ID+Secret（蔚来）</strong>、<strong>OAuth 授权码（Tesla/Mercedes）</strong>。前两者为<strong>应用身份型</strong>、身份对象为应用；后者为<strong>用户代理型</strong>、身份对象为车主/终端用户（30.3.1）。</li><li><strong>【事实型结论】</strong> 两个已达到 L3 的主体采用了<strong>两种不同的 scope 命名范式</strong>：Tesla 的<strong>平坦英文枚举</strong>与 Mercedes 的 <strong><code>mb:</code> 三段式命名空间</strong>；Tesla 公开了明确的 scope 兼容策略，Mercedes 的本次未载（30.3.2）。</li><li><strong>【事实型结论】</strong> 已取证的两家 OAuth 实现<strong>共享"刷新令牌一次性 + 轮换"这一强约束</strong>；Tesla 另公开了 3 个月有效期 + 24h 宽限，Mercedes 另公开了 <code>expires_in</code> 默认 3599 秒（30.3.3）。</li><li><strong>【事实型结论】</strong> 通用方案中的 <strong>RFC 9396（RAR）与 RFC 9449（DPoP）在已落地的公开文档中均未出现</strong>；Tesla 以自定义 <code>granular_access.hide_private</code> 实现字段级收窄，属"授权被授予但资源级策略进一步收窄"的双层控制实例（30.3.1、30.9.3）。</li><li><strong>【事实型结论】</strong> 规范层的<strong>国际栈（ECDSA/AES/FIPS 族）与中国合规栈（SM2/SM3/SM4 + GB/T 32918/32905/32907/35275/35276 + RFC 8998 + GB/T 44402.1）逐项对等</strong>；但<strong>关于九家国内车企是否已采用国密/mTLS/HSM/SE，本次未取得任何官方一手来源</strong>（30.4）。</li><li><strong>【事实型结论】</strong> 中国侧有明确的强制节点（GB 44495/44496 于 <strong>2026-01-01</strong> 实施）与推荐性标准族；国际侧的 UN R155/R156、GDPR、EU Data Act <strong>本次均未取得正文</strong>，只能比较名称与方向（30.5）。</li><li><strong>【推测型结论】</strong> 两条路线的<strong>架构分叉</strong>（授权语义、披露动因）<strong>可能与"合规驱动"与"市场驱动"的起点差异相关</strong>——需以"是否出现类似 <code>developer.tesla.com</code> 的公开文档""同意界面字段差异"等可检验推断验证（30.5.2）。</li><li><strong>【事实型结论】</strong> 已取证的开放策略分<strong>三类生态位</strong>：服务云开放（蔚来、比亚迪）、车控开放（Tesla）、数据开放（Mercedes）；三类生态位的<strong>身份对象与安全责任重心不同</strong>（30.6）。</li><li><strong>【事实型结论】</strong> 披露生态的可取证事实集中在 Tesla：Bugcrowd 项目<strong>启动于 2015-08-04</strong>、四档赏金、硬件预登记、未修复不得公开披露；国内侧<strong>仅奇瑞漏洞专栏</strong>为已取证事实，<strong>不得据"仅 1 家"推断国内披露生态不成熟</strong>（30.7）。</li><li><strong>【推测型结论】</strong> 造成国内外差异的<strong>可能成因</strong>可归为 7 个维度（监管时序、数据主权、生态成熟度、商业模式、手机生态依赖、供应链结构、人才与工程文化），每个维度均给出可检验推断与检验方法，<strong>均待 RFI 补证</strong>（30.8）。</li><li><strong>【事实型结论】</strong> "通用方案 vs 落地实现"的差异呈<strong>"中间厚、两端薄"</strong>分布：授权层落地文档最充分，硬件层与通信层在落地文档中基本不可见，OTA/合规层规范齐备但机制面不可见；<strong>该分布是取证条件与披露规律的产物，不宜读作真实的行业安全分布</strong>（30.9.6）。</li></ol>
+<hr>
+</section>
+<section class="rep-section" id="sec-46">
+  <div class="sec-head"><span class="sec-badge">12</span><h2>30.11 本章待补证清单</h2></div>
+<p>本清单只列<strong>本章对比所需、但本次未取得</strong>的证据，并给出补证动作。<strong>必须声明："未取得"是披露/可达性缺口，不等于"不存在"。</strong>（对齐 AC-8。）</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>待补证项</th><th>影响的对比维度</th><th>建议补证方式</th></tr></thead><tbody><tr><td>1</td><td>Tesla 访问令牌 TTL</td><td>30.3.3（令牌参数对比）</td><td>实机走一遍 token 响应读取 <code>expires_in</code></td></tr><tr><td>2</td><td>Mercedes scope 变更/兼容策略</td><td>30.3.2（命名空间对比）</td><td>会员/开发者渠道获取文档更新说明</td></tr><tr><td>3</td><td>Mercedes 撤销入口与发现元数据</td><td>30.3.3</td><td>开发者门户深层文档或沙箱</td></tr><tr><td>4</td><td>国内 9 家的车控层授权文档</td><td>30.3.1、30.9.3</td><td>RFI / 商务沙箱申请 / 探测 <code>.well-known/oauth-authorization-server</code></td></tr><tr><td>5</td><td>国内 9 家的国密/mTLS/证书轮换证据</td><td>30.4</td><td>RFI / 采购安全白皮书 / 查专利与招标文件</td></tr><tr><td>6</td><td>国内 9 家的 TEE/SE/HSM 证据</td><td>30.4、30.9.1</td><td>器件选型逆向 / T-BOX 拆解 / 芯片厂 Design Win 公告</td></tr><tr><td>7</td><td>BMW CarData / OAuth 文档</td><td>30.2、30.3</td><td>换出口 IP 或代理后重跑</td></tr><tr><td>8</td><td>Rivian Fleet API 文档</td><td>30.2、30.3</td><td>换出口 IP</td></tr><tr><td>9</td><td>小鹏开放平台鉴权细节</td><td>30.2、30.3</td><td>商务渠道申请沙箱账号</td></tr><tr><td>10</td><td>华为鸿蒙座舱安全与数字车钥匙</td><td>30.2、30.4</td><td>带 JS 渲染的抓取（须登录）</td></tr><tr><td>11</td><td>UN R155/R156 条款与时间表</td><td>30.5</td><td>恢复检索额度或用官方 PDF 直链</td></tr><tr><td>12</td><td>GDPR / EU Data Act 正文</td><td>30.5</td><td>EUR-Lex 正文（本次返回 202）</td></tr><tr><td>13</td><td>ISO/SAE 21434 / 24089 / ISO 15118 正文</td><td>30.4、30.5、30.9.5</td><td>标准购买渠道或 SAE 页面</td></tr><tr><td>14</td><td>GB/T 44402 系列后续部分</td><td>30.4、30.8</td><td>跟踪国标公开系统发布</td></tr><tr><td>15</td><td>国内车企漏洞披露政策（除奇瑞外）</td><td>30.7</td><td>逐家检索官网"漏洞/安全应急"栏目</td></tr><tr><td>16</td><td>各主体 OTA 签名链与 SBOM 实践</td><td>30.9.5</td><td>采购安全白皮书 / 公开研究成果</td></tr><tr><td>17</td><td>各主体是否采用 mTLS（链路）</td><td>30.9.2</td><td>TLS 探测（范围外，本次不做）/ RFI</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-47">
+  <div class="sec-head"><span class="sec-badge">13</span><h2>30.12 本章小结</h2></div>
+<h3 id="sec-48">30.12.1 本章完成了什么</h3>
+<p>本章按 AC-6 要求给出了 <strong>6 个维度的对比矩阵</strong>（证据可见度、鉴权与授权形态、硬件根信任与密码栈、监管驱动、开放生态位、披露治理）与 <strong>7 个维度的差异归因</strong>（监管时序、数据主权、生态成熟度、商业模式、手机生态依赖、供应链结构、人才与工程文化），另设"与通用分层技术方案的差异"专节逐层对照，并给出 12 条结论（8 条事实型、4 条推测型）与 17 项待补证清单。</p>
+<h3 id="sec-49">30.12.2 本章的三条核心结论</h3>
+<ol><li><strong>【事实】</strong> 本次对比的最大变量是<strong>证据可见度</strong>，不是<strong>安全水平</strong>。Tesla/Mercedes 的文档充分、国内多家取证受限，是<strong>披露与可达性</strong>的产物；<strong>本章全程把"证据可见度"与"安全水平"分离，不据可见度给任何主体排序</strong>（30.0.2）。</li><li><strong>【事实】</strong> 在<strong>可观测形态</strong>层面，鉴权形态呈三态并存（APIKey/ESB × App-ID+Secret × OAuth 授权码），scope 命名呈两范式并存（平坦 vs <code>mb:</code> 命名空间），规范层的国际栈与国密栈逐项对等但<strong>国内车企实际采用国密/mTLS/HSM/SE 全部未取证</strong>。</li><li><strong>【推测】</strong> 国内外差异的可能成因集中在<strong>制度起点（合规 vs 市场）、数据主权取向、生态与商业模式</strong>；这些均为可检验推断，须由后续 RFI 补证，<strong>本章不将其写成事实</strong>。</li></ol>
+<h3 id="sec-50">30.12.3 本章的已知局限（三条）</h3>
+<ol><li><strong>可比性偏差</strong>：对比两侧的可观测面极不对称，所有"差异"都可能是"可见度差"而非"方案差"。本章已显式声明，但仍无法在本次条件下消除。</li><li><strong>国际法规模块缺失</strong>：UN R155/R156、GDPR、EU Data Act 本次均未取得正文，30.5 只能给名称与方向。</li><li><strong>国内车企实证缺口巨大</strong>：授权、通信、硬件三层对 9 家国内车企全部未取证；本章凡涉此者一律写"未取证/未找到公开来源"。</li></ol>
+<h3 id="sec-51">30.12.4 对下游章节的移交</h3>
+<ul><li>移交 <code>docs/31-summary-trends.md</code>：本章 30.8 的 7 个归因维度与 30.10 的 12 条结论，可直接作为"趋势判断"的输入（<strong>注意携带每条的"事实/推测"标记</strong>）。</li><li>移交 <code>docs/90-references.md</code>：本章引用的全部标准号、URL、车企文档页，须与信源档案逐条对齐后登记。</li><li><strong>重审触发条件</strong>：若 30.11 的任一高优先级项（#1、#4、#5、#6）被补证，本章 30.3、30.4、30.9 的相应结论须重新审定。</li></ul>
+<hr>
+<blockquote><p><strong>本章结束语（中立性重申）</strong>：本章对被检主体一律不作优劣判断。凡"未找到公开来源""本次未取证"者，均为<strong>公开信息缺口</strong>，<strong>不等同于能力缺失</strong>；凡标注"本报告判断（推测，非事实）"者，均为<strong>待检验假设</strong>，不构成对任何主体的事实断言。本章所有结论的可信度，受 30.0.2 所声明的取证条件约束。</p></blockquote>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 33,644 字符</div>
+  </div>
+</footer>
+</body>
+</html>

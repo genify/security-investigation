@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>授权与访问控制 · 总论 · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="授权与访问控制 · 总论 — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>授权与访问控制 · 总论</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  <section class="meta-card"><dl><dt>编制</dt><dd>Trail of Bits Security · 首席安全官（CSO）</dd><dt>文件编号</dt><dd>10-authz-00-intro.md（报告第 3 部分第 1 章）</dd><dt>覆盖验收标准</dt><dd>AC-2、AC-3、AC-7、AC-8</dd><dt>版本</dt><dd>v1.0（唯一现行版本，修订就地覆盖）</dd></dl></section>
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">10.0 本部分的定位与阅读顺序</a></li>
+<li class="lvl2"><a href="#sec-4">10.1 为什么授权是车云安全的核心矛盾</a></li>
+<li class="lvl2"><a href="#sec-8">10.2 授权链的解剖：从人的意图到车端执行</a></li>
+<li class="lvl2"><a href="#sec-12">10.3 授权设计的第一原理：五条不变量</a></li>
+<li class="lvl2"><a href="#sec-18">10.4 通用授权架构的四个平面</a></li>
+<li class="lvl2"><a href="#sec-19">10.5 行业标尺：以两个可读实现作为基准</a></li>
+<li class="lvl2"><a href="#sec-23">10.6 本部分使用的规范底座（分组索引）</a></li>
+<li class="lvl2"><a href="#sec-24">10.7 严重度分类在本部分的应用</a></li>
+<li class="lvl2"><a href="#sec-25">10.8 本部分的常见误解（八条）</a></li>
+<li class="lvl2"><a href="#sec-26">10.9 本部分整体层面的待补证清单</a></li>
+<li class="lvl2"><a href="#sec-27">10.10 本章小结</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>10.0 本部分的定位与阅读顺序</h2></div>
+<h3 id="sec-1">10.0.1 为什么授权需要一个 10 章的部分</h3>
+<p>委托方要求"报告要针对'授权与访问控制'这部分的技术方案和各车企实践情况展开分析，这部分章节相关内容不得少于 300K"。这个要求背后是一个技术判断：在车云安全里，授权是<strong>唯一同时具备下列四个特征</strong>的一层——</p>
+<ol><li><strong>它是攻击者直接关注的目标</strong>：读位置、开车门、启动车辆、看摄像头，全部落在授权决策上；</li><li><strong>它跨越的信任边界最多</strong>：从车主的手机、到第三方开发者服务器、到车企云、到车端执行器，每一跳都要重新判定；</li><li><strong>它的规范供给最丰富但实现最分散</strong>：OAuth 2.x 系列 RFC 已把资源级授权、发送方约束、令牌交换、步进认证全部标准化，但没有一家车企的实现会与另一家一致；</li><li><strong>它的失败后果最直接且可限定</strong>：授权控制做得好，单点被攻破的后果是可界定的；做得差，一次凭证泄露可以波及同账号的多台车。</li></ol>
+<p>因此本部分不采用"总述 + 案例"的两段式写法，而按 10 个切面展开，每个切面独立成章、独立取证、独立对账。</p>
+<h3 id="sec-2">10.0.2 本部分 10 个切面与依赖关系</h3>
+<div class="table-wrap"><table><thead><tr><th>章</th><th>文件</th><th>切面</th><th>依赖</th></tr></thead><tbody><tr><td>10</td><td>10-authz-00-intro.md（本文件）</td><td>总论：授权链解剖、设计不变量、行业标尺、阅读路径</td><td>—</td></tr><tr><td>11</td><td>11-authz-10-protocols.md</td><td>协议族与消息流程（OAuth 2.x、PKCE、设备授权、令牌交换、RAR、GNAP、OIDC、mTLS、DPoP、数字钥匙、V2X 证书、充电授权）</td><td>10</td></tr><tr><td>12</td><td>12-authz-20-tokens-keys.md</td><td>令牌与密钥治理（令牌谱系、生命周期、发送方约束、JWT vs 内省、客户端认证、密钥生命周期）</td><td>11</td></tr><tr><td>13</td><td>13-authz-30-resource-authz.md</td><td>资源级授权与最小权限（RAR、scope 解构、双层授权控制、同意模型、影响范围控制、RBAC/ABAC/ReBAC）</td><td>11、12</td></tr><tr><td>14</td><td>14-authz-40-threat-model.md</td><td>威胁模型与攻击面（资产/主体、STRIDE 逐层、六棵攻击树、威胁-控制矩阵、严重度应用）</td><td>11–13</td></tr><tr><td>15</td><td>15-authz-50-engineering.md</td><td>工程实现参考架构（参考架构、决策流水线、绑定实现、多租户、可观测性、容量、测试、故障处置）</td><td>11–14</td></tr><tr><td>16</td><td>16-authz-60-cn-oem.md</td><td>国内 9 家车企授权实践</td><td>10–15</td></tr><tr><td>17</td><td>17-authz-70-global-oem.md</td><td>国际 5 家车企授权实践</td><td>10–15</td></tr><tr><td>18</td><td>18-authz-80-compliance-audit.md</td><td>合规映射与审计程序</td><td>11–17</td></tr><tr><td>19</td><td>19-authz-90-reference-tables.md</td><td>参考表与索引（规范索引、参数对照、证据台账、缺口台账）</td><td>全部</td></tr></tbody></table></div>
+<p><strong>三条推荐阅读路径</strong></p>
+<ul><li><strong>架构视角（最短路径）</strong>：10 → 11 §11.8（三个协议组合参考架构）→ 12 §12.3（发送方约束）→ 13 §13.3（双层授权控制）→ 15 §15.2（决策流水线）。</li><li><strong>风险评估视角</strong>：10 §10.3（五条不变量）→ 14 §14.1（资产与主体）→ 14 §14.5（威胁-控制矩阵）→ 14 §14.6（严重度判定）→ 31 §31.4（优先级建议）。</li><li><strong>对标与选型视角</strong>：10 §10.5（行业标尺）→ 13 §13.2（scope 解构）→ 17 §17.7（国际横向对照）→ 16 §16.3（国内横向对比）→ 30（差异归因）。</li></ul>
+<h3 id="sec-3">10.0.3 本章的取证纪律</h3>
+<p>本章只使用已取证材料：全部 RFC/规范来自 RFC Editor 与官方规范库（[A]）；车企实现参数来自 Tesla 与 Mercedes-Benz 官方开发者文档（[A]）。凡属本报告由规范与已取证架构推导的判断，一律标注为"<strong>本报告判断</strong>…（推测，非事实）"，并与事实层物理分段。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-4">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>10.1 为什么授权是车云安全的核心矛盾</h2></div>
+<h3 id="sec-5">10.1.1 从"链路安全"到"资源级授权"的范式转移</h3>
+<p>传统车云安全的第一阶段问题是"链路会不会被窃听或篡改"，其答案是成熟的：双向证书、TLS 1.3、PKI 全生命周期管理、防重放机制。这一阶段的技术供给已经标准化（见 02 章 §02.3 与 11 章 §11.6.4）。</p>
+<p>第二阶段的问题变了。当一辆车通过云平台向第三方应用、向车队管理员、向售后技师、向企业内部微服务同时暴露"能力"时，真正的问题不再是"这条链路可不可信"，而是：</p>
+<blockquote><p>这次调用，代表的是谁？它凭什么可以对这个特定的资源执行这个特定的动作？这个凭什么，如果出错了，能不能被及时撤回？</p></blockquote>
+<p>对这三个问句的回答，就是授权与访问控制。</p>
+<h3 id="sec-6">10.1.2 车云授权区别于通用 Web 授权的四个特殊性</h3>
+<div class="table-wrap"><table><thead><tr><th>特殊性</th><th>说明</th><th>对设计的直接后果</th></tr></thead><tbody><tr><td><strong>资源是物理世界的</strong></td><td>授权错误的后果不是数据泄露，而是车门被打开、车辆被启动、位置被跟踪</td><td>严重度分级的上限被拉高；必须引入"授权被授予 ≠ 动作被执行"的第二道判断（见 §10.3 不变量 I2）</td></tr><tr><td><strong>主体是高度多元的</strong></td><td>车主、被授权驾驶员、亲属、代客泊车员、服务技师、第三方应用、企业内部服务、车队管理员</td><td>单一账号模型不够用；需要把"主体类型"作为策略的一等维度（见 13 章 §13.6）</td></tr><tr><td><strong>撤销必须到达执行点</strong></td><td>车主取消共享后，车辆本身必须拒绝命令，而不只是云端不再签发令牌</td><td>撤销（revocation）不是"删除一行记录"，而是一条贯穿云到车的链路（见 12 章 §12.2.3）</td></tr><tr><td><strong>设备在线状态不稳定</strong></td><td>车辆可能离线、弱网、休眠；命令可能排队</td><td>授权判定必须明确"决策发生在哪一跳、能否依赖实时在线校验"，并为此设计降级策略（见 15 章 §15.2.3）</td></tr></tbody></table></div>
+<h3 id="sec-7">10.1.3 授权失败与"链路失败"的后果量级差异</h3>
+<blockquote><p><strong>本报告判断</strong>（推测，非事实，依据 §10.1.2 的四项特殊性推导）：在车云场景中，一次链路层的密钥泄露通常导致的是"某条通道被窃听"，影响面由通道数量决定；而一次授权设计缺陷（例如同一账号下所有车辆共享一个长效高权限令牌）导致的后果由<strong>账号下的车辆数与权限并集</strong>决定。工程上后者的影响范围下限更高，且更难在事后界定。</p></blockquote>
+<p>这一判断是本报告把授权章节展开到 10 个切面的直接理由。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-8">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>10.2 授权链的解剖：从人的意图到车端执行</h2></div>
+<h3 id="sec-9">10.2.1 七段链路</h3>
+<p>车云授权的完整链路可以拆成七段。每一段都可能是断点，每一段也都有独立的证据要求。</p>
+<pre><code>[1] 主体身份           车主 / 驾驶员 / 企业管理员 / 内部工作负载
+     │                 证据形态：身份提供方（IdP）认证结果、登录凭据强度
+     ▼
+[2] 意图与同意         用户在同意界面上看到&quot;谁、对什么、做什么、多久&quot;
+     │                 证据形态：scope / authorization_details + purpose 说明
+     ▼
+[3] 授权服务器决策     按策略签发凭证（授权码 → 令牌）
+     │                 证据形态：OAuth 授权码流、PKCE、客户端认证
+     ▼
+[4] 令牌与绑定         令牌的适用范围、有效期、是否绑定持有者
+     │                 证据形态：JWT 声明 / 不透明令牌 / cnf 绑定 / DPoP
+     ▼
+[5] 云侧资源服务器     每次调用重新判定：主体-资源-动作 三元组是否被允许
+     │                 证据形态：PEP/PDP 决策日志、策略版本
+     ▼
+[6] 命令通道与车端     命令载荷签名与验签，车辆在**执行前**再判一次
+     │                 证据形态：虚拟密钥配对记录、车端验签结果
+     ▼
+[7] 执行与审计         动作发生，且留下可追溯的记录
+                       证据形态：审计事件（主体/客户端/令牌/资源/动作/决策/原因码）</code></pre>
+<h3 id="sec-10">10.2.2 每一段的失败模式与控制点</h3>
+<div class="table-wrap"><table><thead><tr><th>段</th><th>典型失败模式</th><th>控制点</th><th>本报告位置</th><th>证据</th></tr></thead><tbody><tr><td>1 主体身份</td><td>弱认证、账号共享、凭证填充</td><td>强认证（WebAuthn/FIDO2）、步进认证</td><td>11 §11.5、12 §12.5.4</td><td>[A] 规范</td></tr><tr><td>2 意图与同意</td><td>consent phishing、过度授权（一次同意长期放大）</td><td>最小 scope、结构化授权（RAR）、<code>prompt_missing_scopes</code> 类增量授权</td><td>13 §13.4、11 §11.2.8</td><td>[A] 规范 + [A] Tesla/Mercedes 实现</td></tr><tr><td>3 授权服务器决策</td><td>授权码拦截、重定向劫持</td><td>PKCE（S256）、精确重定向 URI、原生 App 强制外部浏览器</td><td>11 §11.2.3、§11.2.5</td><td>[A] RFC 7636 / RFC 8252</td></tr><tr><td>4 令牌与绑定</td><td>Bearer 令牌可被复制、长效令牌、无轮换</td><td>发送方约束（mTLS 证书绑定 / DPoP）、短 TTL、一次性刷新令牌 + 轮换</td><td>12 §12.3、§12.2.2</td><td>[A] RFC 8705 / RFC 9449 + [A] Tesla/Mercedes 参数</td></tr><tr><td>5 云侧资源服务器</td><td>对象级越权（换一个 VIN 就能读别人的车）、属性级越权（响应里多给字段）</td><td>资源级策略、字段级过滤、双层控制</td><td>13 §13.2–§13.3、§13.7</td><td>[A] Tesla <code>granular_access.hide_private</code></td></tr><tr><td>6 命令通道与车端</td><td>云端判定通过但车端不校验，令牌复制后直接构造命令</td><td>车端验签（虚拟密钥）、命令载荷签名、密钥数量上限</td><td>12 §12.3.4、17 §17.2.4</td><td>[A] Tesla 虚拟密钥文档</td></tr><tr><td>7 执行与审计</td><td>无审计日志、日志缺授权决策依据</td><td>结构化审计事件、决策原因码、策略版本</td><td>15 §15.5.1、18 §18.5.3</td><td>[A] 规范 + 工程要求</td></tr></tbody></table></div>
+<p><strong>这张表是本部分 10 章的组织骨架</strong>：每一段在后续章节中都被展开成一个或多个专节。</p>
+<h3 id="sec-11">10.2.3 关键观察：第 5 段和第 6 段是"两次判定"</h3>
+<p>在成熟的实现里，授权判定不是一次，而是<strong>两次</strong>，且发生在两个不同的信任域：</p>
+<ul><li><strong>云侧判定</strong>（第 5 段）：判定"这个令牌可以对这个 VIN 做这个动作"。</li><li><strong>车端判定</strong>（第 6 段）：判定"这个命令载荷的签名确实来自被授权的那把私钥"。</li></ul>
+<p>第二次判定的价值在于：即使云端被攻破、或者某个高权限令牌泄露，攻击者仍然需要<strong>被车主添加到车辆上的那把私钥</strong>才能让车辆执行命令。已取证的实现给出这一模式的完整样本：车辆在执行命令前或接受遥测配置前会验证载荷签名，且配对密钥由可信用户在车辆侧添加、由用户在车辆界面删除。</p>
+<blockquote><p><strong>本报告判断</strong>（推测，非事实）：把"授权判定"拆到两个信任域，是车云授权区别于通用 Web 授权最有价值的一条架构经验。它把"云端凭据泄露"的后果从"可控制车辆"降级为"可读取数据"。</p></blockquote>
+<hr>
+</section>
+<section class="rep-section" id="sec-12">
+  <div class="sec-head"><span class="sec-badge">04</span><h2>10.3 授权设计的第一原理：五条不变量</h2></div>
+<p>下面五条不变量是本报告提出的评估框架（<strong>本报告构造，非既有标准</strong>），用于在任何一次车云授权架构评审中快速定位缺陷。14 章 §14.5 与 18 章 §18.4 的控制点均按其组织。</p>
+<h3 id="sec-13">不变量 I1：每个请求必须可归因到一个人或一个工作负载</h3>
+<ul><li><strong>含义</strong>：不存在"系统令牌"这类匿名调用者的豁免通道；任何调用都能回答"代表谁"。</li><li><strong>违反时的表现</strong>：共享 API Key、共享服务账号、无法区分"车主本人操作"与"第三方代操作"。</li><li><strong>规范工具</strong>：RFC 8693 令牌交换的 <code>subject_token</code>/<code>actor_token</code> 链路；RFC 7523 客户端断言。</li><li><strong>检验方法</strong>：抽样审计事件的"主体"字段，若出现同一主体覆盖多个自然人行为，即违规。</li></ul>
+<h3 id="sec-14">不变量 I2：令牌必须绑定到它被允许作用的资源</h3>
+<ul><li><strong>含义</strong>：令牌不是"万能凭据"，它会话化地绑定到具体的资源集合（如某个 VIN）与动作集合。</li><li><strong>违反时的表现</strong>：一个令牌可用于账号下任意车辆；换一个 VIN 参数即可越权（对象级授权缺失）。</li><li><strong>规范工具</strong>：RFC 8705 证书绑定令牌、RFC 9449 DPoP（绑定持有者）、RFC 9396 <code>authorization_details</code>（绑定资源与动作）。</li><li><strong>检验方法</strong>：用令牌 A 请求资源 B，观察是否被拒并返回可区分的错误语义。</li></ul>
+<h3 id="sec-15">不变量 I3：授权必须能在不依赖客户端配合的情况下被撤销</h3>
+<ul><li><strong>含义</strong>：撤销由服务端与车端共同保证，不能依赖第三方应用"自觉丢弃"令牌。</li><li><strong>违反时的表现</strong>：撤销后长连接仍在推送；撤销只对新签发的令牌生效而旧令牌继续可用至过期；车辆端仍接受旧密钥签名的命令。</li><li><strong>规范工具</strong>：RFC 7009 吊销端点、RFC 7662 内省、短 TTL + 轮换；车端密钥删除。</li><li><strong>检验方法</strong>：撤销后立即发放一条命令，观察云端与车端是否都拒绝。</li></ul>
+<h3 id="sec-16">不变量 I4：令牌泄露的影响必须是可界定且可回收的</h3>
+<ul><li><strong>含义</strong>：任何单一凭证的泄露，其最大影响面在架构上是被限定的（限定到车、限定到动作、限定到时间窗）。</li><li><strong>违反时的表现</strong>：单一应用凭证可横向影响同账号其他车辆或平台其他租户；无速率限制，泄露后可无界消耗。</li><li><strong>工程手段（已取证实例）</strong>：单台车辆同时推流上限、配对密钥数量上限、按账号按设备的限流与配额、计费上限导致的自动暂停。</li><li><strong>检验方法</strong>：构造一次凭证误用，测量可影响的车辆数、动作数与持续时长。</li></ul>
+<h3 id="sec-17">不变量 I5：每个授权决策必须留下可审计的证据</h3>
+<ul><li><strong>含义</strong>：审计日志必须能回答"为什么放行/为什么拒绝"，而不只是"调用了什么接口"。</li><li><strong>违反时的表现</strong>：日志只有访问日志没有决策日志；无法回放某次越权是配置问题还是策略问题。</li><li><strong>工程手段</strong>：结构化审计事件（含策略版本与原因码）、变更记录、密钥轮换记录。</li><li><strong>检验方法</strong>：取一次被拒绝的请求，检查能否从日志还原判定依据。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-18">
+  <div class="sec-head"><span class="sec-badge">05</span><h2>10.4 通用授权架构的四个平面</h2></div>
+<p>无论具体实现如何，一个完整的车云授权体系都包含四个平面。本报告用它作为"通用分层方案"中授权层的内部结构（对应 02 章 §02.4）。</p>
+<div class="table-wrap"><table><thead><tr><th>平面</th><th>职责</th><th>典型组件</th><th>主要失败面</th><th>本报告位置</th></tr></thead><tbody><tr><td><strong>凭证平面</strong></td><td>签发、保护、传输、轮换令牌与密钥</td><td>授权服务器、KMS/HSM、客户端 SDK、车端密钥存储</td><td>令牌可复制、密钥泄露、轮换失败</td><td>11 §11.3、12 全章</td></tr><tr><td><strong>决策平面</strong></td><td>对每个请求做主体-资源-动作判定</td><td>PEP/PDP、策略引擎、资源级策略、字段级过滤</td><td>对象级越权、策略漂移、缓存与撤销不一致</td><td>13 §13.3、§13.7、15 §15.2</td></tr><tr><td><strong>策略与资源平面</strong></td><td>定义资源模型、权限模型与策略来源</td><td>资源目录（VIN 为键）、scope/authorization_details 定义、同意记录</td><td>资源模型过粗、scope 爆炸、同意与权限不一致</td><td>13 §13.1、§13.4、§13.6</td></tr><tr><td><strong>观测平面</strong></td><td>记录并检测授权行为</td><td>审计日志管道、异常行为检测、指标与告警</td><td>无决策证据、检测缺失、告警噪声</td><td>15 §15.5、14 §14.7</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-19">
+  <div class="sec-head"><span class="sec-badge">06</span><h2>10.5 行业标尺：以两个可读实现作为基准</h2></div>
+<h3 id="sec-20">10.5.1 为什么可以拿它们当标尺</h3>
+<p>对标基准法的前提是"标尺本身要可核对"。本次调研中，只有两家车企的开发者文档达到了"接口级、参数级可核对"的程度：</p>
+<ul><li><strong>Tesla Fleet API</strong>：文档覆盖令牌类型、全部 scope 定义、授权端点与参数、刷新与吊销语义、虚拟密钥机制、遥测推流、限流与计费、漏洞披露政策。这是目前公开文档中最完整的"车-云-第三方授权"实现范例。</li><li><strong>Mercedes-Benz Developer Platform</strong>：文档覆盖两种鉴权集成模式、同意界面语义（scope + purpose URL）、令牌端点与客户端认证方式、令牌有效期与刷新语义、错误语义。</li></ul>
+<p>两家文档均为官方一手材料（[A]），因此可以作为"通用方案落地到什么程度"的经验基准。<strong>注意：基准的作用是量化"已公开实现的形态"，不是评价谁更安全。</strong></p>
+<h3 id="sec-21">10.5.2 九个可比参数</h3>
+<div class="table-wrap"><table><thead><tr><th>参数</th><th>Tesla Fleet API（已取证）</th><th>Mercedes-Benz（已取证）</th><th>规范侧的要求来源</th></tr></thead><tbody><tr><td>令牌类型</td><td>第三方令牌（代表车主）、合作伙伴令牌、业务第三方令牌三类并存</td><td>访问令牌 + 刷新令牌 + id_token（标准 OAuth 2.0 输出）</td><td>RFC 6749 §1.4 令牌类型</td></tr><tr><td>scope 命名</td><td>平坦命名，12 个 scope（<code>vehicle_cmds</code>、<code>vehicle_location</code> 等）</td><td>三段式命名空间（<code>mb:vehicle:mbdata:fuelstatus</code>）</td><td>命名非规范强制，属治理选择</td></tr><tr><td>客户端认证</td><td>授权端点与令牌端点分属不同主机；<code>/token</code> 来自应用服务器</td><td>令牌端点采用 HTTP Basic（<code>clientId:clientSecret</code>）</td><td>RFC 6749 §2.3.1</td></tr><tr><td>同意模型</td><td>授权码流代表车主行事；支持对未授权 scope 再次提示、要求全部 scope 才放行</td><td>同意界面展示 SCOPE 与 purpose URL，便于知情决策</td><td>RFC 6749 §3.1；RFC 9396（结构化授权）</td></tr><tr><td>资源级策略</td><td>存在"已授予位置 scope 仍拒绝位置字段"的双层控制</td><td>本次未见等价公开描述</td><td>RFC 8705 / RFC 9396 提供工具</td></tr><tr><td>刷新令牌</td><td>一次性使用、3 个月过期、24 小时复用宽限</td><td>一次性使用，刷新返回新的访问令牌与新的刷新令牌</td><td>RFC 6749 §6；OAuth 2.1 草案倾向轮换</td></tr><tr><td>访问令牌有效期</td><td>文档未给出确定值（本次未证实"约 8 小时"一说）</td><td><code>expires_in</code> 默认 3599 秒</td><td>RFC 6749 §5.1</td></tr><tr><td>撤销路径</td><td>车主侧撤销入口；scope 缩减仅对新签发访问令牌生效；推流配置随 scope 撤销被移除</td><td>文档未描述车主侧撤销入口</td><td>RFC 7009；RFC 7662</td></tr><tr><td>车端二次校验</td><td>有：虚拟密钥（P-256），车辆执行前验签，密钥由车主添加/删除</td><td>本次未找到公开来源</td><td>非规范强制，属架构选择</td></tr></tbody></table></div>
+<h3 id="sec-22">10.5.3 标尺的局限（必读）</h3>
+<ol><li><strong>两家的实现不代表行业最佳实践</strong>，只代表"公开文档最完整"。它们的选择受各自生态与历史约束影响。</li><li><strong>两家都有关键参数未被文档化</strong>（例如 Tesla 访问令牌的真实 TTL、Mercedes 是否支持发送方约束令牌、两家的车端证书体系）。</li><li><strong>国内 9 家车企本次未取得任何可与此对标的一手参数</strong>，因此 16 章 §16.3.1 的横向矩阵中大量格子是"未取证"。<strong>这不能被读成能力差距。</strong></li></ol>
+<hr>
+</section>
+<section class="rep-section" id="sec-23">
+  <div class="sec-head"><span class="sec-badge">07</span><h2>10.6 本部分使用的规范底座（分组索引）</h2></div>
+<p>规范底座的完整清单与逐条证据等级见 19 章 §19.2、§19.3 与 90 章。此处按用途分组，便于定位。</p>
+<div class="table-wrap"><table><thead><tr><th>组</th><th>用途</th><th>代表规范</th><th>展开位置</th></tr></thead><tbody><tr><td><strong>授权协议组</strong></td><td>授权流程与令牌获取</td><td>RFC 6749、RFC 6750、RFC 7636、RFC 8628、RFC 8693、RFC 7523、RFC 9396、RFC 9635、OAuth 2.1 草案、OIDC Core/Discovery</td><td>11 §11.2、§11.3、§11.4</td></tr><tr><td><strong>令牌治理组</strong></td><td>令牌绑定、内省、吊销、步进认证</td><td>RFC 8705、RFC 9449、RFC 7662、RFC 7009、RFC 9068、RFC 9470、RFC 8414</td><td>12 §12.2–§12.5</td></tr><tr><td><strong>通信与 PKI 组</strong></td><td>链路可信与证书生命周期</td><td>RFC 8446、RFC 5280、RFC 6960、RFC 8555、RFC 3161、RFC 5480、RFC 8017、RFC 8998（国密 TLS 套件）</td><td>02 §02.3、11 §11.6.4</td></tr><tr><td><strong>密钥与硬件组</strong></td><td>密钥保管与密码基线</td><td>FIPS 140-3、FIPS 186-5、FIPS 197、SP 800-57 Pt1 R5、SP 800-38D、SP 800-90A、SP 800-133、GlobalPlatform TEE、EVITA 分级</td><td>12 §12.7、02 §02.2</td></tr><tr><td><strong>数字钥匙与近场组</strong></td><td>近场授权与无钥匙进入</td><td>CCC Digital Key Release 3.0、FiRa 规范族、GB/T 44402.1-2024</td><td>11 §11.6.1</td></tr><tr><td><strong>车联网与合规组（中国）</strong></td><td>合规基线</td><td>GB 44495-2024、GB 44496-2024、GB/T 47324-2026、GB/T 47467-2026、GB/T 45181-2024、GB/T 45112-2024、GB/T 41871-2022、GB/T 44464-2024</td><td>16 §16.1、18 §18.2–§18.3</td></tr><tr><td><strong>OTA 与供应链组</strong></td><td>更新与构建完整性</td><td>Uptane 2.1.0、TUF 规范、RFC 9019、RFC 9124、SLSA v1.0、SPDX、CycloneDX</td><td>02 §02.6、14 §14.3.6</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-24">
+  <div class="sec-head"><span class="sec-badge">08</span><h2>10.7 严重度分类在本部分的应用</h2></div>
+<p>严重度口径沿用 00-engagement-plan.md §3.3，本部分不做修改。为便于读者在授权上下文中使用，此处给出判据与授权场景的对应关系：</p>
+<div class="table-wrap"><table><thead><tr><th>等级</th><th>判据（满足其一）</th><th>授权场景中的典型形态</th><th>报告中的处理</th></tr></thead><tbody><tr><td><strong>Critical</strong></td><td>授权链可被绕过，导致任意车辆车控/位置被未授权访问；或根密钥可被远程提取</td><td>存在"输入一个 VIN 即可控制"的路径；云端根私钥在线可取</td><td>在 30 章作为行业级风险单列并给缓解控制</td></tr><tr><td><strong>High</strong></td><td>单一应用/单一凭证被攻破可横向影响同账号其他车辆或平台其他租户</td><td>令牌未绑定到车；账号级令牌覆盖全部车辆；缺少资源级策略</td><td>单列控制建议（最小权限、令牌绑定）</td></tr><tr><td><strong>Medium</strong></td><td>令牌生命周期管理不当（长效令牌、无轮换、无吊销联动）导致影响范围扩大</td><td>刷新令牌未轮换；撤销只对新令牌生效且无传播机制</td><td>归入 15 章控制清单</td></tr><tr><td><strong>Low</strong></td><td>文档与可观测性缺失、日志不含授权决策依据</td><td>无决策原因码、无策略版本记录</td><td>归入 18 章合规映射</td></tr><tr><td><strong>Informational</strong></td><td>架构观察、行业趋势判断</td><td>双层授权控制这类可复制的良好设计</td><td>归入 31 章趋势</td></tr></tbody></table></div>
+<p><strong>本部分已作出的两项严重度判定（CSO 判定，沿用 00-engagement-plan §3.3 的示例）</strong></p>
+<ul><li><strong>High</strong>：某些车辆级资源仅合作伙伴令牌可用、且对任意车辆无需车主授权（<code>vehicle_specs</code>、<code>vehicle_pricing_info</code>）——这是"退出逐车主同意模型"的资源访问路径。判定为 High，要求在报告中显式标注，并以契约与审计作为补偿控制（展开见 13 §13.2、14 §14.6）。</li><li><strong>Informational → 正面控制案例</strong>：在已授予位置 scope 的前提下，带 <code>granular_access.hide_private</code> 的车辆共享仍拒绝位置字段并返回 403（<code>location access not granted</code>）。判定为"双层授权控制"的良好实践，建议其他车企对标（展开见 13 §13.3）。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-25">
+  <div class="sec-head"><span class="sec-badge">09</span><h2>10.8 本部分的常见误解（八条）</h2></div>
+<p>以下八条是本次调研中反复出现的误读。它们会直接导致架构决策出错，因此单独列出。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>误解</th><th>为什么错</th><th>正确表述</th></tr></thead><tbody><tr><td>1</td><td>"有了双向证书就不需要授权了"</td><td>证书证明"这条链路的一端是谁"，不证明"这次调用代表谁、对哪个资源可做什么"</td><td>链路认证与资源级授权是两层独立判定，见 §10.2.3</td></tr><tr><td>2</td><td>"OAuth 就是单点登录"</td><td>OIDC 覆盖登录（认证），OAuth 覆盖授权委托；混用会把"身份"当成"权限"</td><td>认证与授权分离，见 11 §11.4</td></tr><tr><td>3</td><td>"scope 越少越安全"</td><td>过粗的 scope 集合迫使应用索要超出所需的能力；过窄的 scope 集合又无法表达"仅这辆车、仅这 2 小时"</td><td>需要的是<strong>结构化</strong>而非仅仅更少的权限，见 13 §13.1</td></tr><tr><td>4</td><td>"短 TTL 一定更安全"</td><td>极短 TTL 会放大刷新频次，把失败模式从"令牌被滥用"转移到"刷新竞态"</td><td>TTL 必须与轮换、宽限期、并发安全一起设计，见 12 §12.2.2</td></tr><tr><td>5</td><td>"撤销只要删掉数据库里的令牌"</td><td>撤销必须传导到长连接、缓存、车端密钥与推流配置</td><td>撤销是一条链路而非一个动作，见 §10.3 不变量 I3</td></tr><tr><td>6</td><td>"刷新令牌一次性就够了"</td><td>一次性刷新在并发场景会出现竞态，若无宽限期与幂等处理会造成会话丢失</td><td>轮换 + 宽限期 + 并发安全是同一组设计，见 12 §12.2.2</td></tr><tr><td>7</td><td>"限流只是防滥用的运维手段"</td><td>限流与配额同时是影响范围控制手段，且配额耗尽本身构成可用性攻击面</td><td>见 13 §13.5.2</td></tr><tr><td>8</td><td>"没有公开安全文档说明这家车企没有安全机制"</td><td>车端硬件、密码实现、供应链是行业性低披露领域；国内开放平台多以商务对接为入口</td><td>本报告一律写"未找到公开来源"，见 01 §01.5.3</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-26">
+  <div class="sec-head"><span class="sec-badge">10</span><h2>10.9 本部分整体层面的待补证清单</h2></div>
+<p>以下缺口超出单家车企的范围，属于整个授权主题的证据缺口；各章内部的具体缺口另见该章待补证清单与 19 章 §19.11 汇总台账。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>缺口</th><th>已检索对象</th><th>结果</th><th>补证动作</th></tr></thead><tbody><tr><td>1</td><td>Tesla 访问令牌的真实 TTL</td><td>Tesla 官方文档（已读页面）</td><td>未获证实（仅确证刷新令牌 3 个月 + 24 小时宽限）</td><td>在授权沙箱内走一遍令牌响应，读取 <code>expires_in</code></td></tr><tr><td>2</td><td>是否存在车端证书体系与轮换周期（任一车企）</td><td>各车企开发者门户与安全页</td><td>未找到公开一手来源</td><td>RFI 问卷、T-BOX 拆解、招标文件检索</td></tr><tr><td>3</td><td>国内车企是否采用国密栈及其范围</td><td>9 家车企官网/开放平台/隐私政策/SRC 页</td><td>未找到公开一手来源</td><td>商务申请沙箱、专利检索、白皮书采购</td></tr><tr><td>4</td><td>国际车企是否支持发送方约束令牌（mTLS / DPoP）</td><td>Tesla / Mercedes 文档</td><td>未见公开描述</td><td>RFI 或沙箱实测令牌响应与错误语义</td></tr><tr><td>5</td><td>UN R155/R156 对授权管理的具体条款与时间表</td><td>unece.org</td><td>被 Cloudflare 拦截，正文未取到</td><td>获取官方 PDF 或通过认证机构渠道</td></tr><tr><td>6</td><td>ISO/SAE 21434 与 ISO 24089 正文</td><td>iso.org</td><td>被 Cloudflare 拦截</td><td>标准购买渠道</td></tr><tr><td>7</td><td>ISO 15118 Plug &amp; Charge 的授权细节</td><td>iso.org</td><td>未取证</td><td>标准购买渠道</td></tr><tr><td>8</td><td>UMA 2.0、AUTOSAR Crypto Stack/IdsM、TPM 2.0、SHE 规范正文</td><td>对应官网</td><td>站点不可达或成员制</td><td>会员渠道获取规范正文</td></tr><tr><td>9</td><td>数字钥匙在国内的手机钱包生态适配</td><td>手机厂商开发者文档</td><td>JS 空壳，正文不可取</td><td>带登录态的渲染抓取或商务渠道</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-27">
+  <div class="sec-head"><span class="sec-badge">11</span><h2>10.10 本章小结</h2></div>
+<ul><li>车云授权的核心矛盾是：链路安全已工程化成熟，而"某调用者是否有权对某资源做某动作"才是事故高发区。</li><li>车云授权区别于通用 Web 授权的四点特殊性是：资源是物理世界的、主体高度多元、撤销必须到达执行端、设备在线状态不稳定。</li><li>授权链可拆为七段（身份 → 同意 → 授权服务器 → 令牌与绑定 → 云侧资源判定 → 车端二次校验 → 执行与审计），每一段都有独立的失败模式与控制点；第 5 段与第 6 段的"两次判定"是最有价值的架构经验。</li><li>五条不变量（可归因、绑定资源、可撤销、影响可界定、可审计）构成本报告自建的评估框架，14 章与 18 章的控制点均按其组织。</li><li>通用授权架构含四个平面（凭证、决策、策略与资源、观测），本部分各章均落在这四个平面上。</li><li>行业标尺选取 Tesla Fleet API 与 Mercedes-Benz Developer Platform，并用九个可比参数量化了差异；<strong>标尺比较的是实现形态，不是安全水平</strong>。</li><li>本部分已作出两项严重度判定（一项 High 的授权控制例外、一项 Informational 的正面控制案例），并在 13/14 章展开。</li><li>八条常见误解与九项整体缺口在本章集中登记，避免读者在后续章节重复踩坑。</li></ul>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 13,195 字符</div>
+  </div>
+</footer>
+</body>
+</html>
