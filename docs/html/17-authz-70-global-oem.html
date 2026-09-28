@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>授权与访问控制 · 国际新能源车企实践分析 · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="授权与访问控制 · 国际新能源车企实践分析 — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>授权与访问控制 · 国际新能源车企实践分析</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">17.0 本章方法与覆盖度声明</a></li>
+<li class="lvl2"><a href="#sec-5">17.1 国际车企授权治理的合规底座</a></li>
+<li class="lvl2"><a href="#sec-11">17.2 Tesla Fleet API 深度剖析</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<blockquote><p><strong>文件编号</strong>：<code>17-authz-70-global-oem.md</code> <strong>所属工作流</strong>：WF-5（授权与访问控制 · 国际车企实践，5 家） <strong>覆盖验收标准</strong>：AC-2（授权章节 ≥300K 字符的组成部分）、AC-5（国际 ≥5 家逐家拆解）、AC-7（信源可靠并标注等级）、AC-11（客观中立） <strong>证据底座</strong>：<code>docs/sources/source-dossier.md</code>（唯一事实底座） <strong>编制</strong>：Trail of Bits Security · Reverse Engineering Lead <strong>版本</strong>：v1.0 · 生效 2026-09-28 <strong>阅读提示</strong>：本章全部事实后紧跟 <code>—— 来源名称 —— URL —— [等级]</code>。等级口径沿用审计计划 §3.1：<code>[A]</code> 一手官方文档、<code>[B]</code> 权威第三方、<code>[C]</code> 二手、<code>[未验证]</code> 站点可达但正文未取到、<code>[合理推测（本报告判断）]</code>、<code>未找到公开来源</code>。凡本报告无法在信源档案中定位到对应条目的断言，一律标记为 <code>未找到公开来源</code>，<strong>绝不以行业常识填充</strong>（写作红线 §3.2.3）。</p></blockquote>
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>17.0 本章方法与覆盖度声明</h2></div>
+<h3 id="sec-1">17.0.1 本章的定位：把两类"可读文档"当作标尺，而非清单</h3>
+<p>本章研究对象为五家国际新能源车企——Tesla（特斯拉）、Mercedes-Benz（梅赛德斯-奔驰）、Volkswagen Group / CARIAD（大众集团／软件子公司 CARIAD）、BMW（宝马）、Rivian。与国内车企章节（<code>16-authz-60-cn-oem.md</code>）相比，本章的写作目标不是"每家企业平均分配篇幅"，而是<strong>识别出其中文档公开度最高、机制可被逐条复现的实现，将其规范化为"行业标尺"</strong>，再用标尺去度量其余各家。</p>
+<p>审计计划 §4.5 已确立"对标基准法"：以 <strong>Tesla Fleet API</strong>（公开文档最完整）与 <strong>Mercedes-Benz Developer Platform</strong> 为"已公开实现的标尺"，其他车企与通用方案均与此对标，量化差异（scope 命名空间、令牌 TTL、轮换策略、同意模型、密钥模型）—— 来源：审计计划 §4.5 —— <code>docs/00-engagement-plan.md</code> —— [A，本项目内部方法论文档]。</p>
+<p>因此，本章的篇幅与深度分布是<strong>刻意不对称</strong>的：</p>
+<ul><li>Tesla 一节（§17.2）为本章最重要的技术剖析，逐机制拆解到"可控工程复现"的粒度；</li><li>Mercedes-Benz 一节（§17.3）次之，聚焦其 OAuth 实现细节与 scope 命名空间约定；</li><li>CARIAD（§17.4）仅有企业自述口径可引；</li><li>BMW（§17.5）与 Rivian（§17.6）本次<strong>未能取证</strong>，按审计计划 §3.1 的 <code>未找到公开来源</code> 口径诚实处理，并单列补证动作。</li></ul>
+<h3 id="sec-2">17.0.2 取证条件与本次覆盖度声明</h3>
+<p>本章写作的前提条件必须显式声明，因为它决定了全部结论的可信度边界。信源档案 §0"采集方法与局限"记载：采集日期 2026-09-28，执行方式为 <code>terminal + curl</code> 与浏览器直连权威站点；<strong>检索工具 <code>web_search</code> / <code>web_extract</code> 全程返回额度耗尽（Firecrawl 402/429），本次调研无法做开放网络发现，只能"直取已知权威 URL"</strong>；公开搜索引擎在本运行环境同样不可用（Bing 地理重定向、Baidu/Sogou/360 验证码、Google 机器人墙、DuckDuckGo 验证码）；<code>bmw.com</code> / <code>bmwgroup.com</code> / <code>rivian.com</code> 被 Akamai/CloudFront 区域封锁 —— 来源：信源档案 §0 —— <code>docs/sources/source-dossier.md</code> —— [A，本项目内部采证记录]。</p>
+<p>由此产生的覆盖度偏置是：<strong>证据密度向"文档公开可达"的企业倾斜</strong>，Tesla、Mercedes-Benz 证据最厚，BMW、Rivian 证据薄弱。信源档案 §0 对此有强制写作纪律：<strong>"未找到公开来源" = 本次披露缺口，绝不等于能力缺口，不得反向推断为"该企业没有该能力"</strong> —— 来源：信源档案 §0 —— 同上 —— [A]。</p>
+<p>本任务执行说明（如实声明）：本次写作在 <strong>web_search / web_extract 完全不可用</strong>的条件下进行，<code>terminal + curl</code> 直取档案中已列 URL 为可选项但未被要求执行；本章全部事实仅来自信源档案中已核实的条目，<strong>未引入任何档案之外的新 URL、数字或条款号</strong>。凡国际标准正文（GDPR、欧盟 Data Act、UN R155/R156、ISO/SAE 21434）在本次取证中"站点可达性已确认但正文未取到"者，本章一律标 <code>[未验证]</code> 或 <code>未找到公开来源</code>，且<strong>不给条款编号</strong>（对齐信源档案 §1.4 写作纪律提示）。</p>
+<h3 id="sec-3">17.0.3 BMW / Rivian 未取证的诚实说明</h3>
+<p>在本章动笔前必须先把两家"缺证据"的企业交代清楚，避免读者把"本章对 BMW/Rivian 着墨少"误读为"两家技术能力弱"。</p>
+<p><strong>BMW</strong>：本次取证结果为——<code>https://developer.bmwgroup.com/</code> 的 DNS 可解析（160.46.244.54），但返回的是 Apache 占位页，页面文本为 "BMW Group – no content deployed … This project didn't deploy any content yet"，<code>Last-Modified</code> 头为 2026-04-27，且<strong>未提供 CarData / OAuth 任何文档</strong>；<code>https://crd.bmwgroup.com/</code> 无法解析；<code>https://b2b-developer.bmwgroup.com/</code> 超时；<code>www.bmw.com</code> / <code>www.bmwgroup.com</code> 从本网络被区域封锁（HTTP 000 / 边缘封锁）；<code>www.bmwgroup.com/en/innovation/vehicle-data.html</code> 经浏览器返回站点自身 404；<code>https://b2b.bmw.com</code> 虽可达，但为<strong>供应商采购门户</strong>（purchasing / logistics 登录），并非车辆数据开发者 API 门户 —— 来源：信源档案 §7.4 —— <code>docs/sources/source-dossier.md</code> —— [A，直接观测]。</p>
+<p><strong>Rivian</strong>：本次取证结果为——<code>https://rivian.com</code> 从本出口返回 Amazon CloudFront 403，正文为 "The CloudFront distribution is configured to block access from your country"；<code>developer.rivian.com</code> 无 DNS 解析；<code>api.rivian.com</code> 可解析（13.35.190.19）但为 App 后端，非公开开发者门户 —— 来源：信源档案 §7.5 —— 同上 —— [A，直接观测]。</p>
+<p><strong>结论</strong>：BMW 与 Rivian 在本次调研中属于<strong>"披露缺口"而非"能力缺口"</strong>（信源档案 §0 表述）。本章 §17.5 / §17.6 把上述观测事实如实记录，并给出补证动作清单（换出口 IP、代理重跑、RFI），而不对两家的授权与访问控制能力下任何否定性判断。这是 AC-11 中立性红线的直接要求 —— 来源：审计计划 §3.2.4 —— <code>docs/00-engagement-plan.md</code> —— [A]。</p>
+<h3 id="sec-4">17.0.4 本章结构导航</h3>
+<div class="table-wrap"><table><thead><tr><th>小节</th><th>主题</th><th>主证据强度</th></tr></thead><tbody><tr><td>17.1</td><td>国际车企授权治理的合规底座（GDPR / Data Act / R155-R156）</td><td>多为 [未验证]／未找到公开来源</td></tr><tr><td>17.2</td><td>Tesla Fleet API 深度剖析</td><td>[A] 厚</td></tr><tr><td>17.3</td><td>Mercedes-Benz Developer Platform 剖析</td><td>[A] 厚</td></tr><tr><td>17.4</td><td>Volkswagen Group / CARIAD</td><td>[A，企业自述口径] 薄</td></tr><tr><td>17.5</td><td>BMW（未取证）</td><td>[A，直接观测]</td></tr><tr><td>17.6</td><td>Rivian（未取证）</td><td>[A，直接观测]</td></tr><tr><td>17.7</td><td>五家横向对照矩阵（≥12 维度）</td><td>综合</td></tr><tr><td>17.8</td><td>国际路线的方法论启示</td><td>[合理推测]</td></tr><tr><td>17.9</td><td>待补证清单</td><td>综合</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-5">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>17.1 国际车企授权治理的合规底座</h2></div>
+<h3 id="sec-6">17.1.1 本节的取证限制（必须先读）</h3>
+<p>讨论国际车企的授权治理，绕不开三部法律/标准文本：欧盟 <strong>GDPR</strong>（General Data Protection Regulation，通用数据保护条例）、欧盟 <strong>Data Act</strong>（数据法案，涉及互联产品与车辆数据的访问权）、联合国 <strong>UN R155 / R156</strong>（车辆网络安全管理体系 CSMS 与软件更新管理体系 SUMS）。这三者构成"授权与访问控制为什么必须做、做到什么程度"的合规底座。</p>
+<p>但本次取证对三者的结果都不理想，必须逐条交代（对齐信源档案 §1.4 与审计计划 §3.2.3）：</p>
+<ul><li><strong>GDPR</strong>：欧盟法规编号为 Regulation (EU) 2016/679，EUR-Lex 官方页 <code>https://eur-lex.europa.eu/eli/reg/2016/679/oj/eng</code>，本次返回 HTTP <strong>202 异步状态，正文未取到</strong> —— 来源：信源档案 §1.4 —— <code>docs/sources/source-dossier.md</code> —— [C]。因此本章<strong>不引用 GDPR 任何条款号</strong>，只能按"通行公开认知"描述其性质为"以同意（consent）为合法性基础之一的个人数据保护框架"，并标记 <code>[未验证]</code>。</li><li><strong>欧盟 Data Act</strong>：编号为 Regulation (EU) 2023/2854，EUR-Lex 页 <code>https://eur-lex.europa.eu/eli/reg/2023/2854/oj</code>，本次返回 HTTP <strong>202</strong>，正文未取到 —— 来源：信源档案 §1.4 —— 同上 —— [C]。其通行公开认知是"赋予互联产品用户对其所生成数据的访问权与可携权"，但<strong>具体条款、适用范围、生效时间表本次均无一手来源</strong>，一律标 <code>[未验证：依通行公开认知]</code>。</li><li><strong>UN R155 / R156</strong>：unece.org 被 Cloudflare 全站拦截，URL 结构需复核。R155 通行认知为"网络安全管理体系（CSMS）"，R156 为"软件更新管理体系（SUMS）" —— 来源：信源档案 §1.4 —— 同上 —— [未验证]。信源档案 §1.4 有明确写作纪律：<strong>"涉及 R155/R156 的具体条款号、强制时间表、审核要求时，本次无一手来源。凡引用必须标注「[未验证] 依通行公开认知」或改为待补证陈述，不得给出条款编号。"</strong></li></ul>
+<p><strong>本节写作承诺</strong>：下文凡涉及上述三者的"要求域"描述，均为<strong>性质层面的通行公开认知</strong>，不带条款号、不带时间表、不带具体审核要求；凡进入本节表格的每一行，均标 <code>[未验证]</code> 或 <code>未找到公开来源</code>。</p>
+<h3 id="sec-7">17.1.2 GDPR 视角下的"授权同意"与车企同意的耦合</h3>
+<p>尽管 GDPR 正文未取到，<strong>车企侧对 GDPR 的公开表态</strong>却是一手可引的 [A] 级证据。Mercedes-Benz 开发者平台首页原文写明：<strong>"The trust and consent of our vehicle customers are at the heart of our business – ensuring GDPR compliance and enabling secure, reliable data you can depend on."</strong>（"我们车辆客户的信任与同意是我们业务的核心——确保 GDPR 合规，并提供您可以依赖的安全、可靠数据。"）—— 来源：Mercedes-Benz Developer Platform 首页 —— <code>https://developer.mercedes-benz.com/</code> —— [A]。</p>
+<p>这句话的工程含义值得展开：它把"客户同意"与"GDPR 合规"绑定为同一件事，而 OAuth 授权码流程正承担了"采集并留存终端用户同意"的技术职责。Mercedes 文档对此的表述（意译）是：部分 API 提供燃油状态、车门锁状态等数据，<strong>属 GDPR 意义上的个人数据，因此需要终端用户同意</strong>，平台自称使用"standard OAuth 2.0" —— 来源：Mercedes-Benz 授权码流文档 —— <code>https://developer.mercedes-benz.com/get-started/oauth/authorization-code-flow</code> —— [A]。</p>
+<p>由此可以抽出一条清晰的因果链（<strong>本报告判断，见 §17.8</strong>）：<strong>GDPR 的"同意"要求 → 需要可撤回、可细粒度、可留痕的授权机制 → 车企被迫把 OAuth scope 设计与"车主同意界面"耦合起来 → 授权与访问控制从"技术实现"升格为"合规义务"</strong>。这条链解释了为什么国际车企的公开 scope 文档普遍比国内车企厚——scope 不只是权限位，还是<strong>向监管者与车主举证"我们取得了哪些同意"的凭证</strong>。</p>
+<h3 id="sec-8">17.1.3 欧盟 Data Act 对"车辆数据访问权"的通行认知与本报告的处理</h3>
+<p>Data Act 的通行公开认知是：赋予互联产品（connected products，含车辆）的使用者对其所产生数据获得访问与再使用的权利，并允许用户把数据直接分享给第三方。若该认知成立，它将在授权层产生一项硬性派生需求——<strong>平台必须提供一个"用户主导、可由用户转授给第三方"的数据访问通道</strong>，而这恰好对应 OAuth 授权码流程的 <code>authorization_code</code> 将"资源所有者"设为真人车主的设计。</p>
+<p>但请注意本报告的取证纪律：<strong>Data Act 正文本次返回 HTTP 202，未取到，故本条仅为通行认知，标 [未验证：依通行公开认知]</strong> —— 来源：信源档案 §1.4 —— <code>docs/sources/source-dossier.md</code> —— [C/未验证]。<strong>本报告不引用 Data Act 任何条款编号，也不引用其生效时间表。</strong> 待补证动作见 §17.9。</p>
+<p>值得记录的对照现象（<strong>本报告判断，非事实</strong>）：Tesla Fleet API 的"车主侧 revoke consent 端点"与 Mercedes 的"同意界面展示 scope 与 purpose URL"，在<strong>功能形态上</strong>与 Data Act 所描述的"用户主导数据访问"高度同构。但<strong>这只能说两者形态相容，不能断言是 Data Act 的直接合规驱动</strong>——因为 Data Act 正文未取证，因果归属无法证实。</p>
+<h3 id="sec-9">17.1.4 UN R155/R156 的授权管理面（性质层面）</h3>
+<p>在无一手正文的前提下，本报告只能描述 R155/R156 与授权管理的<strong>性质关联</strong>，并全部标 <code>[未验证]</code>：</p>
+<div class="table-wrap"><table><thead><tr><th>法规</th><th>通行认知的体系对象</th><th>与"授权与访问控制"的性质关联（本报告判断）</th><th>证据等级</th></tr></thead><tbody><tr><td>UN R155</td><td>网络安全管理体系（CSMS）</td><td>要求整车企业建立覆盖全生命周期的网络安全流程；授权/身份管理属其"访问控制"要求域的组成部分</td><td>[未验证：依通行公开认知]</td></tr><tr><td>UN R156</td><td>软件更新管理体系（SUMS）</td><td>要求软件更新过程的完整性、真实性与授权可追溯；OTA 下发权限属其"更新授权"要求域</td><td>[未验证：依通行公开认知]</td></tr><tr><td>ISO/SAE 21434</td><td>道路车辆网络安全工程</td><td>提供威胁分析与风险评估（TARA）方法论，是 R155 的技术支撑标准之一</td><td>[未验证：编号与年份为通行共识，正文未取到]</td></tr></tbody></table></div>
+<p>来源：信源档案 §1.4 —— <code>docs/sources/source-dossier.md</code> —— [未验证]。</p>
+<p><strong>本报告明确声明</strong>：上述表格<strong>不含任何条款号、时间表、审核要求</strong>，因为本次无一手来源。信源档案 §1.4 与审计计划 §3.2.3 均禁止以记忆填补此类缺口。凡需引用 R155/R156 具体条款的场景，一律进入 §17.9 待补证清单。</p>
+<h3 id="sec-10">17.1.5 合规底座小结</h3>
+<p>本节可安全输出的结论只有两条，且都可溯源：</p>
+<ol><li><strong>车企侧的公开表态确证"同意"与"合规"的耦合</strong>：Mercedes-Benz 开发者平台首页原文把"信任与同意"与"GDPR 合规"并列为业务核心 —— 来源：Mercedes-Benz 开发者平台首页 —— <code>https://developer.mercedes-benz.com/</code> —— [A]。</li><li><strong>国际法规/标准的正文本次普遍未取到</strong>：GDPR、Data Act、R155、R156、ISO/SAE 21434 均标 <code>[未验证]</code>／<code>[C]</code>，<strong>不得作为条款级依据</strong> —— 来源：信源档案 §1.4 —— 同上 —— [C/未验证]。</li></ol>
+<p>据此，本章后续各节的机制剖析<strong>不依赖法规条款</strong>，而全部建立在<strong>车企一手开发者文档</strong>这一 [A] 级证据之上。这也正是本章标题取"实践分析"而非"合规分析"的原因——合规映射交由 WF-6 的 <code>18-authz-80-compliance-audit.md</code> 处理。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-11">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>17.2 Tesla Fleet API 深度剖析</h2></div>
+<blockquote><p>本节为本章最重要的技术剖析，目标是把 Tesla Fleet API 拆到"可被其他车企逐条对标、可被工程团队复现"的粒度。 全部事实来自信源档案 §7.1（全部 [A]，来源 developer.tesla.com）—— 来源：信源档案 §7.1 —— <code>docs/sources/source-dossier.md</code> —— [A]。</p></blockquote>
+<h3 id="sec-12">17.2.1 三类令牌模型（third-party / partner / third-party-for-business）与信任边界</h3>
+<p>Tesla Fleet API 的第一层设计是<strong>令牌分类</strong>。文档要求所有请求携带请求头 <code>Authorization: Bearer &lt;token&gt;</code> —— 来源：Tesla Fleet API 认证总览 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/overview</code> —— [A]。但其关键不在"Bearer"这一载体，而在于<strong>同一个载体背后有三类语义完全不同的令牌</strong>：</p>
+<ul><li><strong>third-party token</strong>（第三方令牌）：代表车主（resource owner）行事的令牌，语义上"这是某个车主授权某个第三方应用做的事"。</li><li><strong>partner token</strong>（合作伙伴令牌）：代表合作伙伴（通常是企业级/商业开发者）行事的令牌，<strong>不绑定单个车主的逐次同意</strong>。</li><li><strong>third-party-for-business token</strong>（面向企业业务的第三方令牌）：文档列为第三类令牌名称 —— 来源：同 <code>authentication/overview</code> 页 —— [A]。</li></ul>
+<p><strong>信任边界分析（本报告判断）</strong>：三类令牌的价值在于把"谁在授权"与"能做什么"解耦成两个维度——</p>
+<ul><li>第一维度是<strong>主体身份</strong>：是"代车主行事的应用"（third-party）还是"企业自身身份"（partner）。</li><li>第二维度是<strong>同意的取得方式</strong>：third-party 令牌必须走车主同意的授权码流程；partner 令牌走的是企业契约路径，不进入逐车主同意模型。</li></ul>
+<p>这一解耦直接决定了<strong>后续所有 scope 的可授予主体</strong>（见 §17.2.2 表格的"可授予主体"列）。最典型的后果是 <code>vehicle_specs</code> 与 <code>vehicle_pricing_info</code> <strong>仅 Partner Token 可用</strong>，即这两类资源从设计上就<strong>退出了"逐车主同意"模型</strong> —— 来源：Tesla Fleet API 认证总览 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/overview</code> —— [A]。</p>
+<p>信任边界可以用 ASCII 图表达如下：</p>
+<pre><code>                      Tesla Fleet API 令牌信任边界（本报告整理）
+  ┌─────────────────────────────────────────────────────────────────────┐
+  │  资源所有者（车主）          合作伙伴/企业（Partner）                  │
+  │       │                            │                                 │
+  │       │ 授权码流程（/authorize）   │ 企业契约/注册（Partner Account） │
+  │       ▼                            ▼                                 │
+  │  ┌──────────────┐            ┌──────────────┐                        │
+  │  │ third-party  │            │ partner       │                       │
+  │  │ token        │            │ token         │                       │
+  │  └──────┬───────┘            └───────┬───────┘                       │
+  │         │                            │                               │
+  │         │ 进入逐车主同意模型          │ 不进入逐车主同意模型           │
+  │         │                            │（vehicle_specs /             │
+  │         │                            │  vehicle_pricing_info 例外）  │
+  │         └────────────┬───────────────┘                              │
+  │                      ▼                                               │
+  │              Fleet API 资源（车辆/能源/用户/企业）                    │
+  └─────────────────────────────────────────────────────────────────────┘
+        第三类：third-party-for-business token（面向企业业务的第三方令牌）</code></pre>
+<p><strong>工程含义</strong>：这三类令牌的存在说明，一个成熟的"车-云第三方授权"实现<strong>不能只有一条授权路径</strong>。它必须至少同时支持：(1) 面向个人车主的"同意驱动"路径；(2) 面向企业客户的"契约驱动"路径。只做前者，企业级批量场景（车队、保险、充电计费）无法落地；只做后者，则违反 GDPR 意义上的"个人数据需终端用户同意"。Tesla 把两条路径<strong>用令牌类型显式区分</strong>，是本模型最值得对标的一点 —— [合理推测（本报告判断）]。</p>
+<h3 id="sec-13">17.2.2 Scope 全清单与资源粒度（12 个 scope 逐个分析）</h3>
+<p>Tesla Fleet API 公开了 <strong>12 个 scope</strong>（scope 即 OAuth 权限范围；本报告首次出现处给中英对照）：<code>openid</code>、<code>offline_access</code>、<code>user_data</code>、<code>vehicle_device_data</code>、<code>vehicle_location</code>、<code>vehicle_cmds</code>、<code>vehicle_charging_cmds</code>、<code>vehicle_specs</code>、<code>vehicle_pricing_info</code>、<code>energy_device_data</code>、<code>energy_cmds</code>、<code>enterprise_management</code> —— 来源：Tesla Fleet API 认证总览 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/overview</code> —— [A]。</p>
+<p>下表逐个分析这 12 个 scope 的覆盖资源、可授予主体、是否需车主同意，以及粒度设计评价（评价栏为 <strong>本报告判断</strong>）：</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>scope</th><th>覆盖资源（文档明载）</th><th>可授予主体</th><th>是否需车主同意</th><th>粒度设计评价（本报告判断）</th></tr></thead><tbody><tr><td>1</td><td><code>openid</code></td><td>"Sign in with Tesla"——允许车主用 Tesla 凭证登录第三方应用</td><td>第三方应用（对车主）</td><td>是（登录即同意动作）</td><td>对应 OpenID Connect Core 1.0 的身份层，与授权分离，设计正确 —— [A]</td></tr><tr><td>2</td><td><code>offline_access</code></td><td>获取刷新令牌，避免重复登录</td><td>第三方应用</td><td>是</td><td>对应 OIDC 离线访问语义，是把"会话"与"长期授权"分开的关键 scope</td></tr><tr><td>3</td><td><code>user_data</code></td><td>联系方式、家庭住址、头像、推荐信息</td><td>第三方应用</td><td>是</td><td>粒度偏粗：把"联系方式"与"家庭住址"捆在一起，属于一类"账户画像"资源包</td></tr><tr><td>4</td><td><code>vehicle_device_data</code></td><td>实时数据、服务历史、服务预约、服务沟通、可升级项、附近超充、所有权信息</td><td>第三方应用</td><td>是</td><td>粒度偏粗且覆盖面广（从遥测到"所有权信息"），是位置之外最敏感的一包</td></tr><tr><td>5</td><td><code>vehicle_location</code></td><td>精确与粗略位置</td><td>第三方应用</td><td>是</td><td><strong>双层收窄的典型</strong>：即便授予，<code>hide_private</code> 共享车仍拒绝返回位置（见下）</td></tr><tr><td>6</td><td><code>vehicle_cmds</code></td><td>添加/移除驾驶员、Live Camera 访问、解锁、唤醒、远程启动、预约软件更新</td><td>第三方应用</td><td>是</td><td>高风险 scope：含"添加/移除驾驶员"（可扩权）与"Live Camera"（可实时窥视）</td></tr><tr><td>7</td><td><code>vehicle_charging_cmds</code></td><td>充电历史、计费金额、充电地点、预约/开始/停止充电</td><td>第三方应用</td><td>是</td><td>把"读充电历史/计费"与"写充电动作"合并在一个 scope，读写未分离</td></tr><tr><td>8</td><td><code>vehicle_specs</code></td><td>车辆规格</td><td><strong>仅 Partner Token</strong></td><td><strong>否——对任意车辆无需车主授权</strong></td><td><strong>授权控制例外（High）</strong>：退出逐车主同意模型，见 §17.2.10</td></tr><tr><td>9</td><td><code>vehicle_pricing_info</code></td><td>车辆定价信息</td><td><strong>仅 Partner Token</strong></td><td><strong>否</strong></td><td>同上，同属 High 级例外</td></tr><tr><td>10</td><td><code>energy_device_data</code></td><td>能源设备（Powerwall 等）数据</td><td>第三方应用</td><td>是</td><td>把授权域从"车"扩展到"能源产品"，是少见的跨产品线授权统一</td></tr><tr><td>11</td><td><code>energy_cmds</code></td><td>能源设备命令（如调度充放电）</td><td>第三方应用</td><td>是</td><td>与 <code>energy_device_data</code> 读写分离处理恰当，注意与车侧 6/7 的不一致</td></tr><tr><td>12</td><td><code>enterprise_management</code></td><td>企业管理（车队级管理）</td><td>Partner/企业</td><td>否（契约路径）</td><td>面向企业租户的"管理面" scope，是 B 端与 C 端授权分层的关键</td></tr></tbody></table></div>
+<p>来源：Tesla Fleet API 认证总览（scope 名称与覆盖资源为该页文档原文）—— <code>https://developer.tesla.com/docs/fleet-api/authentication/overview</code> —— [A]。表中"粒度设计评价"列为本报告判断 —— [合理推测（本报告判断）]。</p>
+<p><strong>逐点机制分析：</strong></p>
+<p><strong>(1) <code>openid</code> 与 <code>offline_access</code> 的定位。</strong> 文档明确 <code>openid</code> = "Sign in with Tesla"（允许车主用 Tesla 凭证登录第三方应用）；<code>offline_access</code> = 获取刷新令牌以免重复登录 —— 来源：同上 —— [A]。这两个 scope 是 <strong>OIDC（OpenID Connect）标准 scope</strong>，与特斯拉自定义的 <code>vehicle_*</code> / <code>energy_*</code> / <code>user_data</code> / <code>enterprise_management</code> 形成清晰分层：<strong>前两个管"身份与会话"，后十个管"资源与动作"</strong>。这是"认证与授权分离"的良好落地（对齐 OpenID Connect Core 1.0 的 UserInfo 与授权分离设计）—— [合理推测（本报告判断）]。</p>
+<p><strong>(2) <code>vehicle_location</code> 的双层收窄（本报告对标的正面案例）。</strong> 文档明载：<code>vehicle_location</code> 覆盖<strong>精确与粗略位置</strong>；此外，<strong>带 <code>granular_access.hide_private=true</code> 的车辆共享，即使被授予 <code>vehicle_location</code>，也拿不到任何位置，且无法流式传输位置字段</strong> —— 来源：Tesla Fleet API 认证总览 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/overview</code> —— [A]。</p>
+<p>这是全章最值得对标的一处设计。它意味着<strong>授权被授予（granted）不等于资源可访问（accessible）</strong>，中间还叠了一层<strong>资源级的策略收窄（granular access / hide_private）</strong>。工程上，这一"第二层"必须独立于 OAuth 授权层实现——即在 API 网关/资源服务器侧，<strong>每次取位置都要重新做一次"该车是否 hide_private"的判定</strong>，而不能只信 token 里的 scope。审计计划 §3.3 已把此点归为 <strong>Informational→正面控制案例</strong>：<strong>"双层授权控制"的良好实践，建议其他车企对标</strong> —— 来源：审计计划 §3.3 —— <code>docs/00-engagement-plan.md</code> —— [A]。</p>
+<p>从 STRIDE 视角（<strong>本报告判断</strong>）：<code>hide_private</code> 收窄的是 <strong>Information Disclosure（信息泄露）</strong> 与 <strong>Elevation of Privilege（越权）</strong> 两类威胁——它切断了"应用一旦拿到 <code>vehicle_location</code> 就能追踪所有共享车"的横向扩散路径。Fleet Telemetry 侧对应字段被拒返回 <strong>HTTP 403 "location access not granted"</strong>，见 §17.2.7 —— 来源：Tesla Fleet Telemetry 文档 —— <code>https://developer.tesla.com/docs/fleet-api/fleet-telemetry</code> —— [A]。</p>
+<p><strong>(3) <code>vehicle_cmds</code> 的高风险内容。</strong> 该 scope 覆盖<strong>添加/移除驾驶员、Live Camera 访问、解锁、唤醒、远程启动、预约软件更新</strong> —— 来源：Tesla Fleet API 认证总览 —— 同上 —— [A]。其中两点需要特别标注（<strong>本报告判断</strong>）：</p>
+<ul><li>"<strong>添加/移除驾驶员</strong>"是一个<strong>可扩权动作</strong>——获此 scope 的应用理论上可通过"添加驾驶员"改变车辆的用户集合，其影响面大于单次解锁；</li><li>"<strong>Live Camera 访问</strong>"是<strong>实时视觉数据</strong>，一旦泄露即场景级信息暴露，其敏感度高于普通遥测。</li></ul>
+<p>因此 <code>vehicle_cmds</code> 在风险分级上应高于"读类" scope。这提示一个通用设计原则：<strong>scope 划分不应只按"资源对象"（vehicle），还应按"读/写"与"是否可扩权"细分层级</strong>。Tesla 在此处把大量动作合并进一个 scope，属<strong>粒度偏粗但以虚拟密钥二次校验补偿</strong>的取舍（见 §17.2.6 与 §17.2.10）。</p>
+<p><strong>(4) <code>vehicle_specs</code> / <code>vehicle_pricing_info</code> 的授权控制例外。</strong> 文档明载这两个 scope <strong>仅 Partner Token 可用</strong>，且 <code>vehicle_specs</code> <strong>对任意车辆可用、无需车主授权</strong> —— 来源：Tesla Fleet API 认证总览 —— 同上 —— [A]。这是<strong>唯一明确退出"逐车主同意"模型的车辆资源访问路径</strong>。审计计划 §3.3 已将其判定为 <strong>High 级授权控制例外</strong>：<strong>"需在报告中显式标注为'退出逐车主同意模型'的路径，并建议以契约与审计补偿"</strong> —— 来源：审计计划 §3.3 —— <code>docs/00-engagement-plan.md</code> —— [A]。本报告在 §17.2.10 的 Trade-off 表中再次显式标注。</p>
+<p><strong>(5) scope 粒度总评（本报告判断）。</strong> Tesla 的 12 scope 覆盖了 <strong>身份（openid）→ 会话（offline_access）→ 用户画像（user_data）→ 车辆数据（vehicle_device_data/vehicle_location）→ 车辆动作（vehicle_cmds/vehicle_charging_cmds）→ 规格价格（vehicle_specs/vehicle_pricing_info）→ 能源（energy_device_data/energy_cmds）→ 企业管理（enterprise_management）</strong> 八个层级，覆盖完整；但<strong>读/写分离不彻底</strong>（<code>vehicle_device_data</code> 为纯读，而 <code>vehicle_cmds</code> / <code>vehicle_charging_cmds</code> 读写混装），且<strong>存在两个可绕过车主同意的 Partner 专属 scope</strong>。综合看，Tesla 的 scope 模型属"<strong>覆盖广、粒度中、以密钥二次校验补强</strong>"的工程取舍，而非学术意义上的最细粒度模型——若对齐 OAuth 2.0 Rich Authorization Requests（RFC 9396，<code>authorization_details</code> 结构化权限对象）所能表达的"资源级授权"粒度，Tesla 仍有细化空间 —— 来源：RFC 9396 —— <code>https://www.rfc-editor.org/rfc/rfc9396.txt</code> —— [A]。</p>
+<h3 id="sec-14">17.2.3 授权码流程逐步剖析</h3>
+<h4>17.2.3.1 授权服务器元数据（Discovery）</h4>
+<p>Tesla 的授权服务器元数据发布于： <code>https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/thirdparty/.well-known/openid-configuration</code> —— 来源：Tesla Fleet API 认证总览 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/overview</code> —— [A]。</p>
+<p>这一条对应两项规范：<strong>OIDC Discovery 1.0</strong>（<code>/.well-known/openid-configuration</code>）与 <strong>RFC 8414</strong>（OAuth 2.0 Authorization Server Metadata，<code>/.well-known/oauth-authorization-server</code>）—— 来源：信源档案 §2.1 —— <code>docs/sources/source-dossier.md</code> —— [A]。其工程价值在于：<strong>客户端无需硬编码端点，可通过一次 GET 自动发现 authorize/token 端点、支持的 scope、JWKS 公钥位置</strong>。对第三方开发者而言，这降低了"对接出错到无法授权"的概率；对 Tesla 而言，这让<strong>密钥轮换、端点迁移可以在不破坏既有集成的情况下完成</strong>（<strong>本报告判断</strong>）。</p>
+<p>注意元数据 URL 中的 <code>thirdparty</code> 路径段：它暗示<strong>按令牌类型划分元数据命名空间</strong>——thirdparty 的元数据独立于 partner/for-business —— [合理推测（本报告判断）]。</p>
+<h4>17.2.3.2 授权端点与参数</h4>
+<p>文档给出的授权端点为 <code>https://auth.tesla.com/oauth2/v3/authorize</code> —— 来源：Tesla Fleet API 第三方令牌文档 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/third-party-tokens</code> —— [A]。</p>
+<p><strong>必填参数</strong>（文档明载）：<code>response_type=code</code>、<code>client_id</code>、<code>redirect_uri</code>、<code>scope</code>、<code>state</code>（文档描述 <code>state</code> 为"用于校验的随机值"）—— 来源：同上 —— [A]。</p>
+<p><strong>可选参数</strong>：<code>nonce</code>（"用于防重放的随机值"）—— 来源：同上 —— [A]。</p>
+<p>一个完整的授权请求报文（按文档参数拼装，实际值须以开发者注册信息为准）：</p>
+<pre><code>GET /oauth2/v3/authorize?
+    response_type=code
+    &amp;client_id=$CLIENT_ID
+    &amp;redirect_uri=https%3A%2F%2Fdeveloper.example.com%2Fcallback
+    &amp;scope=openid%20offline_access%20vehicle_device_data%20vehicle_cmds
+    &amp;state=$RANDOM_STATE
+    &amp;nonce=$RANDOM_NONCE
+    &amp;audience=https%3A%2F%2Ffleet-api.prd.na.vn.cloud.tesla.com
+Host: auth.tesla.com</code></pre>
+<p>（参数清单来源：Tesla Fleet API 第三方令牌文档 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/third-party-tokens</code> —— [A]；<code>audience</code> 参数见 §17.2.3.4。）</p>
+<p><strong><code>state</code> 的作用剖析（本报告判断）</strong>：<code>state</code> 是 OAuth 2.0 核心的 <strong>CSRF（Cross-Site Request Forgery）防护</strong>手段——客户端生成一个不可预测的随机值，授权服务器原样回传，客户端在回调时比对。若攻击者能构造一个"把受害者账号绑定到攻击者应用"的授权请求，<code>state</code> 不匹配即可拦截。文档仅描述为"用于校验的随机值"，未展开其威胁模型 —— [A]（文档）+ [合理推测（本报告判断）]（威胁模型）。</p>
+<p><strong><code>nonce</code> 的作用剖析（本报告判断）</strong>：<code>nonce</code> 属 OIDC 层，绑定 <code>id_token</code> 与本次授权请求，防止 <strong>ID Token 重放</strong>。文档描述为"用于防重放的随机值"，与实际语义一致 —— 来源：Tesla Fleet API 第三方令牌文档 —— 同上 —— [A]。</p>
+<h4>17.2.3.3 三个附加参数：授权流程的"可控性旋钮"</h4>
+<p>Tesla 在 <code>/authorize</code> 上提供了三个<strong>非标准但极具工程价值</strong>的可选参数 —— 来源：Tesla Fleet API 第三方令牌文档 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/third-party-tokens</code> —— [A]：</p>
+<ul><li><code>prompt_missing_scopes=true</code>：<strong>对尚未授权的 scope 再次提示</strong>（即"增量授权"——车主此前已同意的 scope 不再重复展示，只对新增部分再次征求同意）。</li><li><code>require_requested_scopes=true</code>：<strong>必须授权全部请求 scope 才放行</strong>（即"全有或全无"——若车主只同意部分 scope，则整个授权失败，不颁发部分权限的令牌）。</li><li><code>show_keypair_step=true</code>：<strong>预告虚拟密钥配对第二步</strong>（即在授权 UI 中提前展示"稍后还需配对虚拟密钥"这一步，见 §17.2.6）。</li></ul>
+<p><strong>机制级分析（本报告判断）</strong>：这三个参数把"授权流程的严格程度"变成客户端可控的旋钮，其价值如下：</p>
+<ol><li><code>prompt_missing_scopes</code> 解决的是<strong>增量授权体验</strong>问题。若无此参数，每次应用新增一个 scope 都得让车主重新走完整同意界面（重复展示已授权项会造成"同意疲劳"，反而降低安全性）。Tesla 的取舍是：<strong>默认精确到"缺什么补什么"</strong>，把重复同意降到最低。</li><li><code>require_requested_scopes</code> 解决的是<strong>部分授权导致的运行期失败</strong>问题。若允许部分授权，应用拿到"半套权限"后运行到某一步才发现缺少 <code>vehicle_cmds</code>，会产生难以诊断的失败；强制全量授权则把"权限不足"提前到授权时刻暴露。代价是<strong>同意率下降</strong>（车主必须全同意）。</li><li><code>show_keypair_step</code> 解决的是<strong>两步式安全流程的用户预期管理</strong>问题。Tesla 车控需要"OAuth 授权 + 虚拟密钥配对"两步，若不预告，车主在第二步会困惑"为什么装个应用还要配对密钥"。提前预告可提升配对完成率。</li></ol>
+<p><strong>与 §17.2.5 的联动</strong>：<code>require_requested_scopes</code> 的"全有或全无"语义，与"<strong>scope 缩减对既有刷新令牌兼容、但新增 scope 必须用 <code>prompt_missing_scopes=true</code> 重新授权</strong>"形成一对不对称策略——<strong>收权限容易（当场生效对后续令牌）、加权限难（必须车主再次出面）</strong>。这是安全的默认方向（<strong>本报告判断</strong>）：扩权必须经车主，缩权可自动进行。</p>
+<h4>17.2.3.4 令牌端点、主机分离与 audience 绑定</h4>
+<p><strong>主机分离</strong>：令牌端点与 API 端点<strong>分属不同主机</strong>——</p>
+<ul><li>令牌端点：<code>POST https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/token</code>；</li><li>授权端点：<code>https://auth.tesla.com/oauth2/v3/authorize</code>；</li><li>API 端点：<code>https://fleet-api.prd.na.vn.cloud.tesla.com</code>（示例 base URL）。</li></ul>
+<p>—— 来源：Tesla Fleet API 第三方令牌文档 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/third-party-tokens</code> —— [A]。</p>
+<p>文档还特别说明：<code>/token</code> 调用"来自应用服务器、适用不同的限流" —— 来源：同上 —— [A]。</p>
+<p><strong>主机分离的工程含义（本报告判断）</strong>：把 <code>auth.tesla.com</code>（面向车主的身份/同意主机）、<code>fleet-auth.prd.vn.cloud.tesla.com</code>（面向应用服务器的令牌主机）、<code>fleet-api.prd.na.vn.cloud.tesla.com</code>（面向应用服务器的资源主机）分置于不同主机，带来三重收益：</p>
+<ol><li><strong>限流域隔离</strong>：<code>/token</code> 是低频、高价值的调用（每次换码/刷新一次），与高频的 API 调用（60 次/分）天然不同频。分离后可独立限流，避免"刷新风暴"打垮 API 网关。</li><li><strong>攻击面收敛</strong>：面向车主的 <code>auth.tesla.com</code> 需要渲染同意 UI、承载车主登录，其攻击面（XSS/CSRF）性质与纯 API 主机不同；分离后二者互不污染。</li><li><strong>信任域切分</strong>：<code>fleet-auth</code> 属"授权服务器"信任域，<code>fleet-api</code> 属"资源服务器"信任域——这正对应 OAuth 2.0 架构中 AS（Authorization Server）与 RS（Resource Server）的角色分离（RFC 6749）—— 来源：RFC 6749 —— <code>https://www.rfc-editor.org/rfc/rfc6749.txt</code> —— [A]。</li></ol>
+<p><strong>audience 绑定</strong>：<code>/token</code> 换码参数含 <code>grant_type=authorization_code</code>、<code>client_id</code>、<code>client_secret</code>、<code>audience</code>（<strong>必须是 Fleet API base URL</strong>，如 <code>https://fleet-api.prd.na.vn.cloud.tesla.com</code>）、<code>redirect_uri</code>、<code>scope</code> —— 来源：Tesla Fleet API 第三方令牌文档 —— <code>https://developer.tesla.com/docs/fleet-api/authentication/third-party-tokens</code> —— [A]。</p>
+<p><strong>audience 绑定的机制意义（本报告判断）</strong>：Requirement 是"audience 必须是 Fleet API base URL"，这把<strong>签发出来的令牌在签发生成就钉死在某个资源服务器域上</strong>。攻击者即使窃取令牌，也无法把该令牌重放到其他域（例如其他租户域或第三方伪造域），因为资源服务器会校验 <code>aud</code> 是否等于自己。这与 <strong>RFC 9068（JWT Profile for OAuth 2.0 Access Tokens）中"必须校验 <code>aud</code>/<code>iss</code>/<code>exp</code>"的要求</strong>同向 —— 来源：RFC 9068 —— <code>https://www.rfc-editor.org/rfc/rfc9068.txt</code> —— [A]。此外，Tesla 同时存在 <code>.na.</code>（北美）等区域段，说明 audience 实际承载了<strong>区域绑定</strong>语义——令牌跨区域不可用 —— [合理推测（本报告判断）]。</p>
+<p>一个 <code>/token</code> 换码请求的例子（结构按文档参数拼装）：</p>
+<pre><code class="language-http">POST /oauth2/v3/token HTTP/1.1
+Host: fleet-auth.prd.vn.cloud.tesla.com
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=authorization_code
+&amp;client_id=$CLIENT_ID
+&amp;client_secret=$CLIENT_SECRET
+&amp;audience=https%3A%2F%2Ffleet-api.prd.na.vn.cloud.tesla.com
+&amp;redirect_uri=https%3A%2F%2Fdeveloper.example.com%2Fcallback
+&amp;scope=openid+offline_access+vehicle_device_data+vehicle_cmds
+&amp;code=$AUTHORIZATION_CODE</code></pre>
+<p>（参数清单来源：Tesla Fleet API 第三方令牌文档 —— 同上 —— [A]。）</p>
+<p><strong>文档明确"认证端点不计费"</strong>：文档陈述"authentication endpoints are not billed"（认证端点不计费）—— 来源：同上 —— [A]。这一条对开发者意义重大：它把"授权/换码/刷新"这类安全必需操作与"调用业务 API"的计费解耦，<strong>避免了"因计费上限而让令牌刷新失败，导致应用被动断服"这一失败模式</strong>——见 §17.2.8 的计费模型 —— [合理推测（本报告判断）]。</p>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 21,147 字符</div>
+  </div>
+</footer>
+</body>
+</html>

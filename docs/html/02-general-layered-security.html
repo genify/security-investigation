@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>通用车云安全技术方案（分层解构） · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="通用车云安全技术方案（分层解构） — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>通用车云安全技术方案（分层解构）</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">02.0 方法与边界</a></li>
+<li class="lvl2"><a href="#sec-5">02.1 分层模型总览</a></li>
+<li class="lvl2"><a href="#sec-11">02.2 硬件安全层（L0 + L1 的物理与执行环境部分）</a></li>
+<li class="lvl2"><a href="#sec-18">02.3 通信安全层（L2）</a></li>
+<li class="lvl2"><a href="#sec-25">02.4 授权与身份层（L3，总纲 · 指向第 3 部分）</a></li>
+<li class="lvl2"><a href="#sec-28">02.5 应用与平台安全层（L4）</a></li>
+<li class="lvl2"><a href="#sec-33">02.6 生命周期与合规层（L5）</a></li>
+<li class="lvl2"><a href="#sec-38">02.7 通用方案「控制点 → 威胁」双向映射大表</a></li>
+<li class="lvl2"><a href="#sec-39">02.8 通用方案的工程落地参考（三个片段，均为示意）</a></li>
+<li class="lvl2"><a href="#sec-43">02.9 通用方案的已知薄弱点（≥ 8 条）</a></li>
+<li class="lvl2"><a href="#sec-44">02.10 本章待补证清单</a></li>
+<li class="lvl2"><a href="#sec-45">02.11 本章小结</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<blockquote><p>本文件为 TRA-1《车云安全技术方案调研》第 2 部分「通用车云安全技术方案分析」。 前序：<code>01-overview.md</code>（概述）；后续：第 3 部分「授权与访问控制」（<code>10</code>–<code>19</code> 号文件）、第 4/5 部分「车企实践」（<code>16</code>/<code>17</code>/<code>20</code>/<code>21</code> 号文件）、第 6 部分「对比与差异」（<code>30-comparison.md</code>）。 覆盖验收标准：AC-3、AC-7、AC-12。 事实底座：<code>docs/sources/source-dossier.md</code>（下称"信源档案"）。本章不引入信源档案之外的任何 URL、标准编号、条款号、数字或日期。</p></blockquote>
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>02.0 方法与边界</h2></div>
+<h3 id="sec-1">02.0.1 本章在全报告中的位置</h3>
+<p>本报告采用"通用基准线 → 车企实践 → 差异归因"的三段式结构。本章是其中的<strong>第一段：通用基准线</strong>。它回答的问题是：</p>
+<blockquote><p><strong>在不考虑任何特定车企的前提下，一个"行业通用"的车云安全技术方案，应当由哪些层构成？每层的可信基是什么？威胁面在哪里？控制点有哪些？每一条控制点能在哪一份公开规范里找到依据？又该如何验证它真的被实现了？</strong></p></blockquote>
+<p>之所以必须先写这一章，理由来自 <code>00-engagement-plan.md</code> §4 的<strong>对标基准法</strong>：第 4/5 部分要对 14 家车企做逐家拆解，如果缺少一条公开的、可引用的"通用方案基准线"，那么对车企的评价就会退化为写作团队的主观印象——"这家做得多、那家做得少"将无法判定。有了本章的基准线，后续每一家车企的实践都可以写成"相对于基准线，它在哪一层有公开证据、证据强度如何、在哪一层无公开证据"。<strong>基准线是评价的标尺，而不是评价的结论。</strong></p>
+<p>同时，本章也是"授权层薄、其他层厚"的刻意安排。按 <code>00-engagement-plan.md</code> §2 的工作流分解，授权与访问控制单独占据 WF-2/WF-3/WF-4/WF-5/WF-6 共 8 个切面、435K 字符预算（预算见该文件 §2 的字符预算对账表）。因此本章对授权层<strong>只给出"接口与引用"</strong>——即说明该层在分层模型中的位置、它与通信层/硬件层的依赖关系、以及它由哪些后续文件展开——而<strong>不重复展开协议细节、令牌模型、资源级授权</strong>。凡本章提到授权层具体机制之处，一律以"见 10–19 号文件"的方式指向，避免与 WF-2/WF-3 产生内容重叠。</p>
+<h3 id="sec-2">02.0.2 唯一事实底座与证据分级</h3>
+<p>本章全部事实性断言，均取自信源档案。信源档案 §0 记录了本次调研的采集方法与<strong>根本局限</strong>，该局限直接决定了本章的措辞边界，必须先复述：</p>
+<ul><li><strong>检索工具不可用</strong>：<code>web_search</code> / <code>web_extract</code> 全程返回额度耗尽（Firecrawl 402/429），本次调研<strong>无法做开放网络发现</strong>，只能"直取已知权威 URL"。</li><li><strong>公开搜索引擎同样不可用</strong>：Bing 被地理重定向至 <code>cn.bing.com</code> 且对中文品牌词返回噪声；Baidu / Sogou / 360 触发验证码；Google 返回机器人墙或空结果；DuckDuckGo 验证码。</li><li><strong>区域/网络封锁</strong>：<code>bmw.com</code> / <code>bmwgroup.com</code> / <code>rivian.com</code> 被 Akamai/CloudFront 区域封锁；<code>unece.org</code>、<code>iso.org</code>、<code>autosar.org</code>、<code>trustedcomputinggroup.org</code> 被 Cloudflare 或超时拦截；<code>open.xiaopeng.com</code> 对所有请求返回 403。</li><li><strong>覆盖度偏置</strong>：证据密度向"文档公开可达"的企业倾斜（Tesla、Mercedes-Benz 最厚），对文档未公开的企业证据薄弱。信源档案 §0 对此定下纪律：<strong>「未找到公开来源」= 本次披露缺口，绝不等于能力缺口</strong>，不得反向推断为"该企业没有该能力"。</li></ul>
+<p><strong>证据分级沿用 <code>00-engagement-plan.md</code> §3.1 的统一口径</strong>，本章正文中一律以方括号标注，措辞规则如下表。</p>
+<div class="table-wrap"><table><thead><tr><th>标记</th><th>定义</th><th>本章允许的措辞</th></tr></thead><tbody><tr><td><code>[A]</code></td><td>一手：国家标准全文公开系统 / RFC Editor / 官方规范库 / 官方产品页</td><td>"文档明载……"</td></tr><tr><td><code>[B]</code></td><td>权威第三方：行业联盟规范页、官方 SDK 仓库、权威机构</td><td>"据……（第三方）……"</td></tr><tr><td><code>[C]</code></td><td>二手：自媒体、博客、论坛、聚合站</td><td>"有报道称……（未经一手核实）"</td></tr><tr><td><code>[未验证]</code></td><td>站点可达性已确认但正文未取到</td><td>"尚未取证，URL 结构待复核"</td></tr><tr><td><code>[推测]</code></td><td>由已知规范/架构推导，档案无直接来源</td><td>"<strong>本报告判断</strong>……（推测，非事实）"</td></tr><tr><td><code>未找到公开来源</code></td><td>已检索指定对象无果</td><td>"本次未找到公开来源，不等同于能力缺失"</td></tr></tbody></table></div>
+<h3 id="sec-3">02.0.3 本章不做什么（边界声明）</h3>
+<p>为避免读者误读，本节把本章<strong>明确不做</strong>的四件事写出：</p>
+<ol><li><strong>不做车企专属断言。</strong> 本章出现的唯一一组"企业名"是硬件器件生态（Infineon / NXP / Renesas / TI，见 02.2.6）与 OTA/供应链框架（Uptane / TUF，见 02.6.1），且这两组内容均以"<strong>站点存在</strong>"为限，<strong>不写任何"某型车辆搭载某器件/某框架"的断言</strong>。凡涉及具体车企的方案，一律留给第 4/5 部分。本节出现的 Tesla / Mercedes-Benz / CARIAD 等名称，仅用于<strong>举例说明"通用方案在某处已有公开实现"</strong>，不作为对企业的评价。</li><li><strong>不把"未取到"写成"不具备"。</strong> 对 TPM 2.0、SHE、AUTOSAR、ISO 21434、UN R155/R156、欧盟 Data Act 等本次未取到正文的对象，本章一律写"本次未找到可核验公开一手来源 / 尚未取证"，<strong>不写"行业普遍未采用"</strong>。</li><li><strong>不给出无来源的数值。</strong> 本章如需给出阈值、周期、配额（例如证书轮换周期、密钥长度），一律标注为"<strong>设计建议值</strong>"，并与"规范明载值"物理分隔（不同段落）。</li><li><strong>不做漏洞披露与实车测试。</strong> 对齐 <code>00-engagement-plan.md</code> §1"范围外"：本委托为公开信息调研，不含主动测试，不披露任何未修复漏洞。本章的"薄弱点"分析（02.9）是<strong>机制层的一般性风险陈述</strong>，不指向任何具体产品的具体漏洞。</li></ol>
+<h3 id="sec-4">02.0.4 本章的"可验证证据"定义</h3>
+<p>本章 02.1 的大表中有一列叫「可验证证据」。必须说清该列的含义，否则会与"事实分级"混淆：</p>
+<ul><li><strong>事实分级</strong>（<code>[A]</code>/<code>[B]</code>/<code>[C]</code>/<code>[未验证]</code>/<code>[推测]</code>）回答的是：<strong>这条陈述的来源有多强？</strong></li><li><strong>可验证证据</strong>回答的是：<strong>若要对某个具体实现做合规/安全验证，在该层上有哪些公开可用的验证抓手？</strong></li></ul>
+<p>举例：硬件层的"可验证证据"可以是"密码模块的 FIPS 140-3 认证编号""TEE 的 GlobalPlatform 认证状态"；通信层的可以是"服务端证书链能否被指定 CA 校验通过"；OTA 层的可以是"更新包 Manifest 是否含阈值签名"。<strong>这些验证抓手本身也是行业通用方案的一部分</strong>——一个方案如果设计上不可验证，它就在工程上不可交付。这一点在 02.7 的映射表中会逐条展开为「验证方法」列。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-5">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>02.1 分层模型总览</h2></div>
+<h3 id="sec-6">02.1.1 六层参考模型的定义</h3>
+<p>本章采用 <code>00-engagement-plan.md</code> §4 分层解构法的 5 层骨架（硬件根信任 → 通信 → 授权 → 应用与平台 → 生命周期/合规），并在其最底层<strong>显式拆出"芯片/硬件根信任"为 L0</strong>、把原有的"硬件"层细化，形成 6 层参考模型。</p>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>名称</th><th>一句话定义</th><th>可信基（Root of Trust 的落点）</th></tr></thead><tbody><tr><td><strong>L0</strong></td><td>芯片 / 硬件根信任</td><td>不可变的密钥与身份锚点，以及承载算法的硅</td><td>芯片内一次性可编程区、密钥保险库、密码加速器、器件唯一标识</td></tr><tr><td><strong>L1</strong></td><td>车端系统与执行环境</td><td>让 L0 的密钥"可用"的软件执行环境（引导链、TEE、内核、应用沙箱）</td><td>安全启动链、TEE 的隔离边界、操作系统强制访问控制</td></tr><tr><td><strong>L2</strong></td><td>通信与 PKI</td><td>让车与云之间的每一跳可认证、可保密、可防重放</td><td>证书颁发与吊销体系、TLS 终结点、时间基准</td></tr><tr><td><strong>L3</strong></td><td>授权与身份</td><td>判定"这个调用者，是否有权对这个资源，做这个动作"</td><td>授权服务器、令牌与密钥绑定、资源级策略决策点</td></tr><tr><td><strong>L4</strong></td><td>应用与平台</td><td>承载业务的云侧微服务与车侧应用，以及它们的隔离与影响范围控制</td><td>服务身份、容器/分域隔离、网关鉴权、审计</td></tr><tr><td><strong>L5</strong></td><td>生命周期</td><td>OTA 软件更新、数据隐私合规、供应链完整性、管理体系</td><td>更新仓库签名、SBOM、构建证明、合规证据链</td></tr></tbody></table></div>
+<p><strong>为什么把 L0 从 L1 里拆出来？</strong> 因为在车云场景中，L0 与 L1 的失败模式完全不同：L0 的失败通常是<strong>物理或硅层的</strong>（密钥被侧信道提取、调试口未关、器件被替换），而 L1 的失败通常是<strong>软件链的</strong>（引导校验被跳过、TEE 漏洞、内核提权）。两者对应的控制点、规范依据（FIPS 140-3 vs. GlobalPlatform TEE）与验证方法（芯片认证 vs. 引导日志）都不同，混在一层会让"控制-威胁"映射失焦。这一拆分是<strong>本章的框架选择</strong>，属<strong>本报告判断</strong>（框架设计，非事实断言）。</p>
+<h3 id="sec-7">02.1.2 分层架构图（ASCII）</h3>
+<pre><code>                      ┌───────────────────────────────────────────────────────────────┐
+                      │                        云 侧（Cloud）                          │
+                      │  ┌─────────────────────────────────────────────────────────┐  │
+   L5 生命周期 ────────┼──▶ OTA 仓库(Director/Image) │ SBOM │ 构建证明 │ 合规证据链 │  │
+                      │  └─────────────────────────────────────────────────────────┘  │
+                      │  ┌─────────────────────────────────────────────────────────┐  │
+   L4 应用与平台 ──────┼──▶ API 网关 ──▶ 微服务(服务身份/mTLS) ──▶ KMS/HSM 后端       │  │
+                      │  │                │  WAF │ 速率限制 │ 审计日志               │  │
+                      │  └─────────────────────────────────────────────────────────┘  │
+                      │  ┌─────────────────────────────────────────────────────────┐  │
+   L3 授权与身份 ──────┼──▶ 授权服务器 │ 令牌签发/内省/吊销 │ 资源级策略决策点(PDP)  │  │
+                      │  └─────────────────────────────────────────────────────────┘  │
+                      │  ┌─────────────────────────────────────────────────────────┐  │
+   L2 通信与 PKI ──────┼──▶ CA/OCSP/ACME ── mTLS/TLS1.3 ──▶ TLS 终结点            │  │
+                      └───────────────────────────────────────────────────────────────┘
+                                                    ▲  │
+                       证书链 / 时间戳 / 命令幂等键  │  │  双向认证
+                                                    │  ▼
+                      ┌───────────────────────────────────────────────────────────────┐
+                      │                  车 端（Vehicle / T-BOX / 网关）              │
+                      │  ┌─────────────────────────────────────────────────────────┐  │
+   L1 车端执行环境 ────┼──▶ 安全启动链 ──▶ TEE(可信执行) │ Hypervisor 分域 │ 应用沙箱 │  │
+                      │  └─────────────────────────────────────────────────────────┘  │
+                      │  ┌─────────────────────────────────────────────────────────┐  │
+   L0 硬件根信任 ──────┼──▶ SE/eSE │ 车载 HSM │ (TPM 2.0 未取证) │ 器件唯一标识     │  │
+                      │  └─────────────────────────────────────────────────────────┘  │
+                      └───────────────────────────────────────────────────────────────┘</code></pre>
+<p>图中箭头方向表示"信任的传递方向"：L0 的根密钥向上经 L1 的执行环境保护、由 L2 的证书体系为车云链路背书、由 L3 判定每一次调用的合法性、由 L4 隔离影响范围、由 L5 保证软件与数据在其全生命周期内不变质。<strong>任何一层断裂，其上各层的可信性都不再成立</strong>——这是分层模型最重要的读法。</p>
+<h3 id="sec-8">02.1.3 六层参考模型大表（可信基 / 威胁面 / 控制点 / 代表规范 / 可验证证据）</h3>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>可信基</th><th>主要威胁面</th><th>主要控制点</th><th>代表规范（均出自信源档案）</th><th>可验证证据</th></tr></thead><tbody><tr><td><strong>L0 芯片/硬件根信任</strong></td><td>芯片内密钥保险库、OTP fuses、器件唯一标识、密码加速器</td><td>侧信道与故障注入；调试口/JTAG 未关；器件被物理替换；密钥可被导出到外部存储</td><td>密钥不可导出；安全元件存储私钥；HSM 分级匹配算力与成本；FIPS 140-3 认证等级</td><td>FIPS 140-3 <code>[A]</code>；FIPS 197 <code>[A]</code>；FIPS 186-5 <code>[A]</code>；EVITA Full/Medium/Light 分级 <code>[B]</code>；GlobalPlatform Secure Element 分类 <code>[A]</code></td><td>密码模块认证编号；器件数据手册中的安全特性项；调试口锁定状态的产线记录</td></tr><tr><td><strong>L1 车端系统与执行环境</strong></td><td>安全启动链的每一级签名校验；TEE 的隔离边界；内核 MAC/沙箱策略</td><td>引导链被跳过或降级；TEE 实现漏洞；内核提权；恶意应用读写他人 IPC</td><td>逐级验签启动；TEE 隔离敏感操作；Hypervisor 分域；应用沙箱与 IPC 白名单</td><td>GlobalPlatform TEE System Architecture v1.3（GPD_SPE_009）<code>[A]</code>；OP-TEE <code>[A]</code>；ARM TrustZone for Cortex-A / Cortex-M <code>[B]</code></td><td>启动日志逐级校验记录；TEE 认证状态；沙箱策略文件；<code>dmesg</code>/secure boot 状态位</td></tr><tr><td><strong>L2 通信与 PKI</strong></td><td>证书链的锚点 CA；TLS 会话密钥；可信时间基准</td><td>中间人；链路降级至弱套件；证书吊销不传播；重放已捕获的合法报文；密钥泄露不可检测</td><td>双向证书认证；仅启用 1.3/前向保密套件；OCSP/CRL 兜底；nonce/序列号/时间戳/幂等键</td><td>RFC 8446 <code>[A]</code>；RFC 5280 <code>[A]</code>；RFC 6960 <code>[A]</code>；RFC 3161 <code>[A]</code>；RFC 8555 <code>[A]</code>；RFC 8998 <code>[A]</code>；GB/T 45112-2024 <code>[A]</code></td><td>服务端 <code>openssl s_client</code> 握手结果；证书链长度与有效期；OCSP 响应可达性；重放测试用例结果</td></tr><tr><td><strong>L3 授权与身份</strong></td><td>授权服务器的判定逻辑；令牌与持有者的绑定关系；车端对命令载荷的验签</td><td>令牌被盗用（Bearer 天然可复制）；越权访问他人车辆；授权撤销不联动；代理链主体混淆</td><td>OAuth 2.x 授权码 + PKCE；令牌绑定（mTLS/DPoP）；细粒度 scope/资源级授权；签发方约束令牌；令牌内省与吊销</td><td>RFC 6749/6750/7636/8705/9449/9396/7662/7009/8693/9635 <code>[A]</code>；OIDC Core 1.0 <code>[A]</code>；GB/T 47467-2026 <code>[A]</code></td><td>授权端点 <code>/.well-known</code> 元数据 <code>[A]</code>（对标 Tesla 已发布该元数据）；令牌内省响应；撤销后访问返回 401 的实测</td></tr><tr><td><strong>L4 应用与平台</strong></td><td>服务身份（服务间 mTLS）；容器/分域隔离边界；网关作为统一鉴权点</td><td>单服务被攻破后横向移动；租户/账号越界；SSRF 打内网；外设被恶意应用占用；资源耗尽</td><td>微服务最小权限；服务间 mTLS；容器隔离；密钥托管于 KMS/HSM；网关集中鉴权；命令白名单与速率限制</td><td>GB/T 47324-2026 <code>[A]</code>；RFC 8705 <code>[A]</code>（服务间 mTLS 机制）；GB/T 45181-2024 <code>[A]</code>（异常行为检测）；Tesla 限流模型 <code>[A]</code>（作为已公开的限流实例）</td><td>网络策略清单；服务身份证书；容器安全基线扫描结果；网关访问日志与授权决策日志</td></tr><tr><td><strong>L5 生命周期</strong></td><td>更新仓库的签名角色与阈值；构建过程的可复现性；数据分类分级台账</td><td>版本降级/回滚攻击；仓库或签名密钥泄露；供应链投毒；重要数据违规出境</td><td>双仓库 + 阈值签名；四角色 TUF 模型；SUIT Manifest；回滚保护；SBOM + 构建完整性；数据分类分级</td><td>Uptane 2.1.0 <code>[A]</code>；TUF 规范 <code>[A]</code>；RFC 9019 / RFC 9124 <code>[A]</code>；SPDX <code>[A]</code>/CycloneDX <code>[B]</code>；SLSA v1.0 <code>[A]</code>；in-toto <code>[B]</code>；GB 44496-2024 <code>[A]</code>；GB/T 47325-2026 <code>[A]</code>；GB/T 41871-2022 <code>[A]</code>；GB/T 44464-2024 <code>[A]</code></td><td>更新包 Manifest 签名链；版本号单调性检查；SBOM 文件；构建证明（provenance）；数据出境评估记录</td></tr></tbody></table></div>
+<h3 id="sec-9">02.1.4 读表的四条要点</h3>
+<p><strong>要点一：可信基与威胁面是"成对"的。</strong> 表中"可信基"是设计者<strong>依赖</strong>的东西，"威胁面"是攻击者<strong>攻击</strong>的东西——二者常常是同一处。例如 L0 的可信基是"密钥不可导出"，其威胁面正是"密钥被导出"（侧信道、调试口）。一份安全方案评审若不把这两列对齐检查，就会出现"信任了一个自己无法验证的组件"的经典错误。<strong>本报告判断</strong>：这是分层解构相对于"按功能罗列控制项"的核心价值（方法论判断，非事实）。</p>
+<p><strong>要点二：代表规范列里出现的是"规范编号"，不是"实现等级"。</strong> 一条 RFC 或一份 GB 的存在只说明"该机制有规范可依"，<strong>不说明任何具体实现已达到该规范</strong>。表中同时给出 L0 的 FIPS 140-3 与 L2 的 RFC 8446，并不意味着某辆车同时满足二者——是否满足要靠"可验证证据"列去核。这是本章反复强调的纪律：<strong>规范的引用密度不能当作实现成熟度的度量</strong>。</p>
+<p><strong>要点三：中国的规范体系在这一层是"成组出现"的。</strong> 信源档案 §1 显示，中国在车云安全上已有相当密的规范网：GB 44495-2024（整车信息安全）与 GB 44496-2024（软件升级）为<strong>强制性</strong>国标，发布 2024-08-23、实施 2026-01-01 <code>[A]</code>；其下是 GB/T 40855/40856/40857-2021 分别覆盖<strong>远程服务与管理系统、车载信息交互系统、汽车网关</strong>三个部件级对象 <code>[A]</code>；再到 GB/T 47324-2026《车联网平台网络安全防护要求》与 GB/T 47325-2026《车联网在线升级安全技术要求与测试方法》分别命中<strong>云平台侧</strong>与<strong>OTA 侧</strong>，均为 2026-03-31 发布、2026-10-01 实施 <code>[A]</code>；另有 GB/T 47467-2026《车联网安全管理接口规范》（2026-04-30 发布、2026-11-01 实施）落在<strong>接口层</strong> <code>[A]</code>；证书体系侧有 GB/T 45112-2024《基于 LTE 的车联网无线通信技术 安全证书管理系统技术要求》 <code>[A]</code>；异常检测侧有 GB/T 45181-2024《车联网网络安全异常行为检测机制》 <code>[A]</code>；密码算法侧有 GB/T 32918 系列（SM2）、GB/T 32905（SM3）、GB/T 32907（SM4）及 GB/T 35275/35276 <code>[A]</code>。<strong>这张规范网的存在是本章最强的一手证据</strong>：它说明"通用车云安全方案"在中国不是一个空洞的概念，而是有强制性落地时间表的合规对象。</p>
+<p><strong>要点四：国际侧的证据强度显著弱于国内侧。</strong> 信源档案 §1.4 明确：ISO/SAE 21434:2021 的 ISO 官方页被 Cloudflare 拦截，标记为 <code>[未验证]</code>（编号与年份为通行共识，正文未取到）；ISO 24089:2023 同为 <code>[未验证]</code>；UN R155/R156 的 UNECE 站点被全站拦截，<code>[未验证]</code>；GDPR 与欧盟 Data Act 2023/2854 的 EUR-Lex 页面返回 202 异步状态，<code>[C]</code>。信源档案 §1.4 因此下了一条<strong>写作纪律</strong>：涉及 R155/R156 时<strong>不得给出条款编号</strong>，只能做"性质层面描述"。本章严格遵守该纪律：02.6.4 处对 R155/R156 只写"性质与体系要求"，不给条款号。</p>
+<h3 id="sec-10">02.1.5 层间依赖的"最短木板"分析</h3>
+<p>分层模型容易给人一种"层数越多越安全"的错觉。实际上，<strong>车云安全的整体强度由最弱的一层决定</strong>，而不是由最强的一层决定。把 02.1.3 的六层按"控制点数量"与"可验证性"两个维度粗略排序，可以读出三条依赖关系：</p>
+<ol><li><strong>L3 依赖 L2。</strong> 授权层的令牌绑定机制（mTLS/DPoP 类）在语义上要求"链路两端已持有可证书化的身份"——这正是 L2 的产物。若 L2 只有单向认证，L3 就只能退回到易复制的 Bearer 令牌。因此<strong>通信层是授权层的物理前提</strong>。规范层面可见其呼应：RFC 8705（mTLS 客户端认证与证书绑定令牌）本身即同时属于 OAuth 家族与传输层绑定机制 <code>[A]</code>。</li><li><strong>L2 依赖 L0。</strong> 车端证书的私钥若可被导出，则 mTLS 的双向性形同虚设——攻击者可直接用被盗私钥完成握手。因此 L2 的强度上限由 L0 的"密钥不可导出"决定。Tesla 的公开文档给出一个可对照的实例：其虚拟密钥要求<strong>私钥留在应用服务器、绝不可托管于域名</strong>，且车辆执行命令前验证载荷签名 <code>[A]</code>（信源档案 §7.1）。</li><li><strong>L5 反向加固 L0–L4。</strong> OTA 是唯一能在车辆出厂后修复前四层缺陷的手段。因此 L5 的签名与回滚保护一旦失效，前四层的所有缺陷都将<strong>永久固化</strong>在已交付车辆上。Uptane 官网将其框架定位为"面向可抵御国家级攻击者设计的软件更新安全系统" <code>[A]</code>（信源档案 §6），这一措辞的工程含义正是：OTA 层是唯一需要按"最高对抗等级"设计的层，因为它一旦失守无补救途径。</li></ol>
+<p><strong>本报告判断</strong>：上述三条依赖关系中，第 3 条在车云场景中的权重高于传统 IT——因为传统 IT 资产可以随时重装，而车辆的平均持有周期以年计且处于物理可达的攻击者手中（推测，非事实）。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-11">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>02.2 硬件安全层（L0 + L1 的物理与执行环境部分）</h2></div>
+<h3 id="sec-12">02.2.1 密钥与证书的硬件保管：能力边界对照</h3>
+<p>车云安全的根在"私钥在哪里"。只要私钥可被导出，其上所有基于签名的机制——mTLS 客户端认证、车端命令验签、OTA 包验签、令牌绑定——都退化为"共享密钥"模式，其安全性只剩"不被读到"这一条。因此 L0 的第一个工程决策是：<strong>私钥放在哪一类器件里？</strong></p>
+<p>下表把四类候选器件按"能力边界"对照。<strong>必须提前声明证据强度差异</strong>：GlobalPlatform 的 Secure Element 分类与 FIPS 140-3 有信源档案可引的一手/权威来源；TPM 2.0 在信源档案 §4 中标记为 <code>[未验证]</code>（TCG 站点 403/超时，正文未取到）；SHE 在信源档案 §4 中明确记录为<strong>「未找到可核验公开一手 URL：成员制规范」</strong>。后两者<strong>只做机制层面的通用描述，不作为"车规采用度"的证据</strong>。</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>SE / eSE（Secure Element）</th><th>车载 HSM</th><th>TPM 2.0（本次未取证）</th><th>SHE（本次未找到可核验一手来源）</th></tr></thead><tbody><tr><td>规范/来源</td><td>GlobalPlatform Secure Element 分类 <code>[A]</code>；CCC Digital Key 明确密钥存储于 Secure Element <code>[A]</code></td><td>FIPS 140-3 为密码模块认证基线 <code>[A]</code>；EVITA 分级 <code>[B]</code></td><td>TCG TPM 2.0 规范页 <code>[未验证]</code>（403/超时）</td><td>成员制规范，<code>[未找到可核验公开一手 URL]</code></td></tr><tr><td>主要形态</td><td>独立芯片或集成于 SoC 的嵌入式 SE</td><td>独立芯片，贴近 MCU/网关</td><td>主板上独立的可信平台模块</td><td>集成在 MCU 内的密钥存储区</td></tr><tr><td>典型能力</td><td>密钥不可导出、加解密、签名、随机数</td><td>高性能签名/验签、真随机数、防篡改外壳、密钥层级</td><td>平台度量与证明（PCR）、密钥层级、密封存储</td><td>对称密钥存储与 AES 运算、安全启动辅助</td></tr><tr><td>算法倾向</td><td>非对称（ECC）为主，兼顾对称</td><td>非对称 + 对称 + 哈希，全算法</td><td>非对称 + 对称 + 哈希</td><td><strong>以对称为主</strong>（该判断依其"密钥存储区"定位，属 <code>[推测]</code>）</td></tr><tr><td>车云场景的落点</td><td>数字钥匙凭证存储（CCC 明确）<code>[A]</code>；车端证书私钥</td><td>网关/T-BOX 的车云链路私钥、OTA 验签</td><td>本次未取得车端搭载证据</td><td>本次未取得可核验规范</td></tr><tr><td>关键工程约束</td><td>算力/存储有限，不适合批量高吞吐</td><td>成本与功耗随安全等级上升</td><td>依赖平台固件对度量流程的正确实现</td><td>对称密钥模型难以支撑"可公开验证的签名"</td></tr><tr><td>验证抓手</td><td>器件认证/合规声明；密钥导出尝试应失败</td><td>密码模块认证等级；密钥生成与使用日志</td><td>本次无</td><td>本次无</td></tr></tbody></table></div>
+<p><strong>一条可核验的落点证据</strong>：信源档案 §5 明载，CCC（Car Connectivity Consortium）Digital Key Release 3.0 于 2021-04-21 发布，新增 BLE + UWB 实现被动无钥匙进入与启动，NFC 保留为<strong>强制备用方案</strong>，且<strong>密钥存储于 Secure Element</strong> <code>[A]</code>。这是"SE 在车云/车端安全中承担密钥保管"这一说法在本档案中<strong>唯一</strong>的确切一手落点。注意其边界：该条目证明的是<strong>数字钥匙凭证</strong>存于 SE，<strong>并未</strong>证明车云 mTLS 链路私钥也存于 SE——后者在本报告中属"未找到公开来源"，不得引为事实。</p>
+<p><strong>为什么列出 SHE 与 TPM 2.0 却给不出结论？</strong> 因为这正是本章要示范的纪律：一个成熟的行业方案评审表应当<strong>明确区分"我知道它存在"与"我确认它在车端被用"</strong>。信源档案 §4 对二者的记录是"站点/规范不可达或成员制"，因此本章只能把它们列为"候选器件类型"，在 02.10 待补证清单中登记为需通过会员渠道获取规范正文的对象。<strong>本次未找到可核验一手来源，不构成对 SHE/TPM 2.0 在车云场景适用性的任何负面判断。</strong></p>
+<h3 id="sec-13">02.2.2 安全执行环境：TrustZone、GlobalPlatform TEE、OP-TEE</h3>
+<p>L1 的核心问题是：<strong>当操作系统（甚至富操作系统/Android）已被攻破时，敏感操作还能在哪执行？</strong> 行业通用答案是"另开一个隔离的执行环境"，落点为 ARM 的 TrustZone 技术与建在其上的 TEE（Trusted Execution Environment）。</p>
+<p><strong>TrustZone 的两条产品线。</strong> 信源档案 §4 记录两条官方渠道：ARM TrustZone for Cortex-A 与 ARM TrustZone for Cortex-M，均为 <code>[B]</code>（官方技术页，HTTP 可达）。二者的工程差异是结构性的（<strong>本报告判断</strong>，属架构常识层面的机制分析，非对具体器件的断言）：Cortex-A 侧用"安全世界/非安全世界"的处理器状态划分，配合外设的安全属性，承载较重的可信应用（如 DRM、支付、数字钥匙服务）；Cortex-M 侧用"安全/非安全状态 + 存储与外设分区"承载车载 MCU 的安全任务（如安全启动伴随校验、SecOC 密钥管理）。信源档案对两者仅取证到"官方技术页存在"，<strong>未取到其在任何车厂项目中的搭载记录</strong>。</p>
+<p><strong>GlobalPlatform TEE System Architecture v1.3。</strong> 信源档案 §4 记录该规范，规范号 <strong>GPD_SPE_009</strong>，来源为 GlobalPlatform 规范库，<code>[A]</code>。该规范定义了 TEE 的系统架构与接口抽象——即"可信应用如何在隔离环境中被加载、被调用、被隔离"。它是"TEE 可互操作、可认证"的规范基础。<strong>引用边界</strong>：本章只能引用规范本身存在与其架构定位，<strong>不得</strong>引用其内部条款编号（本次未取正文逐条）。</p>
+<p><strong>OP-TEE。</strong> 信源档案 §4 记录 OP-TEE 为"开源 TEE OS，TrustZone 之上的 TEE 实现"，来源 <code>optee.readthedocs.io</code>，<code>[A]</code>。它的工程意义在于：<strong>它把 TEE 从"仅可购买的黑盒"变成"可审计的白盒"</strong>。对于需要评估 TEE 实现本身风险的团队，开源实现提供了代码级可验证性——这与 02.0.4 的"可验证证据"概念一致。</p>
+<p><strong>TEE 的信任链与"TEE 不等于不可破"的工程事实。</strong> 这一点必须写清楚，否则会误导读者把 TEE 当作万能屏障：</p>
+<ol><li><strong>TEE 的信任链是：ROM → 安全启动 → TEE OS → 可信应用。</strong> TEE 自身不是根，它依赖 L0 与安全启动链把可信根传递过来。若启动链某级被跳过，TEE 加载的可能是被篡改的 TEE OS，则其上一切隔离承诺作废。</li><li><strong>TEE 的隔离是"基于实现"的，不是"基于物理"的。</strong> TEE 与富 OS 共享同一颗 SoC、同一套内存控制器与总线，隔离靠 MMU/MPU 配置与总线过滤实现。共享硬件决定了<strong>攻击面共享</strong>（<strong>本报告判断</strong>，属 TEE 架构的一般性机制推理）：历史上 TEE 实现层出现过缺陷的先例属行业共识，但本档案未采集任何具体 CVE 或漏洞案例，因此<strong>本章不引用任何具体 TEE 漏洞</strong>，只做机制层的一般性陈述。</li><li><strong>可信应用（TA）的设计缺陷会把 TEE 边界变成"筛子"。</strong> 一个过度授权的 TA、或一个未校验调用方身份的 TA 接口，等价于把 TEE 隔离墙开了一个门。因此工程上 TEE 的安全评审重点不在"是否用了 TEE"，而在"<strong>TA 的接口暴露面与授权模型</strong>"。</li></ol>
+<p><strong>另一条与 TEE 并行的隔离路线：Hypervisor 分域。</strong> 信源档案 §4 未直接取证车载 Hypervisor 的规范来源（AUTOSAR Classic Platform 的 Crypto Stack、SecOC、IdsM 在信源档案中标记为 <code>[未验证]</code>：<code>autosar.org</code> 超时）。因此本章对"车载虚拟化分域"只做机制描述：把座舱域、智驾域、车控域运行在各自虚拟机中，由 Hypervisor 强制隔离，使座舱被攻破不直接等于车控被攻破。<strong>该机制的规范依据在本次调研中未找到可核验一手来源</strong>（见 02.10）。</p>
+<h3 id="sec-14">02.2.3 车载 HSM 分级：EVITA Full / Medium / Light</h3>
+<p><strong>EVITA</strong>（E-safety Vehicle Intrusion Protected Applications）项目在信源档案 §4 中记录为：定义了车载 HSM 的 <strong>Full / Medium / Light 三级分级</strong>，来源 <code>evita-project.org</code>，<code>[B]</code>（权威第三方项目页）。</p>
+<p>该分级是"<strong>把安全等级与部署位置、成本匹配</strong>"的行业通用思路。下表给出三级的定位对照。<strong>注意证据边界</strong>：信源档案只记录"定义了三级分级"这一事实，<strong>未取到各级的技术指标定义细则</strong>，因此下表中"适用位置""性能量级"两列为<strong>本报告判断</strong>（由分级的命名语义与车载电子的一般部署常识推导，推测，非事实），仅用于说明分级思路，<strong>不得作为任何项目的选型依据</strong>。</p>
+<div class="table-wrap"><table><thead><tr><th>级别</th><th>定位（命名语义）</th><th>典型适用位置（<code>[推测]</code>）</th><th>资源/成本取向（<code>[推测]</code>）</th><th>能支撑的车云控制点</th></tr></thead><tbody><tr><td><strong>Light</strong></td><td>轻量、对称为主</td><td>传感器/执行器级 ECU、对时延敏感的小节点</td><td>低算力、低成本、小面积</td><td>报文认证（对称 MAC）、局部密钥存储</td></tr><tr><td><strong>Medium</strong></td><td>中量、对称 + 哈希 + 有限非对称</td><td>网关、域控制器、T-BOX</td><td>中等算力，兼顾吞吐与签名</td><td>SecOC 密钥管理、车端 TLS 会话、固件验签</td></tr><tr><td><strong>Full</strong></td><td>全量、非对称 + 对称 + 真随机数 + 防篡改</td><td>中央计算/中央网关、负责 OTA 验签与车云身份的节点</td><td>高算力、高成本、含物理防护</td><td>车端证书私钥保管、OTA 包根级验签、车云 mTLS</td></tr></tbody></table></div>
+<p><strong>分级思路的工程价值</strong>：它把"HSM"从一个笼统的词拆成了"等级—位置—成本"三元组。<strong>本报告判断</strong>：一份合格的通用方案应当能回答"我们的每一类车端节点分别需要哪一级 HSM"，而不是笼统宣称"全车有 HSM"（推测，非事实）。分级的存在也从侧面说明：<strong>"是否使用 HSM"不是二分问题，而是连续谱</strong>——这在后续章节对车企做对比时，是一个需要提防的"术语陷阱"：两家都称"有 HSM"，其等级可能相差一个数量级。</p>
+<p><strong>FIPS 140-3 认证等级对车规器件的意义。</strong> 信源档案 §4 记录 FIPS 140-3（密码模块安全要求，HSM 认证基线），来源 <code>csrc.nist.gov</code>，<code>[A]</code>。其意义有三层：</p>
+<ol><li><strong>它把"安全等级"从市场话术变成可审计的等级制。</strong> FIPS 140-3 本身是一套分等级的安全要求体系（本次未取正文逐条，故<strong>不列出具体等级编号与判据</strong>）。</li><li><strong>它为跨供应链的互认提供共同语言。</strong> 车厂采购 HSM、Tier-1 采购 SE、云侧采购 KMS 后端，若都以同一认证体系表述，则"我方依赖的密码模块达到某等级"这句话在契约中可写、可核。</li><li><strong>它不等于"车规合规"。</strong> FIPS 140-3 是密码模块认证，不覆盖功能安全体系（信源档案 §1.4 仅采集到 ISO 体系中的网络安全相关标准，功能安全标准未在本次采集范围）与整车信息安全强制国标（GB 44495-2024 <code>[A]</code>）。<strong>本报告判断</strong>：把 FIPS 140-3 认证当作"车规安全已通过"是一种常见误读（推测，非事实）。</li></ol>
+<h3 id="sec-15">02.2.4 安全启动与可信启动链（通用原理）</h3>
+<p><strong>明确声明</strong>：本节只写通用原理。信源档案 §4 记录 AUTOSAR Classic Platform（Crypto Stack、SecOC、IdsM 入侵检测）为 <code>[未验证]</code>（<code>autosar.org</code> 超时，正文未取到），因此<strong>本节不引用 AUTOSAR 的任何具体规范条款，也不断言任何车企的启动链实现</strong>（见 02.10 待补证清单）。</p>
+<p>安全启动的通用原理可以概括为<strong>"逐级验签、信任传递"</strong>：</p>
+<pre><code>上电/复位
+   │
+   ▼
+[BootROM]  ── 从不可变的片内 ROM 执行，读取&quot;信任根公钥&quot;(固化/OTP/fuse)
+   │              ── 校验下一级引导程序的签名
+   ▼
+[BL1 / 一级引导] ── 校验通过后执行；校验下一级
+   │
+   ▼
+[BL2 / 二级引导] ── 校验 TEE OS 与主 OS 引导器
+   │
+   ▼
+[TEE OS] + [主 OS Kernel] ── 校验可信应用与内核模块
+   │
+   ▼
+[应用层] ── 校验应用签名 / 系统分区完整性</code></pre>
+<p>四个必须写清的工程要点（均为机制层分析，<code>[推测]</code> 性质的一般性陈述）：</p>
+<ol><li><strong>信任根必须"不可变"。</strong> 若 BootROM 读出的根公钥可被改写（例如存放于可写 Flash），整条链无意义。工程上落在 OTP/fuse 或片内 ROM。</li><li><strong>"安全启动"与"可信启动"不是同一件事。</strong> 前者的目标是"不通过就不执行"（拒绝启动篡改镜像）；后者还要求"对启动过程做可验证的度量记录"（度量值可被远程证明）。车云场景中二者常需并存：安全启动挡住本地篡改，度量记录支撑云端对"这辆车当前运行的是什么"的判断。</li><li><strong>降级攻击是安全启动的固有威胁。</strong> 攻击者不必篡改新固件，只要让设备回退到<strong>一个签名合法但已被披露漏洞的旧版本</strong>即可。这直接引出 02.6.1 的"回滚保护"——<strong>回滚保护是安全启动的必要组成，不是可选项</strong>。</li><li><strong>调试口是启动链最常见的旁路。</strong> 若产线/售后遗留的调试接口可读写 Flash 或可注入，则"逐级验签"在物理层被绕过。<strong>本报告判断</strong>：启动链评估必须同时覆盖软件验证与调试口状态（推测，非事实）。</li></ol>
+<h3 id="sec-16">02.2.5 密码算法基线</h3>
+<p>本节分国内 / 国际两条线。<strong>所有编号均出自信源档案 §1.2 与 §4</strong>，无编号来自记忆。</p>
+<p><strong>国际线（NIST 体系，全部 <code>[A]</code>，来源 <code>csrc.nist.gov</code>）：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>用途</th><th>规范</th><th>规范号</th><th>说明</th></tr></thead><tbody><tr><td>对称分组加密</td><td>FIPS 197（AES）</td><td>FIPS 197 <code>[A]</code></td><td>AES 为对称加密基准算法</td></tr><tr><td>认证加密（AEAD）</td><td>GCM 模式</td><td>NIST SP 800-38D <code>[A]</code></td><td>AEAD 同时提供机密性与完整性，是车云报文加密的首选形态</td></tr><tr><td>随机数生成</td><td>确定性随机比特发生器</td><td>NIST SP 800-90A Rev.1 <code>[A]</code></td><td>密钥与 nonce 的熵来源；弱 RNG 会摧毁一切上层机制</td></tr><tr><td>数字签名</td><td>数字签名标准（DSS）</td><td>FIPS 186-5 <code>[A]</code></td><td>签名算法族的上位标准</td></tr><tr><td>密钥生成</td><td>密钥生成建议</td><td>NIST SP 800-133 <code>[A]</code></td><td>生成过程的合规基线</td></tr><tr><td>密钥管理</td><td>密钥管理建议（生命周期、密码周期）</td><td>NIST SP 800-57 Part 1 Rev.5 <code>[A]</code></td><td><strong>密钥生命周期管理的总纲</strong>，直接对应 02.3.3 的证书轮换</td></tr></tbody></table></div>
+<p><strong>椭圆曲线表示与签名基础（RFC 体系，全部 <code>[A]</code>，来源 RFC Editor）：</strong>RFC 5480（ECDSA/EC 公钥在 X.509 中的表示）；RFC 6090（ECDSA/ECC 基础）；RFC 8017（PKCS #1 RSA）。</p>
+<p><strong>一条落到实现数量级的证据</strong>：信源档案 §7.1 明载，Tesla 虚拟密钥的文档给出密钥生成命令 <code>openssl ecparam -name prime256v1 -genkey -noout</code>，并明确"<strong>车辆仅支持 prime256v1 密钥</strong>"（即 P-256 ECDSA）<code>[A]</code>。这是本档案中<strong>唯一</strong>一处"某车云平台对曲线选择做出明确限制"的一手证据；其可引用范围仅限该平台，<strong>不得外推为行业惯例</strong>。</p>
+<p><strong>国内合规线（国密，全部 <code>[A]</code>，来源国家标准全文公开系统）：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>算法/规范</th><th>标准号</th><th>覆盖内容</th></tr></thead><tbody><tr><td>SM2 椭圆曲线公钥密码算法</td><td>GB/T 32918.1~.5-2016/2017 <code>[A]</code></td><td>总则 / 数字签名 / 密钥交换 / 公钥加密 / 参数定义</td></tr><tr><td>SM3 密码杂凑算法</td><td>GB/T 32905-2016 <code>[A]</code></td><td>哈希</td></tr><tr><td>SM4 分组密码算法</td><td>GB/T 32907-2016 <code>[A]</code></td><td>对称分组加密</td></tr><tr><td>SM2 加密签名消息语法规范</td><td>GB/T 35275-2017 <code>[A]</code></td><td>消息语法（可用于证书/签名结构的国密化）</td></tr><tr><td>SM2 密码算法使用规范</td><td>GB/T 35276-2017 <code>[A]</code></td><td>使用规范</td></tr></tbody></table></div>
+<p><strong>国密在传输层的国际落点</strong>：信源档案 §3 记录 <strong>RFC 8998 (2021) ShangMi (SM) Cipher Suites for TLS 1.3</strong> <code>[A]</code>，其内容包含 SM2 签名、<code>AEAD_SM4_GCM</code> / <code>AEAD_SM4_CCM</code>、SM3。信源档案将该条目标注为"<strong>国密 TLS 在国际标准层面的唯一落点，国产车云链路合规的关键</strong>"。这是本章中"国内合规路径"与"国际规范体系"的<strong>唯一交点</strong>，工程意义明确：<strong>一条需要同时满足国密要求与 TLS 1.3 现代性的车云链路，其在 IETF 侧的规范依据就是 RFC 8998。</strong></p>
+<p><strong>算法基线的三条工程纪律：</strong></p>
+<ol><li><strong>算法选择由合规区域决定，不由技术偏好决定。</strong> 同一家车企在不同市场可能需并行启用国际套件与国密套件（<code>[推测]</code>：这需要证书体系与密码模块同时支持两套算法，见 02.3.2 的密码套件选择建议）。</li><li><strong>AEAD 是默认，不是增强项。</strong> SP 800-38D <code>[A]</code> 的存在意味着 GCM 类模式是规范内的标准选项；反过来，使用"加密但不认证"的模式在车云场景中应被视为缺陷。</li><li><strong>密钥管理规范（SP 800-57 Part 1 Rev.5 <code>[A]</code>）的引用常被忽略，但它才是轮换策略的依据。</strong> 02.3.3 的证书轮换设计必须与此对齐。</li></ol>
+<h3 id="sec-17">02.2.6 芯片与器件生态（仅陈述"站点存在"）</h3>
+<p>信源档案 §4 采集了四家车规器件厂商的官方站点，其证据等级如下。<strong>本节严格限定在"已确认站点存在"这一层，不写任何搭载关系、不写任何"某车使用某芯片"的断言</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>厂商/产品线</th><th>信源档案记录</th><th>证据等级</th><th>本节可写 / 不可写</th></tr></thead><tbody><tr><td>Infineon AURIX / TriCore 32 位汽车微控制器</td><td><code>infineon.com</code> 对应产品页</td><td><code>[C]</code>（HTTP 202，型号页未解析）</td><td>可写"站点存在、定位为 32 位汽车 MCU 产品线"；<strong>不可写</strong>任何车型搭载</td></tr><tr><td>NXP S32 汽车平台</td><td><code>nxp.com</code> S32 页面</td><td><code>[未验证]</code>（curl 超时）</td><td>只能写"站点/页面路径存在，正文未取到"；<strong>不可写</strong>平台能力细节</td></tr><tr><td>Renesas 汽车产品线（RH850 系列）</td><td><code>renesas.com</code> 汽车产品页</td><td><code>[C]</code></td><td>可写"站点存在、含 RH850 系列"；<strong>不可写</strong>具体型号安全特性</td></tr><tr><td>TI Jacinto TDA4VM</td><td><code>ti.com</code> TDA4VM 产品页</td><td><code>[C]</code></td><td>可写"站点存在、产品线为 Jacinto/TDA4VM"；<strong>不可写</strong>在车云安全中的角色</td></tr></tbody></table></div>
+<p><strong>本节为何存在？</strong> 因为在后续章节做车企对比时，会反复出现"某方案依赖某类芯片能力"的说法。若无本节这条纪律，写作团队极易从"某厂商有安全 MCU 产品线"滑向"某车企使用了它"。<strong>信源档案 §0 的覆盖度声明明确</strong>：本次未取到任何车载 HSM/SE 的<strong>车端搭载一手证据</strong>（信源档案 §8 覆盖度表亦将"国内车企 TEE/SE/HSM 实现"列为"未找到公开一手来源"）。因此本章在该方向上<strong>只到"器件生态存在"为止</strong>，其余一律进入 02.10 待补证清单。</p>
+<p><strong>一条重要的生态观察（<code>[推测]</code>）</strong>：上述四家的产品页覆盖"MCU（AURIX/S32/RH850）"与"高性能 SoC（Jacinto）"两类车规计算平台，与 02.1 的 L0/L1 分层在市场上是"成对供给"的——这一观察仅用于说明"通用方案的底层器件是可获得的"，不用于任何选型或搭载判断（推测，非事实）。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-18">
+  <div class="sec-head"><span class="sec-badge">04</span><h2>02.3 通信安全层（L2）</h2></div>
+<h3 id="sec-19">02.3.1 双向证书（mTLS）车云链路的建立流程与 PKI 前提</h3>
+<p>车云链路的通用第一原则是<strong>双向认证</strong>：不只车端要确认"我在跟真正的车厂云说话"，云端也要确认"连上来的是真正的、属于某辆车的设备"。只做单向认证（服务端证书）的链路，无法回答"请求来自哪一辆车"，因此在授权层就失去了可信的输入。</p>
+<p><strong>mTLS 握手与授权链路的 ASCII 时序（通用原理，具体字段以 RFC 8446 / RFC 5280 为准）：</strong></p>
+<pre><code> 车端(T-BOX/网关)                                          云端(TLS 终结点)
+      │                                                         │
+      │ 1. ClientHello: 版本/随机数/支持的密码套件/SNI            │
+      │ ───────────────────────────────────────────────────────▶ │
+      │                                                         │
+      │                    2. ServerHello: 选定套件/服务端随机数  │
+      │ ◀─────────────────────────────────────────────────────── │
+      │                    3. EncryptedExtensions + CertificateRequest
+      │ ◀─────────────────────────────────────────────────────── │
+      │                                                         │
+      │                    4. 服务端 Certificate(链) + CertificateVerify
+      │                       + Finished(基于握手转录的 MAC)      │
+      │ ◀─────────────────────────────────────────────────────── │
+      │                                                         │
+      │ 5. 车端校验服务端证书链:                                  │
+      │    - 签名链可回溯到受信 CA (RFC 5280)                     │
+      │    - 有效期 / 用途(EKU) / 主机名匹配                      │
+      │    - 吊销状态: OCSP(RFC 6960) 或 CRL(RFC 5280)           │
+      │    失败 =&gt; 中止（不得降级为继续）                          │
+      │                                                         │
+      │ 6. 车端 Certificate(设备证书) + CertificateVerify         │
+      │    (用 L0 硬件内私钥签名握手转录)                          │
+      │ ───────────────────────────────────────────────────────▶ │
+      │                                                         │
+      │                    7. 云端校验车端证书链 + 绑定车辆身份 VIN │
+      │                                                         │
+      │ 8. 双方 Finished 校验通过 =&gt; 握手完成, 建立会话密钥        │
+      │ ◀──────────────────────────────────────────────────────▶ │
+      │                                                         │
+      │ 9. 应用层请求 (Authorization: Bearer / 或证书绑定令牌)      │
+      │ ───────────────────────────────────────────────────────▶ │
+      │                    10. 授权判定 =&gt; 见第 3 部分 10–19 号文件 │</code></pre>
+<p><strong>流程中的四个工程关键点：</strong></p>
+<ol><li><strong>第 5 步的失败必须是"中止"，不能是"降级继续"。</strong> 若代码在证书校验失败时回退到"仍然发请求但不校验"，则 mTLS 名存实亡。此点属通用安全编程纪律（<code>[推测]</code> 性质的机制陈述）。</li><li><strong>第 6 步的私钥必须在 L0 内。</strong> 若车端私钥可被导出，攻击者可在一台无关设备上完成第 6 步，mTLS 退化为"持有被窃字符串"。这印证 02.1.5 的"L2 依赖 L0"。</li><li><strong>第 7 步是"证书身份 → 车辆身份"的映射点。</strong> 证书的 subject/SAN 通常需承载可识别的设备标识；<strong>本报告判断</strong>：该映射的严格性直接决定"一张证书能否被用于冒充另一辆车"（推测，非事实）。这是后续章节对车企做对比时应重点寻找的公开证据位。</li><li><strong>证书不得静默共用。</strong> 若全网车辆共用一张客户端证书（而非每车一证），则单张私钥泄露即影响全部车辆，属 <code>00-engagement-plan.md</code> §3.3 中定义的 <strong>High</strong> 级风险（单一凭证被攻破可横向影响其他对象）。</li></ol>
+<p><strong>PKI 体系的规范前提（信源档案 §3，均 <code>[A]</code>）：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>规范</th><th>作用</th><th>在车云链路中的位置</th></tr></thead><tbody><tr><td>RFC 5280（2008）X.509 PKI 证书与 CRL 规范</td><td>定义证书链、证书扩展、吊销列表</td><td>第 5/7 步链校验的基础；证书字段设计的依据</td></tr><tr><td>RFC 6960（2013）OCSP</td><td>在线证书状态查询</td><td>第 5 步的实时吊销检查（相对 CRL 的即时性优势）</td></tr><tr><td>RFC 5480（2009）ECDSA/EC 公钥在 X.509 中的表示</td><td>定义 ECC 公钥的编码</td><td>当使用 ECDSA（如 P-256）时的证书编码依据</td></tr></tbody></table></div>
+<p><strong>国家级的车联网证书体系</strong>：信源档案 §1.2 记录 <strong>GB/T 45112-2024《基于 LTE 的车联网无线通信技术 安全证书管理系统技术要求》</strong>（发布 2024-12-31，实施 2025-04-01，<code>[A]</code>），该档案将其定位为"中国 C-V2X 证书管理体系，是'车-云-车'证书体系的国家级规范"。<strong>引用边界</strong>：本章只引用其存在、名称、日期与定位，<strong>不引用任何条款号</strong>（本次未取正文）。此外信源档案 §3 记录 IEEE 1609.2（WAVE 安全服务/证书格式）为 <code>[C]</code>（HTTP 200，正文未解析），美国 SCMS（V2X 安全证书管理体系）为 <code>[未验证]</code>（未取得可核验官方 URL）——二者因此<strong>只能作为"该方向存在国际体系"的提示，不能作为技术依据</strong>。</p>
+<h3 id="sec-20">02.3.2 TLS 1.3（RFC 8446）：握手、0-RTT 与套件选择</h3>
+<p>信源档案 §3 记录 <strong>RFC 8446 (2018) TLS 1.3</strong>，并明确其三个要点：<strong>1-RTT 握手、0-RTT 重放风险、前向保密</strong> <code>[A]</code>。这三条恰好构成车云链路选型的全部核心判断。</p>
+<p><strong>（一）1-RTT 握手：为什么对车云重要。</strong> 相比 TLS 1.2 的两轮往返，1-RTT 把建立会话所需的网络往返压缩到一轮。对车端的意义在于：T-BOX 常在弱网/高时延环境（地下车库、偏远地区）建立连接，握手往返次数直接决定连接建立时延与失败窗口。信源档案 §7.1 记录了一个相关的工程取舍实例：Tesla Fleet Telemetry 让车辆<strong>直连</strong>开发者服务器以取代轮询 <code>vehicle_data</code> 端点 <code>[A]</code>——把"反复建连 + 轮询"换成"长连 + 推送"，本质上也是在压连接建立成本。</p>
+<p><strong>（二）0-RTT 的重放风险与车云适用性判断。</strong> 这是本节最重要的一条，必须写细：</p>
+<ul><li>TLS 1.3 的 0-RTT 允许客户端在<strong>尚未完成握手</strong>时就携带应用数据（复用之前会话的 PSK），从而省去一个往返。信源档案明确把"0-RTT 重放风险"列为 RFC 8446 的要点 <code>[A]</code>：0-RTT 数据<strong>不具备前向保密</strong>，且<strong>可被重放</strong>——因为它不依赖握手时的新鲜随机数参与密钥派生。</li><li><strong>对车云场景的适用性判断（本报告判断，属工程推理，非事实）</strong>：<ul><li><strong>只读、幂等的请求</strong>（拉取车辆配置、拉取 OTA 清单的元数据查询）在<strong>配合幂等键</strong>的前提下，使用 0-RTT 的风险可控。</li><li><strong>写操作、车控命令、OTA 下载授权</strong>等<strong>非幂等</strong>请求，<strong>不应使用 0-RTT</strong>——重放一次"解锁"或"下发更新"的语义后果无法靠客户端补偿。</li><li>判断依据是 RFC 8446 自身对 0-RTT 的定位（"可重放"），而非任何企业实现；本档案<strong>未取到任何车企是否启用 0-RTT 的证据</strong>，因此本节<strong>不对任何车企作 0-RTT 使用与否的断言</strong>。</li><li><strong>工程纪律</strong>：若启用 0-RTT，服务端必须对 0-RTT 数据做<strong>应用层去重</strong>（见 02.3.4 的幂等键），并限制其可携带的方法与路径。</li></ul></li></ul>
+<p><strong>（三）前向保密。</strong> TLS 1.3 通过会话密钥的临时性实现前向保密：即使某天车端/云端的长期私钥泄露，<strong>已抓取的、使用旧会话密钥加密的历史流量仍不可解</strong>。对车云场景的意义是：车端链路可能被长时间被动监听（攻击者可物理接触车辆），前向保密把"密钥泄露即历史全泄"的风险切掉。</p>
+<p><strong>密码套件选择建议（<code>[推测]</code>，设计建议，非规范明载值）。</strong> 下表为面向车云链路的通用选择建议，<strong>不是任何规范或企业的原文</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>场景</th><th>建议方向</th><th>理由</th><th>依据</th></tr></thead><tbody><tr><td>通用车云链路（国际）</td><td>选用 TLS 1.3 的 AEAD 套件族（AEAD 同时提供机密性与完整性）</td><td>避免"加密但不认证"的 CBC 类历史问题</td><td>RFC 8446 <code>[A]</code>；SP 800-38D <code>[A]</code></td></tr><tr><td>国内合规链路</td><td>启用 RFC 8998 定义的 SM 套件（SM2 签名、<code>AEAD_SM4_GCM</code>/<code>AEAD_SM4_CCM</code>、SM3）</td><td>满足国密要求同时保持 TLS 1.3 现代性</td><td>RFC 8998 <code>[A]</code>；GB/T 32918/32905/32907 <code>[A]</code></td></tr><tr><td>车端密钥与签名曲线</td><td>优先 ECC（P-256 量级）</td><td>计算量与密钥体积适配车端 MCU</td><td>FIPS 186-5 <code>[A]</code>；RFC 5480 <code>[A]</code>；Tesla 明载支持 prime256v1 <code>[A]</code></td></tr><tr><td>客户端认证</td><td>强制双向（mTLS）</td><td>单向认证无法识别"哪辆车"</td><td>RFC 5280 <code>[A]</code>；RFC 8705 <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>一条必须提醒的"降级"风险</strong>：即便服务端支持 TLS 1.3，若为了兼容旧车机而<strong>同时开放 TLS 1.2 及以下</strong>，则实际协商结果可能退回到较弱配置。<strong>本报告判断</strong>：车云链路的"支持 TLS 1.3"与"强制 TLS 1.3"是两种不同的安全状态（推测，非事实）。这也是 02.3.3 中"证书体系须能支撑分层兼容"的原因之一。</p>
+<h3 id="sec-21">02.3.3 证书全生命周期：签发、轮换、吊销</h3>
+<p><strong>（一）签发自动化：RFC 8555 ACME。</strong> 信源档案 §3 记录 <strong>RFC 8555 (2019) ACME</strong>，定位为"自动化证书签发/轮换，短周期证书的工程前提" <code>[A]</code>。其工程逻辑是：</p>
+<ul><li><strong>短周期证书的前提是自动化。</strong> 若证书有效期短（例如数天量级），人工签发与部署必然出错；ACME 把"申请—验证域控制—签发—安装—续期"全流程自动化，使短信周期证书在工程上可行。</li><li><strong>对车云场景的双重适用性（<code>[推测]</code>）</strong>：<ul><li><strong>云侧</strong>：面向第三方开发者接入的 API 端点、内部微服务的服务证书，可用 ACME 级自动化（与 02.5.1 的服务身份体系衔接）。</li><li><strong>车端</strong>：车端证书的续期面临"设备离线""海量设备同时续期"两个特殊约束，标准 ACME 的在线验证模型需要适配。<strong>本档案未取到任何车企车端证书续期机制的公开来源</strong>，故此点标注为待补证（见 02.10）。</li></ul></li></ul>
+<p><strong>（二）轮换策略的工程参数（全部为设计建议值 <code>[推测]</code>，非规范明载值）。</strong> 下表给出"轮换策略应当被设计为哪几个可配置参数"，并说明每个参数的依据来源。<strong>表中所有具体数字均为建议值，任何实际部署须按 <code>SP 800-57 Part 1 Rev.5</code> <code>[A]</code> 的密钥管理原则与自身业务风险重新确定。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>参数</th><th>建议设计方向</th><th>依据 / 说明</th></tr></thead><tbody><tr><td>证书有效期</td><td>短于"密钥泄露被发现的平均时长"</td><td>SP 800-57 Part 1 Rev.5 <code>[A]</code> 的密码周期概念</td></tr><tr><td>轮换触发点</td><td>剩余有效期百分比 + 绝对时间双阈值</td><td>防"到期才发现续不上"；属工程惯例 <code>[推测]</code></td></tr><tr><td>批量轮换的灰度</td><td>分批、按车型/地区/批次滚动，先小流量</td><td>防"一次轮换打挂全量车云链路"；<code>[推测]</code></td></tr><tr><td>双证书重叠期</td><td>新旧证书并存一段时间，旧证书在重叠期内仍被接受</td><td>保证轮换期间无中断；<code>[推测]</code></td></tr><tr><td>回滚能力</td><td>保留上一版证书在紧急情况下可回退</td><td>应对"新证书链配置错误"类事故；<code>[推测]</code></td></tr><tr><td>一次性凭证的轮换</td><td>刷新令牌等一次性凭证采用"用后即换"</td><td>Tesla 明载刷新令牌一次性使用、3 个月过期 <code>[A]</code>；Mercedes 明载刷新返回新访问令牌与新刷新令牌 <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>（三）吊销传播延迟与兜底。</strong> 这是 PKI 在车云场景中最容易被低估的一环。逻辑链条是：</p>
+<ol><li><strong>吊销是"事后追认"</strong>，任何实现都存在传播窗口：CRL 有更新周期，OCSP 有缓存，车端有本地缓存。</li><li><strong>因此不能只依赖吊销。</strong> 必须同时有"短有效期"作为兜底——<strong>即使吊销未能及时传播，证书也会因过期而失效</strong>。这是"短周期证书"与"吊销机制"必须并存的根本原因（<code>[推测]</code>，属 PKI 一般性工程推理）。</li><li><strong>离线场景的兜底（<code>[推测]</code>）</strong>：车辆离线时无法查询 OCSP，因此车端通常需要"软失败/硬失败"策略选择：软失败（查不到就放行）降低可用性风险但放大安全风险；硬失败相反。<strong>本报告判断</strong>：对承载车控能力的链路应偏向硬失败，或采用"预置的、带有效期的短周期 OCSP 响应/白名单"作为离线窗口的兜底（推测，非事实）。</li><li><strong>一条可对照的"授权撤销联动"实例</strong>：信源档案 §7.1 明载，Tesla Fleet Telemetry 配置"若所需 scope 被撤销导致配置失效，配置会被<strong>从车辆移除</strong>" <code>[A]</code>。这属于<strong>授权吊销</strong>而非证书吊销，但它示范了"撤销必须联动下游配置"这一控制模式；证书吊销在执行层面需要同样的联动思路。</li></ol>
+<h3 id="sec-22">02.3.4 防重放：五类机制对照</h3>
+<p>重放攻击的定义是：攻击者不破解密码，只<strong>原样重发</strong>已被捕获的合法报文。在车云场景中重放的后果尤其严重——一次被重放的"解锁"或"启动"指令就是一次真实的车控动作。因此防重放是 L2 的必备控制点，且<strong>可以在多个层次并行部署</strong>。</p>
+<p><strong>五类防重放机制对照表：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>机制</th><th>原理</th><th>有效期语义</th><th>在车云链路的落点</th><th>规范依据</th><th>弱点 / 注意事项</th></tr></thead><tbody><tr><td>1</td><td><strong>Nonce（随机数挑战）</strong></td><td>每次交互由一方发出一次性随机值，响应须包含它</td><td>单次交互内有效</td><td>授权请求、设备配对、激活流程</td><td>RFC 6749 的 <code>state</code> 语义 <code>[A]</code>；OIDC 的 <code>nonce</code> <code>[A]</code>（信源档案 §7.1 记录 Tesla <code>/authorize</code> 的 <code>nonce</code> 被文档描述为"用于防重放的随机值" <code>[A]</code>）</td><td>依赖随机数质量（见 SP 800-90A Rev.1 <code>[A]</code>）；若服务端不记录已用 nonce，则只防跨会话不防同会话</td></tr><tr><td>2</td><td><strong>序列号（单调计数）</strong></td><td>每方维持单调递增计数，接收方拒绝"不大于已见值"的报文</td><td>会话或长期有效</td><td>车内报文（车载网络报文认证）、长连接推送</td><td>SecOC 等车载报文认证机制的一般原理（AUTOSAR <code>[未验证]</code>，故此处只作机制描述）</td><td>需持久化计数，掉电/复位后需安全同步；计数回绕需处理</td></tr><tr><td>3</td><td><strong>时间戳</strong></td><td>报文携带签发时间，接收方仅接受"当前时间 ± 窗口"内的报文</td><td>时间窗口内有效</td><td>服务间断言、签名载荷、离线报文</td><td>RFC 3161（可信时间戳）<code>[A]</code></td><td><strong>强依赖时钟同步</strong>；车辆时钟不可信时窗口形同虚设；需可信时间基准</td></tr><tr><td>4</td><td><strong>幂等键（Idempotency Key）</strong></td><td>客户端为每个"业务动作"生成唯一键，服务端记录已处理键并拒绝重复</td><td>业务动作级（窗口由服务端保留期决定）</td><td>车控命令、OTA 下发请求、计费/计量类操作</td><td>无专用 RFC；属应用层工程模式（<code>[推测]</code>）</td><td>需要服务端去重存储与保留期策略；键的生成须全局唯一</td></tr><tr><td>5</td><td><strong>票据/一次性令牌</strong></td><td>凭证本身用后即失效，重放同一凭证必然失败</td><td>一次性</td><td>授权码换码、刷新令牌轮换</td><td>RFC 6749 <code>[A]</code>；RFC 8555 的 ACME 挑战 <code>[A]</code>；Tesla 刷新令牌一次性使用 <code>[A]</code>；Mercedes 刷新令牌一次性（重复使用报错）<code>[A]</code></td><td>依赖服务端严格实现"用后即废"；网络失败导致的"用了但没收到响应"需要有宽限设计</td></tr></tbody></table></div>
+<p><strong>表外的三条工程补充（均为 <code>[推测]</code>）：</strong></p>
+<ul><li><strong>机制 1 与机制 3 的成本差异</strong>：Nonce 需要一次额外往返或服务端状态；时间戳只需双方时钟同步。车云链路若已建立长连接，Nonce 的额外成本趋近于零；若为短连接无状态设计，时间戳更省。<strong>本报告判断</strong>：这是"防重放机制选择"与"连接模型选择"耦合的原因（推测，非事实）。</li><li><strong>机制 4 是"业务语义层"的防重放，与 1–3 的"协议层"不重叠</strong>。协议层能防"同一报文被重发"，但防不住"客户端因超时重试而重复提交一次真实命令"——后者必须靠幂等键在业务层去重。</li><li><strong>一条可对照的"宽限期"设计</strong>：信源档案 §7.1 明载，Tesla 的刷新令牌一次性使用，但"<strong>最近一次使用的刷新令牌在 24 小时内仍有效</strong>"，用于覆盖"应用未能持久化轮换后令牌"的失败场景 <code>[A]</code>。这是"一次性语义 + 有限宽限期"的公开实例，属机制 5 的工程细化。</li></ul>
+<h3 id="sec-23">02.3.5 车云链路的分段：TLS 终结点位置与信任边界</h3>
+<p>车云链路从车端到云端后端，通常<strong>不是一条端到端的加密隧道</strong>，而是在若干中间点被"解开再重封"。TLS 终结点（termination point）放在哪里，决定了<strong>在哪个位置，明文可见、私钥可用、可做完整授权判定</strong>。这是一个纯粹的架构决策，但它的安全后果极大。</p>
+<p><strong>四种典型终止位置（结构对照）：</strong></p>
+<pre><code>方案 A: 车 ──TLS──▶ [公网负载均衡器终止] ──明文/内网TLS──▶ 后端服务
+方案 B: 车 ──TLS──▶ [云边缘/API 网关终止] ──服务间mTLS──▶ 后端服务
+方案 C: 车 ──TLS──▶ [T-BOX/车机内终止] ──车内网络──▶ 车内部件
+方案 D: 车 ──TLS──▶ [云端各自终止] , 车侧不终止 (纯云侧架构)</code></pre>
+<div class="table-wrap"><table><thead><tr><th>终止点</th><th>明文可见范围</th><th>私钥所在</th><th>信任边界位置</th><th>优点</th><th>风险（含 <code>[推测]</code> 部分）</th></tr></thead><tbody><tr><td><strong>A 公网 LB 终止</strong></td><td>从 LB 起全部内网可见明文</td><td>LB / 其后</td><td>边界即 LB</td><td>实现简单、后端无感</td><td>单点明文暴露面大；LB 侧成为高价值攻击目标（<code>[推测]</code>）</td></tr><tr><td><strong>B 云边缘/网关终止</strong></td><td>网关及其后内网</td><td>网关/服务</td><td>网关是统一鉴权点</td><td><strong>便于把授权判定集中在网关</strong>（02.5.1）；易做限流/审计</td><td>网关若被越过（如服务直连）则控制失效；需网络策略强制（<code>[推测]</code>）</td></tr><tr><td><strong>C 车端终止</strong></td><td>车内部件可见明文</td><td>车端（L0）</td><td>车端内部即为信任边界</td><td>端到端到车；云端明文面最小</td><td>车端被攻破则内部链路明文可见；车端算力压力大（<code>[推测]</code>）</td></tr><tr><td><strong>D 纯云侧终止</strong></td><td>云侧全部相关服务</td><td>云 HSM/KMS</td><td>云内部信任边界</td><td>与云安全体系一致</td><td>车到云的"最后一段"安全性取决于云边缘（<code>[推测]</code>）</td></tr></tbody></table></div>
+<p><strong>本节的核心结论（分事实层与推测层）：</strong></p>
+<ul><li><strong>事实层</strong>：本档案中<strong>未取到任何车企公开披露其 TLS 终结点位置</strong>。因此本节<strong>不对任何车企的终止点位置作断言</strong>，四种方案均为通用架构模式。</li><li><strong>推测层（<code>[推测]</code>）</strong>：从"网关可作为统一鉴权点"这一通用工程优势出发，方案 B 在现代车云架构中较为常见；但方案 B 的安全前提是"后端服务<strong>不可被绕过网关直连</strong>"，这需要网络策略（服务网格/网络策略/安全组）来强制。<strong>本报告判断</strong>：如果网关只是"逻辑上的入口"而缺乏网络层强制，则它提供的是"便利"而非"安全"（推测，非事实）。</li><li><strong>一条可对照的"分段"证据</strong>：信源档案 §7.1 明载，Tesla 的令牌端点与 API 端点<strong>分属不同主机</strong>（<code>/token</code> 在 <code>fleet-auth.prd.vn.cloud.tesla.com</code>，API 在 <code>fleet-api.prd.*.vn.cloud.tesla.com</code>），且文档说明 <code>/token</code> 调用"来自应用服务器、适用不同的限流" <code>[A]</code>。这说明<strong>至少在该公开实现中，认证路径与资源路径在主机层面被分段，并施以不同的限流策略</strong>——这是"分段即控制"的一个公开可核验实例。</li></ul>
+<h3 id="sec-24">02.3.6 近场授权通道：NFC / BLE / UWB 与数字钥匙（CCC / FiRa / GB/T 44402.1）</h3>
+<p>车云链路之外，还存在一条<strong>近场</strong>的车-人授权通道：数字钥匙。它不经过运营商网络，而是用 NFC / BLE / UWB 在人与车之间直接建立信任。之所以把它放在通信层，是因为<strong>决定其安全性的首要因素是物理传输方式本身对"中继攻击"的抵抗力</strong>，而不是上层协议。</p>
+<p><strong>（一）CCC Digital Key Release 3.0（信源档案 §5，<code>[A]</code>）。</strong> 信源档案 §5 明载：CCC（Car Connectivity Consortium）于 <strong>2021-04-21</strong> 发布 Digital Key Release 3.0 公告，新增 <strong>BLE + UWB</strong> 实现被动无钥匙进入与启动，<strong>NFC 保留为强制备用方案</strong>，且<strong>密钥存储于 Secure Element</strong> <code>[A]</code>。这三个要点各自有明确的安全含义：</p>
+<ol><li><strong>UWB 的作用是抗中继（relay attack）</strong>。传统无钥匙进入系统的经典攻击是"中继攻击"：攻击者用一对无线电中继设备把车主钥匙的信号延伸到车旁，使车误判钥匙在附近。UWB 通过<strong>测距（精确飞行时间测量）</strong>而非仅"信号强度"来判断距离，从而抵抗单纯的中继。信源档案还记录 <strong>CCC 与 FiRa Consortium 就 UWB 技术合作</strong> <code>[B]</code>，以及 FiRa 的规范演进：FiRa 2.0 技术规范（2023-11）<code>[B]</code>、FiRa Core 3.0 规范与认证（2025-01）<code>[B]</code>、FiRa Core 4.0 规范与认证（2025-12）<code>[B]</code>。</li><li><strong>NFC 作为强制备用方案</strong>，是因为它<strong>物理上要求极近距离</strong>（数厘米），中继成本极高，同时不依赖电池（可作为"手机没电"时的兜底）。"强制备用"这一措辞的含义是：<strong>任何一种更便捷的通道（BLE/UWB）失效时，都必须有一个物理上更保守的降级路径</strong>——这是"可用性优先的降级设计"在近场通道中的体现（<code>[推测]</code>：这是本报告对"强制备用"设计意图的解读，非 CCC 原文）。</li><li><strong>密钥存储于 Secure Element</strong>，把 02.2.1 的结论落到近场场景：数字钥匙的凭证不进普通应用沙箱，而是进硬件安全元件。</li></ol>
+<p><strong>（二）UWB 物理层的规范状态。</strong> 信源档案 §5 记录 IEEE 802.15.4z（UWB 物理层增强）为 <code>[未验证]</code>——<strong>未取得可核验官方 URL</strong>。因此本章<strong>不引用 IEEE 802.15.4z 的任何条款</strong>，只把它列为待补证对象（见 02.10）。</p>
+<p><strong>（三）中国侧的参考架构。</strong> 信源档案 §1.2 记录 <strong>GB/T 44402.1-2024《卡及身份识别安全设备 数字钥匙系统 第 1 部分：参考架构》</strong>（发布 2024-08-23，实施 2025-03-01） <code>[A]</code>，该档案将其定位为"中国数字钥匙授权模型的国标参考架构"。<strong>引用边界</strong>：本章只引用其存在、名称、日期与定位，<strong>不引用条款号</strong>（本次未取正文）。从名称可安全推断的只有一点：它规定了数字钥匙系统的<strong>参考架构</strong>，且是系列标准的第 1 部分（<strong>本报告判断</strong>：这意味着后续部分可能覆盖具体协议与测试方法；但本次未取到，不作断言）。</p>
+<p><strong>（四）近场通道的三层对照表（机制分析，<code>[推测]</code> 部分已标注）：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>通道</th><th>物理特性</th><th>主要威胁</th><th>抗中继能力</th><th>可用性角色（依 CCC 3.0 明载）</th><th>证据</th></tr></thead><tbody><tr><td><strong>NFC</strong></td><td>极近距离、可无源</td><td>窃听（近距离可行）、克隆</td><td>高（物理距离约束强）</td><td><strong>强制备用方案</strong></td><td><code>[A]</code>（CCC 3.0 公告）</td></tr><tr><td><strong>BLE</strong></td><td>中等距离、低功耗</td><td>中继、追踪、配对劫持</td><td>低（仅靠信号强度判断距离）</td><td>被动无钥匙进入/启动的实现之一</td><td><code>[A]</code>（CCC 3.0 公告）</td></tr><tr><td><strong>UWB</strong></td><td>短距离、高带宽、可精确测距</td><td>中继（需精确时延欺骗）、测距协议缺陷</td><td>高（基于测距而非信号强度）</td><td>被动无钥匙进入/启动的实现之一</td><td><code>[A]</code>（CCC 3.0 公告）</td></tr></tbody></table></div>
+<p><strong>（五）本节与第 3 部分的边界。</strong> 数字钥匙的<strong>授权模型</strong>（谁在何时把钥匙授予谁、钥匙能否转授、共享钥匙如何撤销）属授权层的展开对象，本章<strong>不做展开</strong>。本节只界定"近场通道的物理特性与其对凭证保管的要求（SE）"这一通信层结论。此外，信源档案 §7.10 第 1 条提醒：关于"某车企 UWB+蓝牙+NFC 三合一数字钥匙"的说法仅见二手报道 <code>[C]</code>，其官方技术说明未取得，无法确认是否为 CCC 3.0、是否有 SE 保护——<strong>这类车企专属判断一律留在第 4/5 部分，本章不作任何车企数字钥匙实现的断言</strong>。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-25">
+  <div class="sec-head"><span class="sec-badge">05</span><h2>02.4 授权与身份层（L3，总纲 · 指向第 3 部分）</h2></div>
+<h3 id="sec-26">02.4.1 为什么授权是车云安全的核心矛盾</h3>
+<p>本章第 2.3 节把"链路可信"解决了：mTLS 保证"对面是那辆车、这边的云是真的"，TLS 1.3 保证"内容不被看、不被改"，防重放保证"旧报文不被重发"。但链路可信<strong>只是必要条件，不是充分条件</strong>。真正的安全问题是：</p>
+<blockquote><p><strong>链路另一端那个"已认证的调用者"，是否有权对这个"具体的资源"，执行这个"具体的动作"？</strong></p></blockquote>
+<p>这三者——<strong>调用者、资源、动作</strong>——构成授权的三元组。车云场景的特殊性在于，这三者在实践中会以大量组合出现："车主的手机 App"要"解锁""这辆车的车门"；"第三方车队管理平台"要"读取""100 辆车的电池状态"；"车载语音助手"要"启动""空调"；"车企自己的后端"要"下发""一次 OTA"；"一名已被移出家门的司机"要"打开""后备厢"。<strong>每一次这样的组合，都需要一次独立、可追溯、可撤销的授权判定。</strong> 链路安全解决不了任何一次判定是否"应当允许"。</p>
+<p><strong>从"链路可信"到"调用者是否有权"的落差</strong>，可以由一个公开可核验的实例说明：信源档案 §7.1 明载，Tesla 的 <code>vehicle_cmds</code> scope 覆盖解锁、远程启动等命令 <code>[A]</code>——即在链路层认证通过之后，仍需在授权层判定"该令牌<strong>是否被授了 vehicle_cmds</strong>、<strong>针对哪辆车</strong>、<strong>是否被 <code>require_requested_scopes</code> 之类的策略进一步约束</strong>"。更细的一层：同一份文档明载"<strong>带 <code>granular_access.hide_private=true</code> 的车辆共享，即使被授予 <code>vehicle_location</code> 也拿不到任何位置，且无法流式传输位置字段</strong>" <code>[A]</code>——这证明在车云中，<strong>"scope 被授予"不等于"资源可访问"</strong>，还存在第二层资源级策略。这个双层结构是授权层复杂度的直接来源。</p>
+<p><strong>本报告判断</strong>：授权层之所以成为车云安全的核心矛盾，有三条结构性原因（推测，非事实）：</p>
+<ol><li><strong>调用者链条最长。</strong> 车云链路上"最终发起动作的人"与"持有凭证的人"常不一致：车主授权第三方应用、第三方应用的服务器再调用车企 API、车企云再转发到车。链条每一跳都可能引入"代他人行事"的授权语义，而代行的边界（可以用、可以转授给谁、可以持续多久）必须显式定义。</li><li><strong>动作的物理后果不可逆。</strong> 一个 HTTP 请求在 IT 系统中最多是数据损坏；在车上可能是车门打开、车辆移动。授权判定的错误代价被物理放大。</li><li><strong>撤销必须实时。</strong> 车主可以在任何时候收回授权（卖车、解雇司机、卸载 App），而车端与云端都可能有已签发的、尚未过期的凭证。因此授权层必须具备"<strong>撤销 → 立即在多个执行点生效</strong>"的能力。</li></ol>
+<h3 id="sec-27">02.4.2 本层控制点清单（10 条，指向第 3 部分）</h3>
+<p>本节不展开授权层机制，只给出<strong>控制点清单与其在第 3 部分中的展开位置</strong>。每条的控制点描述均为"该层应当具备什么"，展开的协议细节、令牌模型、资源级策略、威胁建模、工程实现、逐家实践、合规映射与参考表，分别在 <code>10</code>–<code>19</code> 号文件中给出。<strong>本章在此只做"接口声明"。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>控制点</th><th>一句话描述</th><th>展开位置</th></tr></thead><tbody><tr><td>1</td><td><strong>授权协议选型与流选择</strong></td><td>授权码流 + PKCE 作为默认；禁止隐式流/密码模式；原生应用走系统浏览器</td><td><code>10-authz-00-intro.md</code>、<code>11-authz-10-protocols.md</code></td></tr><tr><td>2</td><td><strong>令牌形态与绑定</strong></td><td>从可复制的 Bearer 令牌迁移到发送方约束令牌（mTLS 绑定 / DPoP 类）</td><td><code>12-authz-20-tokens-keys.md</code></td></tr><tr><td>3</td><td><strong>作用域与资源级授权</strong></td><td>用结构化权限对象替代裸字符串 scope；scope 授予之后仍需资源级策略二次收窄</td><td><code>13-authz-30-resource-authz.md</code></td></tr><tr><td>4</td><td><strong>令牌生命周期与轮换</strong></td><td>短生命周期访问令牌 + 一次性刷新令牌 + 有限宽限期</td><td><code>12-authz-20-tokens-keys.md</code></td></tr><tr><td>5</td><td><strong>撤销与吊销联动</strong></td><td>撤销授权后，令牌、刷新令牌、下游配置、车端密钥同步失效</td><td><code>12-authz-20-tokens-keys.md</code>、<code>13-authz-30-resource-authz.md</code></td></tr><tr><td>6</td><td><strong>代行与代理链</strong></td><td>明确"代表车主行事"vs"合作伙伴自身身份"，代行链可归因（subject/actor）</td><td><code>11-authz-10-protocols.md</code>、<code>16/17</code> 号文件</td></tr><tr><td>7</td><td><strong>车端最终校验（最后一道闸门）</strong></td><td>车端在执行动作前校验命令载荷签名，而非只信任云端转发</td><td><code>12-authz-20-tokens-keys.md</code>、<code>13-authz-30-resource-authz.md</code></td></tr><tr><td>8</td><td><strong>授权威胁建模</strong></td><td>令牌窃取、越权、混淆代理、同意疲劳等威胁与缓解</td><td><code>14-authz-40-threat-model.md</code></td></tr><tr><td>9</td><td><strong>授权工程实现</strong></td><td>网关决策点位置、策略引擎、审计埋点、失败语义</td><td><code>15-authz-50-engineering.md</code></td></tr><tr><td>10</td><td><strong>授权合规与审计证据</strong></td><td>授权决策日志、同意记录、可审计性与合规映射</td><td><code>18-authz-80-compliance-audit.md</code>、<code>19-authz-90-reference-tables.md</code></td></tr></tbody></table></div>
+<p><strong>本节与其他章节的边界</strong>：02.3 讨论"链路"，本节只声明"授权层的存在与其控制点坐标"，具体的 OAuth 2.x 族规范语义（RFC 6749 / 6750 / 7636 / 8705 / 9449 / 9396 / 8693 / 7662 / 7009 / 8414 / 9470 / 8628 / 9635 等，均 <code>[A]</code>）、令牌生命周期设计、资源级授权模型，<strong>全部在第 3 部分展开，本章不重复</strong>。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-28">
+  <div class="sec-head"><span class="sec-badge">06</span><h2>02.5 应用与平台安全层（L4）</h2></div>
+<h3 id="sec-29">02.5.1 云侧：最小权限、服务身份、隔离与密钥托管</h3>
+<p>云侧是车云安全中"资产最集中、服务最多、变更最频繁"的一层。它的通用控制目标可以概括为一句话：<strong>把一次越权调用能造成的影响，限制在一个服务、一个租户、一辆车的范围内。</strong></p>
+<p><strong>（一）微服务最小权限。</strong> 每个服务只应持有完成其职责所需的最小权限：只读服务不给写权限，处理位置数据的服务不持有支付密钥，负责 OTA 元数据查询的服务不直接读写车辆控制通道。<strong>落点检查项</strong>（<code>[推测]</code>，通用工程清单）：服务账号的权限清单是否可枚举、是否存在"全权限"服务账号、是否存在服务间共享的长效静态密钥。</p>
+<p><strong>（二）服务身份与服务间 mTLS。</strong> 在车云内部，服务之间的调用同样需要认证。通用模式是给每个服务签发<strong>服务身份凭证</strong>（证书或短期令牌），服务间调用走 mTLS，而非共享一个内部 API Key。规范层面的依据是 <strong>RFC 8705（mTLS 客户端认证与证书绑定令牌）</strong> <code>[A]</code>——它定义的是客户端用证书认证的机制，该机制在服务间通信中同样适用。信源档案 §2 将 RFC 8705 定位为"车云链路最关键的授权规范"，其理由（令牌与持有者绑定，使令牌不可被复制盗用）在服务间调用中同样成立：<strong>一个被复制的服务令牌不应能冒充另一个服务</strong>。</p>
+<p><strong>关于"SPIFFE 类服务身份模型"</strong>：本章仅把它作为<strong>通用原理类别</strong>提及——即"用一个可验证的身份字符串标识服务，并以此签发短期身份凭证"这一模式。<strong>信源档案未采集任何 SPIFFE 规范正文</strong>，因此本章<strong>不引用其规范编号或条款</strong>，也不断言任何车企采用了它（<code>[未找到公开来源]</code>）。</p>
+<p><strong>（三）容器安全与隔离。</strong> 通用控制点包括：镜像来源可信与签名校验、最小基础镜像、以非 root 运行、只读文件系统、资源限额（CPU/内存/进程数）、网络策略（只允许必要的东西向流量）、运行时行为监控。<strong>本报告判断</strong>：在车云场景中，网络策略的严格程度直接决定 02.3.5 中"方案 B（网关终止）"是否真的安全——若服务可被绕过网关直连，则网关上的鉴权形同虚设（推测，非事实）。</p>
+<p><strong>（四）密钥托管（KMS/HSM 后端）。</strong> 云侧的"根"是密钥。通用模式是：应用不直接持有根密钥，而是通过 KMS（其后端常为 HSM，对应 <code>FIPS 140-3</code> <code>[A]</code> 的密码模块认证体系）做加解密/签名，密钥永不离开硬件。层级通常是：根密钥（HSM，极少使用）→ 密钥加密密钥（KEK）→ 数据加密密钥（DEK，可频繁轮换）。<strong>引用依据</strong>：<code>NIST SP 800-57 Part 1 Rev.5</code>（密钥生命周期管理） <code>[A]</code>、<code>NIST SP 800-133</code>（密钥生成） <code>[A]</code>。</p>
+<p><strong>（五）WAF / 网关鉴权 / 授权决策点位置。</strong> 授权决策点（PDP）放在哪，是云侧的核心架构选择。三种通用位置：</p>
+<div class="table-wrap"><table><thead><tr><th>位置</th><th>判定时机</th><th>优点</th><th>风险</th></tr></thead><tbody><tr><td>边缘 WAF/网关</td><td>请求进入时</td><td>拦在最外层，成本低</td><td>无法理解业务语义，只能做粗粒度规则（<code>[推测]</code>）</td></tr><tr><td>API 网关（统一鉴权）</td><td>路由到服务前</td><td>集中策略、集中审计、集中限流</td><td>网关本身成为关键单点；策略绕过（直连服务）风险（<code>[推测]</code>）</td></tr><tr><td>服务内（每服务自决）</td><td>业务逻辑处</td><td>可做最细粒度资源级判定</td><td>策略分散、易不一致、审计难聚合（<code>[推测]</code>）</td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>：成熟的通用方案通常是<strong>分层组合</strong>——WAF 做粗过滤，网关做身份与 scope 级判定，服务内做资源级（对象级）判定。这三层的划分与 02.4.1 中"scope 被授予 ≠ 资源可访问"的双层结构直接对应（推测，非事实）。</p>
+<p><strong>（六）一条公开可核验的云侧限流实例。</strong> 信源档案 §7.1 明载 Tesla Fleet API 的限流模型：实时数据 60 次/分、唤醒 3 次/分、设备命令 30 次/分，且<strong>同账号多个应用共享限额</strong> <code>[A]</code>。这属于云侧"资源保护与影响范围控制"的公开实例，其可引用范围为该平台；<strong>不得外推为行业统一数值</strong>。同处还明载：单台车辆<strong>最多同时向 5 个第三方应用推流</strong> <code>[A]</code>（下节展开）。</p>
+<p>此外，中国侧有直接命中云平台层的规范：<strong>GB/T 47324-2026《车联网平台网络安全防护要求》</strong>（2026-03-31 发布，2026-10-01 实施） <code>[A]</code>，信源档案 §1.2 特别标注其"<strong>直接命中本报告主题：车联网云平台侧的防护要求</strong>"。<strong>引用边界</strong>：本章只引用其存在、名称与日期，<strong>不引用条款号</strong>（本次未取正文）。</p>
+<h3 id="sec-30">02.5.2 车侧：应用沙箱、分域隔离与 IPC 边界</h3>
+<p>车侧 L4 的核心问题是：<strong>座舱里的第三方应用，如何与车控能力共处一颗/一组芯片而不互相污染。</strong></p>
+<p><strong>（一）富 OS 车机平台的应用沙箱。</strong> 座舱侧通常运行富操作系统（<strong>本次调研未取到任何具体座舱平台的安全配置一手来源</strong>，故此处只写通用机制）。通用机制包括：应用以独立用户/沙箱身份运行、权限声明与运行时授权、应用间通过受控接口通信、系统服务对敏感能力（摄像头/麦克风/位置/车辆信号）做访问代理。<strong>本节不指定任何具体平台名称的规范细节</strong>；信源档案 §7.9 记录华为的开发者文档（含 Wallet Kit 数字车钥匙方向）在本次抓取中只返回 JS 空壳页、正文不可取，因此<strong>任何关于鸿蒙座舱安全配置的断言均属"未找到公开来源"</strong>。</p>
+<p><strong>（二）虚拟化 Hypervisor 分域。</strong> 与 TEE 并行的一条路线（见 02.2.2）：把座舱域、智驾域、车控域分置于独立虚拟机，由 Hypervisor 强制隔离。<strong>信源档案未取到该机制的规范依据</strong>（AUTOSAR Classic Platform 的 Crypto Stack / SecOC / IdsM 均标 <code>[未验证]</code>），因此本节只做机制描述，不引条款。</p>
+<p><strong>（三）进程隔离与 IPC 边界。</strong> 通用控制点是：把"能下发车控命令的进程"与"运行第三方代码的进程"严格分离；二者之间只通过<strong>白名单化的、有类型约束的 IPC 接口</strong>通信；IPC 接口的调用方必须被校验身份，而非仅校验"能连到这个 socket"。<strong>本报告判断</strong>：大量车端越权问题的本质是"IPC 接口未校验调用方身份"，而非"加密被破解"（推测，非事实；本档案未采集具体案例，故不举例）。</p>
+<p><strong>（四）外设访问控制。</strong> 摄像头、麦克风、UWB/BLE 射频、USB、诊断口（OBD）等外设是车侧的物理攻击面。通用控制点：默认关闭、按需授权、使用时可见指示、诊断口在行驶中受限。<strong>本报告判断</strong>：信源档案 §7 中各家 SRC 页面的存在（如奇瑞官网设"网络产品安全漏洞"专栏 <code>[A]</code>、Tesla 在 Bugcrowd 运营赏金项目 <code>[A]</code>）说明外部研究者对车端与外设的攻击面是持续关注的（推测，非事实）。</p>
+<h3 id="sec-31">02.5.3 攻破影响范围控制（Blast Radius Control）</h3>
+<p>本节把 L4 的"影响范围控制"独立列出，因为它是<strong>从"防止被攻破"转向"假设已被攻破"的设计范式</strong>。通用手段有五类：</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>手段</th><th>机制</th><th>车云场景落点</th><th>公开可核验实例（信源档案 §7.1，仅限该平台）</th></tr></thead><tbody><tr><td>1</td><td><strong>分域隔离</strong></td><td>把系统切成互不可达的域，域间只留窄接口</td><td>座舱/智驾/车控分域；云侧按租户/车型分域</td><td>（本档案未取到具体分域证据，<code>[推测]</code>）</td></tr><tr><td>2</td><td><strong>单向数据流</strong></td><td>数据只允许从低信任流向高信任，反向需显式通道</td><td>车→云遥测可宽、云→车命令须严；跨域只读</td><td>Fleet Telemetry 为车→云推流 <code>[A]</code>；配置由应用私钥签名且"Tesla 无法编辑" <code>[A]</code></td></tr><tr><td>3</td><td><strong>命令白名单</strong></td><td>只允许预定义命令集，拒绝任意指令</td><td>车端仅接受已知命令 ID 与参数</td><td><code>vehicle_cmds</code> 覆盖一组枚举命令（列举式，非任意） <code>[A]</code></td></tr><tr><td>4</td><td><strong>速率限制</strong></td><td>按维度（账号/设备/命令类）设定配额</td><td>防暴力、防资源耗尽、防异常高频</td><td>实时数据 60/分、唤醒 3/分、设备命令 30/分；同账号多应用共享 <code>[A]</code></td></tr><tr><td>5</td><td><strong>熔断与配额暂停</strong></td><td>超限即暂停能力而非仅返回错误</td><td>防持续滥用的累积影响</td><td>超出计费上限"暂停 API 使用并移除 Fleet Telemetry 推流配置（且不恢复）" <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>表外补充两条来自同一公开实现的"数量上限即控制"实例：</strong></p>
+<ul><li><strong>推流对象数量上限</strong>：单台车辆最多同时向 <strong>5 个</strong>第三方应用推流 <code>[A]</code>——把"多少个第三方能同时看到这辆车的数据"从无限变为有限，是可审计的暴露面控制。</li><li><strong>密钥数量上限</strong>：B2B 项目自动添加虚拟密钥的条件为"已配对密钥少于 <strong>20 把</strong>" <code>[A]</code>——同理，把"多少个凭证可操作这辆车"设上限。</li></ul>
+<p><strong>本报告判断</strong>：影响范围控制的通用原则可以概括为"<strong>把无限暴露面变成有限、可枚举、可审计的暴露面</strong>"（推测，非事实）。上述两个上限是这一原则的公开实例，但它们的具体数值属于该平台的工程选择，<strong>不可外推为行业标准值</strong>。</p>
+<p><strong>另一条重要的失败处理设计</strong>：信源档案 §7.1 明载，Fleet Telemetry 车辆断连时缓冲最多 5000 条消息（≥2500 秒数据），重连采用<strong>指数退避、最大重试延迟 30 秒</strong> <code>[A]</code>。这是车云链路"弱网容错"的公开实例——<strong>影响范围控制不只是"限制"，也包括"限制故障的扩散方式"</strong>：指数退避避免海量车辆同时重连打垮云端。</p>
+<h3 id="sec-32">02.5.4 入侵检测与安全审计</h3>
+<p><strong>（一）车内 IDS 与异常行为检测。</strong> 信源档案 §1.2 记录 <strong>GB/T 45181-2024《车联网网络安全异常行为检测机制》</strong>（2024-12-31 发布，2025-04-01 实施） <code>[A]</code>——这是车联网异常行为检测机制的国家级规范。此外信源档案 §4 记录 AUTOSAR Classic Platform 含 <strong>IdsM 入侵检测</strong>组件，但标记为 <code>[未验证]</code>（<code>autosar.org</code> 超时，正文未取到），因此本章<strong>不引用 IdsM 的规范细节</strong>，只把它列为"车内 IDS 存在标准化组件"的提示。</p>
+<p><strong>通用机制（<code>[推测]</code>）：</strong> 车内 IDS 的检测对象通常是<strong>报文层面的统计异常</strong>（某 CAN ID 的发送频率突增、非预期的仲裁 ID 出现、源地址与预期不符）、<strong>诊断层面的异常</strong>（非授权的诊断请求、刷写尝试）、<strong>主机层面的异常</strong>（异常进程、异常的 IPC 调用序列、非预期的外设访问）。其价值在于：<strong>在车端本地检测到异常并上报，使云端能够对"一小批车"做定向处置</strong>，而不是等到大规模数据泄露才发现。</p>
+<p><strong>（二）云侧异常行为检测。</strong> 云侧的检测对象是<strong>授权与访问行为</strong>：同一账号在极短时间内访问大量不同车辆、某客户端从异常地理位置发起调用、某令牌在多个不相关上下文被使用、高频失败授权（凭证猜测）、以及"应当只读的令牌尝试写操作"。<strong>本报告判断</strong>：云侧检测的决定性前提是<strong>授权决策的可观测性</strong>——若系统只记录"HTTP 200/403"，而不记录"哪个主体、以什么令牌、对什么资源、依据哪条策略作出了允许/拒绝决定"，则异常检测无法定位到授权层（推测，非事实）。</p>
+<p><strong>（三）日志与授权决策证据留存。</strong> 这一条最容易被当作合规负担而敷衍。但从工程角度，<strong>授权决策日志是唯一能在事后回答"当时到底为什么允许了这个请求"的证据</strong>。通用要求（<code>[推测]</code>，对齐 OWASP 类日志实践与 <code>00-engagement-plan.md</code> §3.3 的 Low 级判据"日志不含授权决策依据"）：</p>
+<ol><li><strong>记录五要素</strong>：主体（谁）、令牌/凭证标识、资源（对什么）、动作（做什么）、判决（允许/拒绝）与依据（哪条策略）。</li><li><strong>不记录敏感值</strong>：不得把令牌明文、密钥、位置坐标原值写入普通日志（日志系统本身的泄露会放大问题）。</li><li><strong>不可篡改与可追溯</strong>：审计日志应只追加、有完整性保护，并能关联到具体请求链路。</li><li><strong>留存期限与数据合规的冲突处理</strong>：日志中含个人数据时，须与 02.6.2 的数据合规要求联动（例如位置类日志的脱敏与留存期限）。</li><li><strong>对齐合规要求</strong>：GB/T 47324-2026（车联网平台网络安全防护要求）<code>[A]</code> 与 GB 44495-2024（整车信息安全）<code>[A]</code> 分别在云侧与整车侧构成合规基线；<strong>本章不引用其条款号</strong>（本次未取正文）。</li></ol>
+<hr>
+</section>
+<section class="rep-section" id="sec-33">
+  <div class="sec-head"><span class="sec-badge">07</span><h2>02.6 生命周期与合规层（L5）</h2></div>
+<h3 id="sec-34">02.6.1 OTA 安全：Uptane 双仓库、TUF 四角色、SUIT 与国内要求</h3>
+<p>车云安全与其他 IT 安全最大的结构差异在于：<strong>车辆交付后，唯一能修复前面四层缺陷的手段是 OTA。</strong> OTA 因此不是"一个功能"，而是<strong>整条安全链的固化/修复通道</strong>——OTA 一旦被攻破，攻破方获得的不是一次数据泄露，而是"所有车辆的软件更新权"。这就是为什么 OTA 层的设计对抗等级最高。</p>
+<p><strong>（一）Uptane：双仓库模型（信源档案 §6，<code>[A]</code>）。</strong> 信源档案 §6 记录：</p>
+<ul><li><strong>Uptane 框架官网</strong>（<code>uptane.org</code>）称其为"首个面向汽车、面向'可抵御国家级攻击者'设计的软件更新安全系统"，是 Linux Foundation Joint Development Foundation 项目 <code>[A]</code>。</li><li><strong>Uptane Standard 最新版 2.1.0</strong>，采用 <strong>Director 仓库 + Image 仓库的双仓库模型</strong> <code>[A]</code>。</li></ul>
+<p><strong>双仓库模型解决什么？</strong> 它把一个"更新签名"职责拆成两个独立主体：</p>
+<div class="table-wrap"><table><thead><tr><th>仓库</th><th>代表谁</th><th>能决定什么</th><th>不能决定什么</th></tr></thead><tbody><tr><td><strong>Image 仓库</strong></td><td>软件供应方（车厂/Tier-1）</td><td>"这批软件镜像本身是真实的、未被篡改"</td><td>不能决定"哪辆车该装哪个版本"</td></tr><tr><td><strong>Director 仓库</strong></td><td>车队运营方（车厂）</td><td>"这辆车当前应装哪个版本"</td><td>不能伪造镜像内容（内容由 Image 仓库背书）</td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>：双仓库的工程价值在于<strong>削弱单点密钥的价值</strong>。若只有一个签名方，则该方密钥泄露即全车队沦陷；拆成两方后，任一方的密钥泄露都不足以独立伪造"一个既内容真实、又针对某辆车定向"的更新（推测，非事实；该判断基于双仓库的职责分工，属机制推理）。</p>
+<p><strong>（二）TUF 四角色与阈值签名（信源档案 §6，<code>[A]</code>）。</strong> 信源档案 §6 记录 TUF 规范定义了 <strong>Root / Targets / Snapshot / Timestamp 四角色</strong>，并包含<strong>委托（delegation）</strong>与 <strong>threshold/quorum 阈值模型</strong> <code>[A]</code>；同时记录 TUF 官网的定位为"阈值签名，防仓库/密钥泄露" <code>[B]</code>。四个角色的职责可归纳为：</p>
+<div class="table-wrap"><table><thead><tr><th>角色</th><th>职责</th><th>与其他角色的关系</th><th>为何需要它</th></tr></thead><tbody><tr><td><strong>Root</strong></td><td>定义"谁有权签其他角色"</td><td>所有信任的起点</td><td>Root 是唯一自签名的角色，其更新需最高门槛</td></tr><tr><td><strong>Targets</strong></td><td>声明"哪些目标文件是合法的、其哈希是什么"</td><td>被 Snapshot 引用</td><td>把"内容清单"与"内容本身"分离</td></tr><tr><td><strong>Snapshot</strong></td><td>对当前所有 Targets 元数据集合做一次快照</td><td>被 Timestamp 引用</td><td>防止"混搭旧版本 Targets"的回滚</td></tr><tr><td><strong>Timestamp</strong></td><td>声明"当前最新的 Snapshot 是哪一个"，且频繁更新</td><td>顶层、短周期</td><td>使"冻结攻击"（feign freeze）可被检测</td></tr></tbody></table></div>
+<p><strong>阈值签名的含义</strong>：每个角色的元数据由<strong>多个密钥中的至少 N 个</strong>共同签名。这样，<strong>单个密钥泄露不足以伪造一份合法元数据</strong>——这正是 TUF 定位中"防仓库/密钥泄露"的落点。</p>
+<p><strong>（三）SUIT：IETF 的固件更新架构（信源档案 §6，<code>[A]</code>）。</strong> 信源档案 §6 记录：</p>
+<ul><li><strong>RFC 9019 (2021) A Firmware Update Architecture for IoT Devices</strong>（SUIT 架构） <code>[A]</code>；</li><li><strong>RFC 9124 (2022) A Manifest Information Model for Firmware Updates in IoT Devices</strong>（SUIT Manifest 信息模型） <code>[A]</code>；</li><li>IETF SUIT 工作组 <code>[A]</code>；</li><li>SUIT Manifest 草案 <code>draft-ietf-suit-manifest-27</code> 为 <code>[C]</code>（草案，非最终 RFC）。</li></ul>
+<p><strong>SUIT 与 Uptane/TUF 的关系（<code>[推测]</code>）</strong>：三者关注的层次不同——SUIT 关注"<strong>Manifest 长什么样、如何描述一个固件及其依赖条件</strong>"（信息模型），TUF 关注"<strong>元数据如何被多密钥信任地分发</strong>"（信任模型），Uptane 关注"<strong>汽车场景下如何把二者组合成双仓库发布流程</strong>"（面向汽车的框架）。<strong>本报告判断</strong>：一份完整的通用 OTA 方案通常在"信息模型（SUIT 类）+ 信任模型（TUF 类）+ 汽车化流程（Uptane 类）"三个层次上都需有明确选择（推测，非事实）。</p>
+<p><strong>（四）国内要求定位。</strong> 信源档案 §1 记录两份直接覆盖 OTA 的标准：</p>
+<ul><li><strong>GB 44496-2024《汽车软件升级通用技术要求》</strong>——<strong>强制性</strong>国标，发布 2024-08-23，实施 2026-01-01 <code>[A]</code>；</li><li><strong>GB/T 47325-2026《车联网在线升级安全技术要求与测试方法》</strong>——2026-03-31 发布，2026-10-01 实施 <code>[A]</code>。</li></ul>
+<p><strong>引用边界</strong>：本章只引用其名称、编号、日期与"强制/推荐"性质，<strong>不引用条款号</strong>（本次未取正文）。信源档案 §1.1 将 GB 44496-2024 与 GB 44495-2024 并列为"中国车云与 OTA 安全的合规基线，2026-01-01 起对新车型强制适用" <code>[A]</code>。</p>
+<p><strong>（五）回滚防护与版本降级攻击。</strong> 这是 OTA 安全中与"签名验证"并列的第二根支柱。逻辑链条如下：</p>
+<ol><li><strong>签名验证只能保证"这个包是官方签的"，不能保证"这个包比当前版本新"。</strong> 攻击者可以合法地获取一个<strong>旧版本、签名仍然有效</strong>的包，重放它，使车辆降级到一个已知有漏洞的版本。这就是<strong>版本降级攻击</strong>。</li><li><strong>因此必须有"反回滚"机制</strong>：车端记录一个<strong>单调的、不可回退的版本下界</strong>（存于 L0 硬件/OTP），任何低于该下界的更新一律拒绝。</li><li><strong>TUF 的 Timestamp 角色与"防冻结"正是同一思路在元数据层的实现</strong> <code>[A]</code>——它保证"当前最新"这一事实本身是被签名的，从而使"回退到旧元数据"可被检测。</li><li><strong>工程上的两难（<code>[推测]</code>）</strong>：反回滚与"售后回退到稳定旧版"的需求冲突。<strong>本报告判断</strong>：成熟的通用做法是"<strong>默认拒绝降级，但保留一条由更高权限签名背书的、显式的降级通道</strong>"，且该通道的每次使用都应被审计（推测，非事实）。</li><li><strong>与安全启动的衔接</strong>：02.2.4 已指出"回滚保护是安全启动的必要组成"。二者是同一控制点在"更新时刻"与"启动时刻"的两个执行面。</li></ol>
+<h3 id="sec-35">02.6.2 数据隐私与合规</h3>
+<p>车云安全的另一半是"数据"。本节按"规范体系 → 分类分级 → 出境"三层组织。</p>
+<p><strong>（一）规范体系（信源档案 §1，均 <code>[A]</code>，除非另注）：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>规范</th><th>类型</th><th>日期</th><th>与车云安全的关系</th></tr></thead><tbody><tr><td>《汽车数据安全管理若干规定（试行）》（网信办等五部门令第 7 号）</td><td>部门规章</td><td>2021-08-16 成文，2021-10-01 施行 <code>[A]</code></td><td>规定<strong>重要数据目录、境内存储、年度报送、出境评估</strong>等义务</td></tr><tr><td>GB/T 41871-2022《信息安全技术 汽车数据处理安全要求》</td><td>推荐性国标</td><td>2022-10-14 发布，2023-05-01 实施 <code>[A]</code></td><td>汽车数据处理的安全要求</td></tr><tr><td>GB/T 44464-2024《汽车数据通用要求》</td><td>推荐性国标</td><td>2024-08-23 发布/实施 <code>[A]</code></td><td>汽车数据通用要求</td></tr><tr><td>欧盟 GDPR Regulation (EU) 2016/679</td><td>欧盟法规</td><td>— <code>[C]</code>（EUR-Lex 返回 202 异步状态，正文未取到）</td><td>个人数据保护的通用基线</td></tr><tr><td>欧盟 Data Act Regulation (EU) 2023/2854</td><td>欧盟法规</td><td>— <code>[C]</code>（HTTP 202，正文未取到）</td><td>车辆数据可携权/互联产品数据访问权 <code>[C]</code></td></tr></tbody></table></div>
+<p><strong>引用边界（再次强调）</strong>：GDPR 与 Data Act 在信源档案中均为 <code>[C]</code>，即<strong>站点可达但正文未取到</strong>。因此本章<strong>只引用其编号、名称与主题定位，不引用任何条款号</strong>。信源档案 §1.4 亦将欧盟 Data Act 标注为 <code>[C]</code>，并在 02.6.4 处与 UN R155/R156 一并适用"不得给条款号"的纪律。</p>
+<p><strong>（二）数据分类分级。</strong> 通用方案要求对车云数据做至少三层划分（<code>[推测]</code>，基于上述规范的"重要数据""个人信息"概念而给出的工程建议层级）：</p>
+<div class="table-wrap"><table><thead><tr><th>层级</th><th>判定要点（通用）</th><th>典型处理要求</th><th>规范锚点</th></tr></thead><tbody><tr><td><strong>重要数据</strong></td><td>一旦泄露/篡改可能影响国家安全、公共利益（如大范围地理信息、车流数据）</td><td>境内存储；出境需评估；目录化管理</td><td>《汽车数据安全管理若干规定（试行）》<code>[A]</code>（重要数据目录、境内存储、出境评估）</td></tr><tr><td><strong>个人信息</strong></td><td>可关联到自然人（车主身份、精确位置、行车轨迹、联系人）</td><td>最小必要、告知同意、脱敏、限制留存</td><td>GB/T 41871-2022 <code>[A]</code>；GDPR 主题定位 <code>[C]</code></td></tr><tr><td><strong>一般业务数据</strong></td><td>不直接关联个人且不涉公共利益（如匿名化的车辆状态统计）</td><td>常规访问控制与审计</td><td>GB/T 44464-2024 <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>：分类分级的难点不在"定义三层"，而在<strong>同一条数据在不同处理阶段属于不同层级</strong>——例如一段位置轨迹在车端是原始位置，在云端聚合后可能是匿名统计，在对外提供时又可能因"可再识别"而重新成为个人信息。因此通用方案需要<strong>按"处理目的 + 处理阶段"而非仅按"字段"来分级</strong>（推测，非事实）。</p>
+<p><strong>（三）出境与本地化。</strong> 《汽车数据安全管理若干规定（试行）》明载"境内存储""出境评估"等义务 <code>[A]</code>。工程含义是：<strong>数据流向图（data flow map）必须先于加密方案被画出</strong>——因为"数据存在哪个地理区域"是一个架构约束，一旦服务部署跨区，后期修改成本极高。<strong>本报告判断</strong>：这也是 02.3.5 中"TLS 终结点位置"选择与数据合规直接耦合的原因（推测，非事实）。</p>
+<p><strong>（四）隐私与安全的交叉点。</strong> 通用方案中，隐私与安全并非两条平行线，而在以下三处强耦合（<code>[推测]</code>）：</p>
+<ol><li><strong>密钥管理与个人数据保护</strong>：对个人数据的加密密钥若与业务密钥同库，则数据保护强度取决于最弱一环。</li><li><strong>日志与合规</strong>：02.5.4 要求记录授权决策五要素，其中"主体/资源"往往含个人数据，需脱敏后留存。</li><li><strong>遥测与最小必要</strong>：信源档案 §7.1 记录 Fleet Telemetry 以"按字段 <code>interval_seconds</code> 与变化触发上报"控制数据量 <code>[A]</code>——<strong>采得多不等于用得上</strong>，最小必要原则既能降成本也能降合规风险。</li></ol>
+<h3 id="sec-36">02.6.3 供应链安全：SBOM、构建完整性、依赖治理</h3>
+<p>车辆软件的组件来源极多（Tier-1、Tier-2、开源库、自研），因此"<strong>你交付的软件里到底有什么</strong>"成为一个必须可回答的问题。这就是 SBOM（软件物料清单）。</p>
+<p><strong>（一）SBOM 的两种格式（信源档案 §6）：</strong></p>
+<ul><li><strong>SPDX 规范</strong>（<code>spdx.dev</code>），信源档案记录其"对应国际标准 <strong>ISO/IEC 5962:2021</strong>"，<code>[A]</code>。</li><li><strong>CycloneDX 规范概览</strong>（<code>cyclonedx.org</code>），<code>[B]</code>。</li></ul>
+<p><strong>通用要求（<code>[推测]</code>）</strong>：SBOM 要真正有用，需满足：随每个构建产物自动生成（而非手工补）、覆盖传递依赖（而非只列直接依赖）、含版本与哈希（而非只有名字）、并能与漏洞情报做关联查询。</p>
+<p><strong>（二）构建完整性：SLSA v1.0 与 in-toto（信源档案 §6）。</strong></p>
+<ul><li><strong>SLSA v1.0 分级（Build L0–L3，供应链构建完整性）</strong>（<code>slsa.dev</code>），<code>[A]</code>。</li><li><strong>in-toto 规范（供应链完整性元数据与签名链）</strong>（<code>in-toto.io</code>），<code>[B]</code>。</li></ul>
+<p><strong>机制说明（<code>[推测]</code>）</strong>：SBOM 回答"有什么"，SLSA/in-toto 回答"<strong>它是怎么被构建出来的、过程是否可信</strong>"。二者的关系是：<strong>一个被篡改的构建环境可以产出一份完全真实但被污染的 SBOM</strong>——所以必须同时对"构建过程"本身做完整性证明。SLSA 的分级正是对"构建过程的可信程度"分级（本次未取正文逐条，故不列出各级判据）。in-toto 则提供"把构建链中每一步的元数据串成可验证链条"的机制（<strong>本报告判断</strong>：这与 TUF 的多密钥信任模型在思路上同源，都是"降低单点可信度"的工程手段；推测，非事实）。</p>
+<p><strong>（三）依赖治理与开源许可。</strong> 通用控制点（<code>[推测]</code>）：建立依赖清单与准入流程、对新增依赖做安全与许可评估、锁定依赖版本并校验哈希、对高危漏洞建立修复时限、对开源许可做合规扫描（GPL 类许可与闭源固件的兼容性）。</p>
+<p><strong>（四）与 OTA 的衔接。</strong> SBOM 的价值在车云场景中被放大：<strong>只有知道"某版本里有哪些组件"，才能在某个组件爆出漏洞时快速回答"哪些车、哪些版本受影响"</strong>。<strong>本报告判断</strong>：这是 SBOM 对车厂而言的首要价值——它不是合规表格，而是"召回式响应"（对一大类车做定向 OTA）的前提（推测，非事实）。</p>
+<h3 id="sec-37">02.6.4 管理体系：ISO/SAE 21434、UN R155/R156、GB 44495-2024</h3>
+<p><strong>（一）ISO/SAE 21434:2021《Road vehicles — Cybersecurity engineering》。</strong> 信源档案 §1.4 记录其 SAE 收录页可达、ISO 官方页被 Cloudflare 拦截，标记为 <code>[未验证]</code>（编号与年份为通行共识，正文未取到）。因此本章<strong>只引用其编号、年份与主题定位（汽车网络安全工程）</strong>，<strong>不引用任何条款号、不描述其结构、不断言其要求条目</strong>。信源档案 §1.4 还记录 SAE J3061《Cybersecurity Guidebook for Cyber-Physical Vehicle Systems》为其前身，<code>[B]</code>（HTTP 200）。</p>
+<p><strong>（二）ISO 24089:2023《Road vehicles — Software update engineering》。</strong> 信源档案 §1.4 记录其 <code>[未验证]</code>（<code>iso.org</code> Cloudflare 拦截）。<strong>引用边界同上：只提编号、年份、主题，不提条款。</strong></p>
+<p><strong>（三）UN Regulation No.155（CSMS）与 No.156（SUMS）。</strong> 信源档案 §1.4 记录 <code>unece.org</code> 被 Cloudflare 全站拦截，标记 <code>[未验证]</code>；并<strong>专门下了一条写作纪律</strong>：涉及 R155/R156 的<strong>具体条款号、强制时间表、审核要求</strong>时，本次无一手来源，凡引用必须标注"<code>[未验证]</code> 依通行公开认知"或改为待补证陈述，<strong>不得给出条款编号</strong>。</p>
+<p>因此本节对二者<strong>只做性质层面的描述</strong>（<code>[推测]</code> 性质的定位陈述）：</p>
+<div class="table-wrap"><table><thead><tr><th>法规</th><th>性质层面描述（不含条款号）</th><th>与本章分层的关系</th></tr></thead><tbody><tr><td><strong>UN R155</strong></td><td>面向<strong>网络安全管理体系（CSMS）</strong>的法规要求——即对"组织是否有成体系的网络安全流程"提出要求，而非仅对某个技术点提出要求</td><td>对应本章 L5 的"管理体系"，并向下约束 L0–L4 的工程落地</td></tr><tr><td><strong>UN R156</strong></td><td>面向<strong>软件更新管理体系（SUMS）</strong>的法规要求——即对"软件更新的组织流程与合规性"提出要求</td><td>对应 02.6.1 的 OTA 安全，但强调"管理体系"而非"技术机制"</td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>：R155/R156 与 ISO/SAE 21434 的关系，是"<strong>法规要求你要有一个体系</strong>"与"<strong>标准告诉你怎么建这个体系</strong>"的关系（推测，非事实）。二者都不直接规定"用哪种密码算法"，而是要求"组织能证明其安全工程过程"。这也是本章始终把"管理体系"放在 L5 而非技术层的原因。</p>
+<p><strong>（四）GB 44495-2024 的定位。</strong> 信源档案 §1.1 记录 <strong>GB 44495-2024《汽车整车信息安全技术要求》</strong>，发布 2024-08-23，实施 2026-01-01，属<strong>强制性</strong>国标 <code>[A]</code>；该档案将其定位为"中国车云与 OTA 安全的合规基线"。<strong>引用边界</strong>：只引用名称、编号、日期、强制性质与基线定位，<strong>不引用条款号</strong>（本次未取正文）。</p>
+<p><strong>（五）四条体系类规范的"证据强度差异"必须被读者看到。</strong> 本章在此做出一个显式的对照，因为它是本报告可信度声明的关键：</p>
+<div class="table-wrap"><table><thead><tr><th>规范</th><th>本次证据等级</th><th>本章可引用到哪一层</th></tr></thead><tbody><tr><td>GB 44495-2024 / GB 44496-2024</td><td><code>[A]</code>（国家标准全文公开系统）</td><td>名称/编号/日期/强制性质/基线定位</td></tr><tr><td>GB/T 40855/40856/40857-2021、GB/T 41871-2022、GB/T 44464-2024、GB/T 47324/47325-2026、GB/T 47467-2026、GB/T 45112-2024、GB/T 45181-2024 等推荐性国标</td><td><code>[A]</code>（国家标准全文公开系统）</td><td>名称/编号/日期/定位</td></tr><tr><td>ISO/SAE 21434:2021、ISO 24089:2023</td><td><code>[未验证]</code></td><td><strong>仅编号/年份/主题</strong>；不给条款</td></tr><tr><td>UN R155 / UN R156</td><td><code>[未验证]</code></td><td><strong>仅性质层面</strong>；不给条款号、不给时间表、不给审核要求</td></tr><tr><td>GDPR、欧盟 Data Act 2023/2854</td><td><code>[C]</code></td><td>仅编号/名称/主题定位</td></tr></tbody></table></div>
+<p><strong>这张表是本章最重要的"诚实性声明"</strong>：它让读者一眼看到"哪些结论有强证据、哪些只是性质描述"。后续章节（尤其是第 6 部分对比与第 7 部分总结）在引用这些体系类规范时，必须继承同样的边界。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-38">
+  <div class="sec-head"><span class="sec-badge">08</span><h2>02.7 通用方案「控制点 → 威胁」双向映射大表</h2></div>
+<p>本节是本章的方法论落点。<code>00-engagement-plan.md</code> §4 第 3 条要求"控制-威胁映射法"：<strong>每条控制点反向标记其缓解的威胁，确保不出现'无威胁来源的控制'与'无控制的威胁'</strong>。下表即该映射的实现。</p>
+<p><strong>读表说明：</strong></p>
+<ul><li><strong>控制点 ID</strong> 按层前缀编号：<code>H</code>（L0/L1 硬件与执行环境）、<code>C</code>（L2 通信）、<code>A</code>（L3 授权，仅列接口，细则见 10–19 号文件）、<code>P</code>（L4 应用与平台）、<code>L</code>（L5 生命周期）。</li><li><strong>威胁列</strong>以 STRIDE 六类缩写为主：<code>S</code>=Spoofing 仿冒、<code>T</code>=Tampering 篡改、<code>R</code>=Repudiation 抵赖、<code>I</code>=Information Disclosure 信息泄露、<code>D</code>=Denial of Service 拒绝服务、<code>E</code>=Elevation of Privilege 权限提升。</li><li>少数条目标注"OWASP-API 类：&lt;描述&gt;"，用于指向 API 安全的通用威胁模式。<strong>说明</strong>：OWASP 类别名称在信源档案中未被采集，此处仅作"通行公开认知下的类别描述"，<strong>不引用其编号</strong>（对齐本章 02.0.2 的证据纪律）。</li><li><strong>规范依据</strong>列的规范编号<strong>全部出自信源档案</strong>；凡信源档案未收录者，该列写"本次未找到公开来源"，并以 <code>[推测]</code> 标注该控制点的机制性质。</li><li><strong>验证方法</strong>列给出"若要核验这条控制点是否真的落地，可以怎么查"——这是 02.0.4 定义的可验证性落地。</li></ul>
+<div class="table-wrap"><table><thead><tr><th>控制点 ID</th><th>层</th><th>控制描述</th><th>缓解的威胁</th><th>规范依据</th><th>验证方法</th></tr></thead><tbody><tr><td>H-01</td><td>L0</td><td>私钥不可导出，密钥生成与使用在硬件内完成</td><td>S（仿冒客户端）；I（密钥泄露）</td><td>FIPS 140-3 <code>[A]</code>；SP 800-133 <code>[A]</code></td><td>尝试导出私钥；查密码模块认证等级；查密钥使用日志</td></tr><tr><td>H-02</td><td>L0</td><td>生产环境关闭/锁定调试口（JTAG/串口/UART）</td><td>T；E</td><td>本次未找到公开来源（<code>[推测]</code>，通用工程实践）</td><td>产线锁定记录；物理探测调试口是否可读写</td></tr><tr><td>H-03</td><td>L0</td><td>器件唯一标识与证书绑定，防器件替换</td><td>S</td><td>GB/T 45112-2024 <code>[A]</code>（车联网证书体系定位）</td><td>替换器件后是否仍能完成认证</td></tr><tr><td>H-04</td><td>L0</td><td>密钥保险库层级化（根密钥不直用于业务）</td><td>I；E</td><td>SP 800-57 Part 1 Rev.5 <code>[A]</code></td><td>密钥层级图；根密钥调用频次审计</td></tr><tr><td>H-05</td><td>L1</td><td>逐级验签的安全启动，任一级失败即停止</td><td>T；E</td><td>本次未找到公开来源（<code>[推测]</code>；AUTOSAR <code>[未验证]</code>）</td><td>篡改某一级镜像后观察是否拒绝启动；启动日志</td></tr><tr><td>H-06</td><td>L1</td><td>单调版本下界（反回滚），拒绝低版本启动/安装</td><td>T；E</td><td>TUF Timestamp/防冻结机制 <code>[A]</code>（思路同源）</td><td>尝试刷入旧版本；读硬件中的版本下界</td></tr><tr><td>H-07</td><td>L1</td><td>敏感操作在 TEE 内执行，富 OS 不可读写</td><td>I；E</td><td>GlobalPlatform TEE System Architecture v1.3（GPD_SPE_009）<code>[A]</code>；OP-TEE <code>[A]</code>；ARM TrustZone for Cortex-A/Cortex-M <code>[B]</code></td><td>TA 接口清单；富 OS 尝试访问 TEE 内存/存储的结果</td></tr><tr><td>H-08</td><td>L1</td><td>可信应用（TA）接口最小暴露 + 调用方身份校验</td><td>E；S</td><td>本次未找到公开来源（<code>[推测]</code>）</td><td>TA 接口枚举；以未授权调用方尝试调用</td></tr><tr><td>H-09</td><td>L1</td><td>车载报文认证（对称 MAC）与密钥管理</td><td>S；T</td><td>EVITA 分级 <code>[B]</code>（HSM 等级）；SecOC 属 AUTOSAR <code>[未验证]</code></td><td>注入未认证报文观察是否被拒</td></tr><tr><td>H-10</td><td>L1</td><td>强随机数源（硬件 TRNG）用于密钥与 nonce</td><td>S；T；I</td><td>SP 800-90A Rev.1 <code>[A]</code></td><td>熵源评估；重复 nonce 检测</td></tr><tr><td>C-01</td><td>L2</td><td>强制双向证书认证（mTLS），每车独立证书</td><td>S；I</td><td>RFC 5280 <code>[A]</code>；RFC 8446 <code>[A]</code></td><td>用无客户端证书/错误证书连接；检查是否每车一证</td></tr><tr><td>C-02</td><td>L2</td><td>证书链完整校验（含有效期/EKU/主机名），失败即中止</td><td>S；T</td><td>RFC 5280 <code>[A]</code>；RFC 5480 <code>[A]</code></td><td>使用自签/过期/错误主机名证书测试；代码路径审查</td></tr><tr><td>C-03</td><td>L2</td><td>实时吊销检查（OCSP）+ 短有效期兜底</td><td>S；I</td><td>RFC 6960 <code>[A]</code>；RFC 5280 <code>[A]</code></td><td>吊销一张证后立即测试；查证书有效期设置</td></tr><tr><td>C-04</td><td>L2</td><td>仅启用 TLS 1.3 且禁用降级/弱套件</td><td>I；T</td><td>RFC 8446 <code>[A]</code></td><td>用旧版本/弱套件发起握手观察是否被拒</td></tr><tr><td>C-05</td><td>L2</td><td>非幂等操作禁用 0-RTT</td><td>T；R</td><td>RFC 8446 <code>[A]</code>（0-RTT 可重放）</td><td>观察服务端是否接受 0-RTT 携带写请求</td></tr><tr><td>C-06</td><td>L2</td><td>国密套件支持（SM2/SM3/SM4 over TLS 1.3）</td><td>S；T；I</td><td>RFC 8998 <code>[A]</code>；GB/T 32918/32905/32907 <code>[A]</code></td><td>以 SM 套件发起握手；查证书算法标识</td></tr><tr><td>C-07</td><td>L2</td><td>防重放：nonce / 序列号 / 时间戳 / 幂等键组合</td><td>T；R</td><td>RFC 3161 <code>[A]</code>（时间戳）；RFC 6749 <code>state</code> <code>[A]</code>；OIDC <code>nonce</code> <code>[A]</code></td><td>重放已捕获报文；检查服务端去重与时间窗</td></tr><tr><td>C-08</td><td>L2</td><td>密码套件与算法基线（AEAD、ECC P-256 量级）</td><td>I；T</td><td>SP 800-38D <code>[A]</code>；FIPS 197 <code>[A]</code>；FIPS 186-5 <code>[A]</code>；Tesla 明载支持 prime256v1 <code>[A]</code></td><td>抓包看协商套件；查证书公钥曲线</td></tr><tr><td>C-09</td><td>L2</td><td>证书自动化签发与轮换，含灰度与回滚</td><td>D；S</td><td>RFC 8555 <code>[A]</code></td><td>轮换作业记录；灰度批次策略文档</td></tr><tr><td>C-10</td><td>L2</td><td>近场通道（NFC/BLE/UWB）与凭证存于 SE</td><td>S；I</td><td>CCC Digital Key Release 3.0 <code>[A]</code>；FiRa 规范 <code>[B]</code></td><td>中继攻击测试；查凭证存储位置</td></tr><tr><td>A-01</td><td>L3</td><td>授权码流 + PKCE，禁用隐式/密码模式</td><td>S；I；E</td><td>RFC 6749 <code>[A]</code>；RFC 7636 <code>[A]</code>；RFC 8252 <code>[A]</code></td><td>授权端点参数审查；尝试隐式流是否被拒（细则见 11 号文件）</td></tr><tr><td>A-02</td><td>L3</td><td>令牌与持有者绑定（mTLS 绑定 / DPoP 类）</td><td>S；E</td><td>RFC 8705 <code>[A]</code>；RFC 9449 <code>[A]</code></td><td>把令牌复制到另一客户端尝试调用（细则见 12 号文件）</td></tr><tr><td>A-03</td><td>L3</td><td>资源级授权：scope 授予之外再做对象级判定</td><td>E；I（OWASP：对象级授权失效类）</td><td>RFC 9396 <code>[A]</code>；Tesla <code>hide_private</code> 实例 <code>[A]</code></td><td>以 A 车令牌访问 B 车资源（细则见 13 号文件）</td></tr><tr><td>A-04</td><td>L3</td><td>短生命周期访问令牌 + 一次性刷新令牌 + 有限宽限</td><td>E；I</td><td>RFC 6749 <code>[A]</code>；Tesla 刷新令牌一次性/3 个月/24h 宽限 <code>[A]</code>；Mercedes 刷新令牌一次性 <code>[A]</code></td><td>重复使用刷新令牌观察是否报错（细则见 12 号文件）</td></tr><tr><td>A-05</td><td>L3</td><td>撤销联动：撤销授权后令牌/配置/密钥同步失效</td><td>E；I；R</td><td>RFC 7009 <code>[A]</code>；Tesla 撤销 scope 后配置被移除 <code>[A]</code></td><td>撤销后立即调用；查下游配置是否被回收</td></tr><tr><td>A-06</td><td>L3</td><td>代行链可归因（subject/actor 区分）</td><td>R；E</td><td>RFC 8693 <code>[A]</code></td><td>审计日志是否区分"代表谁"与"谁在调用"</td></tr><tr><td>A-07</td><td>L3</td><td>车端最终校验：执行前验证命令载荷签名</td><td>S；E；T</td><td>Tesla 虚拟密钥文档：车辆执行命令前验证载荷签名 <code>[A]</code></td><td>以无有效签名的载荷尝试下发命令</td></tr><tr><td>A-08</td><td>L3</td><td>令牌内省/元数据驱动的实时校验</td><td>S；E</td><td>RFC 7662 <code>[A]</code>；RFC 8414 <code>[A]</code>；OIDC Discovery <code>[A]</code></td><td>查 <code>/.well-known</code> 元数据；内省端点行为</td></tr><tr><td>P-01</td><td>L4</td><td>微服务最小权限（服务账号权限可枚举）</td><td>E；I</td><td>本次未找到公开来源（<code>[推测]</code>）</td><td>权限清单审计；是否存在"全权限"账号</td></tr><tr><td>P-02</td><td>L4</td><td>服务间 mTLS / 服务身份凭证</td><td>S；E</td><td>RFC 8705 <code>[A]</code></td><td>服务间流量是否双向证书；伪造服务身份是否被拒</td></tr><tr><td>P-03</td><td>L4</td><td>容器最小化与运行时隔离（非 root、只读 FS、资源限额）</td><td>E；D</td><td>本次未找到公开来源（<code>[推测]</code>）</td><td>容器安全基线扫描；逃逸测试（仅授权环境）</td></tr><tr><td>P-04</td><td>L4</td><td>网络策略：后端服务不可绕过网关直连</td><td>E；T</td><td>本次未找到公开来源（<code>[推测]</code>）</td><td>从服务容器直连后端端口观察是否被网络策略拒绝</td></tr><tr><td>P-05</td><td>L4</td><td>密钥托管于 KMS/HSM，应用不持根密钥</td><td>I；E</td><td>FIPS 140-3 <code>[A]</code>；SP 800-57 Part 1 Rev.5 <code>[A]</code></td><td>检查配置中是否出现明文密钥；KMS 调用审计</td></tr><tr><td>P-06</td><td>L4</td><td>授权决策点分层（WAF 粗过滤 / 网关 scope / 服务内资源级）</td><td>E；S</td><td>GB/T 47324-2026 <code>[A]</code>（平台防护定位）</td><td>越权访问矩阵测试；策略清单</td></tr><tr><td>P-07</td><td>L4</td><td>车侧沙箱与 IPC 边界（IPC 校验调用方身份）</td><td>E；T</td><td>本次未找到公开来源（<code>[推测]</code>）</td><td>以低权限进程调用高权限 IPC 观察是否被拒</td></tr><tr><td>P-08</td><td>L4</td><td>外设访问控制（默认关闭、按需授权、诊断口受限）</td><td>E；I</td><td>本次未找到公开来源（<code>[推测]</code>）</td><td>行驶中访问诊断口/USB 的测试；权限清单</td></tr><tr><td>P-09</td><td>L4</td><td>速率限制（按账号/设备/命令类）</td><td>D</td><td>Tesla 限流模型 60/3/30 次每分 <code>[A]</code>（仅该平台数值）</td><td>压测触发限流；配额共享行为验证</td></tr><tr><td>P-10</td><td>L4</td><td>熔断/配额暂停（超限暂停能力而非仅报错）</td><td>D；E</td><td>Tesla 超限暂停 API 并移除推流配置 <code>[A]</code></td><td>超限后能力是否被暂停；恢复策略</td></tr><tr><td>P-11</td><td>L4</td><td>暴露面数量上限（推流对象数、凭证数）</td><td>E；I</td><td>Tesla 5 路推流上限 / 20 把密钥上限 <code>[A]</code></td><td>尝试超出上限观察是否被拒</td></tr><tr><td>P-12</td><td>L4</td><td>车内/云侧异常行为检测与告警</td><td>S；E；D</td><td>GB/T 45181-2024 <code>[A]</code>；IdsM 属 AUTOSAR <code>[未验证]</code></td><td>注入异常行为观察告警；检测规则清单</td></tr><tr><td>P-13</td><td>L4</td><td>授权决策审计日志（主体/凭证/资源/动作/判决/依据）</td><td>R；E</td><td>GB/T 47324-2026 <code>[A]</code>（定位）；日志要求属 <code>[推测]</code></td><td>抽样一条允许记录，检查是否含授权依据</td></tr><tr><td>P-14</td><td>L4</td><td>弱网容错（缓冲 + 指数退避）不放大故障</td><td>D</td><td>Tesla 缓冲 5000 条/退避上限 30 秒 <code>[A]</code></td><td>断网重连压测；是否出现重连风暴</td></tr><tr><td>L-01</td><td>L5</td><td>OTA 双仓库（内容与定向分离）</td><td>T；E</td><td>Uptane 2.1.0 <code>[A]</code></td><td>验证是否存在独立的定向签发方</td></tr><tr><td>L-02</td><td>L5</td><td>四角色元数据 + 阈值签名（单密钥不足伪签）</td><td>T；E</td><td>TUF 规范 <code>[A]</code></td><td>检查各角色 threshold 配置；单密钥伪造测试</td></tr><tr><td>L-03</td><td>L5</td><td>更新包 Manifest 信息模型（含依赖与条件）</td><td>T；E</td><td>RFC 9019 <code>[A]</code>；RFC 9124 <code>[A]</code></td><td>Manifest 字段审查</td></tr><tr><td>L-04</td><td>L5</td><td>回滚保护（版本单调）在更新与启动两侧生效</td><td>T；E</td><td>TUF 防冻结 <code>[A]</code>（思路）；GB/T 47325-2026 <code>[A]</code>（定位）</td><td>刷入低版本包观察是否被拒</td></tr><tr><td>L-05</td><td>L5</td><td>SBOM 随构建生成（含传递依赖与哈希）</td><td>T；I</td><td>SPDX（ISO/IEC 5962:2021）<code>[A]</code>；CycloneDX <code>[B]</code></td><td>取一个版本的 SBOM，核对是否含传递依赖</td></tr><tr><td>L-06</td><td>L5</td><td>构建完整性（构建过程可信证明）</td><td>T；E</td><td>SLSA v1.0 <code>[A]</code>；in-toto <code>[B]</code></td><td>检查 provenance；构建可复现性验证</td></tr><tr><td>L-07</td><td>L5</td><td>数据分类分级与境内存储/出境评估</td><td>I（合规）</td><td>《汽车数据安全管理若干规定（试行）》<code>[A]</code>；GB/T 41871-2022 <code>[A]</code>；GB/T 44464-2024 <code>[A]</code></td><td>数据流向图；出境评估记录</td></tr><tr><td>L-08</td><td>L5</td><td>管理体系与合规证据链（CSMS/SUMS 类体系）</td><td>R（合规）</td><td>GB 44495-2024 <code>[A]</code>；GB 44496-2024 <code>[A]</code>；ISO/SAE 21434 <code>[未验证]</code>；UN R155/R156 <code>[未验证]</code></td><td>体系文档；审核记录</td></tr><tr><td>L-09</td><td>L5</td><td>漏洞披露与响应渠道</td><td>全部（响应能力）</td><td>Tesla Bugcrowd 项目 <code>[A/B]</code>；奇瑞漏洞专栏 <code>[A]</code></td><td>是否有公开披露渠道与响应 SLA</td></tr></tbody></table></div>
+<p><strong>表后双向检查（验证本表自身不出现"孤儿"）：</strong></p>
+<ul><li><strong>每条控制点都有威胁来源</strong>：表中 44 条控制点的"缓解的威胁"列均非空，无"无威胁来源的控制"。</li><li><strong>每类 STRIDE 威胁都有控制点覆盖</strong>：<code>S</code>（H-01/H-03/H-08/H-09/C-01/C-02/C-03/C-06/C-10/A-01/A-02/A-07/A-08/P-02/P-06/P-12）；<code>T</code>（H-02/H-05/H-06/H-07/H-09/C-02/C-04/C-05/C-06/C-07/C-08/A-07/P-04/P-07/L-01/L-02/L-03/L-04/L-05/L-06）；<code>R</code>（C-05/C-07/A-05/A-06/P-13/L-08）；<code>I</code>（H-01/H-04/H-07/C-01/C-03/C-04/C-08/C-10/A-01/A-03/A-04/A-05/A-08/P-01/P-05/P-08/P-11/P-12/L-05/L-07）；<code>D</code>（C-09/P-03/P-09/P-10/P-12/P-14）；<code>E</code>（H-02/H-04/H-05/H-06/H-07/H-08/A-01/A-02/A-03/A-04/A-05/A-06/A-07/A-08/P-01/P-02/P-03/P-04/P-05/P-06/P-07/P-08/P-10/P-11/P-12/P-13/L-01/L-02/L-03/L-04/L-06）。</li><li><strong>结论</strong>：六类威胁均有覆盖。<strong>本报告判断</strong>：这张表的实用价值在于"反向查漏"——评审时可以沿 A→P→L 逐层问"这一层的 E（权限提升）由哪条控制点挡"，从而发现被遗漏的控制（方法论判断，非事实）。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-39">
+  <div class="sec-head"><span class="sec-badge">09</span><h2>02.8 通用方案的工程落地参考（三个片段，均为示意）</h2></div>
+<p><strong>重要声明</strong>：本节三个片段是<strong>示意性工程骨架</strong>，用于说明"通用方案落到代码/清单时长什么样"。它们<strong>不是任何规范或企业文档的原文</strong>，<strong>不构成可直接使用的生产配置</strong>，其中的参数（阈值、周期、顺序）均为<strong>示意值</strong>。凡涉及具体取值，实际项目必须按自身合规区域、器件能力与风险模型重新确定。</p>
+<h3 id="sec-40">片段 A：mTLS 车云链路配置清单（checklist 形式）</h3>
+<pre><code>[ ] 1. 证书体系
+    [ ] 每车一证（禁止全网共用客户端证书）
+    [ ] 设备证书 subject/SAN 承载唯一设备标识，可映射到 VIN
+    [ ] 服务端证书链完整下发（含中间证书）
+    [ ] 证书有效期 ≤ &lt;示意：短于泄露发现周期&gt;
+    [ ] 支持 OCSP 查询，且配置 CRL 作为兜底
+
+[ ] 2. 协商与套件
+    [ ] 仅允许 TLS 1.3（若必须兼容旧端，对旧端单独策略并记录豁免）
+    [ ] 仅允许 AEAD 套件
+    [ ] 若需国密合规：并行启用 RFC 8998 SM 套件，算法标识与证书算法一致
+    [ ] 禁用 0-RTT 于写路径 / 车控路径
+    [ ] 客户端证书类型：ECDSA（P-256 量级）
+
+[ ] 3. 车端实现
+    [ ] 私钥生成于硬件内，且不可导出（连接 L0 KMS/SE/HSM）
+    [ ] 校验失败必须中止连接（禁止&quot;仍发送但不校验&quot;）
+    [ ] 时钟：启用可信时间源，用于证书有效期与时间戳窗口判定
+
+[ ] 4. 云端实现
+    [ ] TLS 终结点位置明确，且其后内网有网络策略防绕过
+    [ ] 从证书身份到车辆身份的映射校验（防跨车冒用）
+    [ ] 认证路径与资源路径分段，并分别限流
+
+[ ] 5. 运维
+    [ ] 轮换自动化（见片段 B）
+    [ ] 证书到期监控与告警
+    [ ] 握手失败率监控（防&quot;轮换打挂全量&quot;）</code></pre>
+<h3 id="sec-41">片段 B：证书轮换作业流程（含灰度与回滚）</h3>
+<pre><code>阶段 0 · 准备
+  1. 生成新证书批次（新 CA/中间证书如需变更，先确认车端信任库可更新）
+  2. 预置&quot;双信任&quot;：车端信任库同时包含旧链与新链的根
+  3. 准备回滚预案：保留旧证书与其签发能力一段时间
+
+阶段 1 · 灰度（分批）
+  4. 选取最小批次（&lt;示意：按车型/地区/固件版本切分&gt;）下发新证书
+  5. 观察指标：握手成功率、认证失败率、连接时延、异常告警
+  6. 若指标劣化超过阈值 =&gt; 触发阶段 4（回滚）
+
+阶段 2 · 扩大
+  7. 逐步扩大批次，每批之间保留观察窗口
+  8. 全程保持新旧证书均可被云端接受（重叠期）
+
+阶段 3 · 收敛
+  9. 全部车辆完成切换后，宣布旧证书进入淘汰期
+ 10. 淘汰期结束后，云端停止接受旧证书
+ 11. 从信任库中移除旧根（可选，视风险与兼容性）
+
+阶段 4 · 回滚（异常时）
+ 12. 云端恢复接受旧证书
+ 13. 停止下发新批次，定位失败原因（链配置/算法/时钟/信任库）
+ 14. 修复后从阶段 1 重新开始
+
+[强制项] 每次轮换保留完整记录：批次范围、时间、指标、决策人
+[强制项] 令牌类凭证的轮换遵循同一&quot;灰度-收敛&quot;逻辑；
+         一次性凭证（如刷新令牌）采用&quot;用后即换 + 有限宽限&quot;</code></pre>
+<h3 id="sec-42">片段 C：OTA 包验签与回滚保护的校验顺序（伪代码）</h3>
+<pre><code>function accept_update(package):
+    # ---- 第 1 层：元数据信任（TUF 类四角色 + 阈值签名）----
+    ts_meta  = fetch_timestamp_metadata()
+    if not verify_signature(ts_meta, role=TIMESTAMP, threshold=N_ts):
+        return REJECT(&quot;timestamp 元数据签名不足&quot;)
+    if ts_meta.version &lt;= local.timestamp_version:
+        return REJECT(&quot;疑似冻结/回滚：timestamp 版本未前进&quot;)
+
+    snap_meta = fetch_snapshot_metadata(ts_meta.snapshot_ref)
+    if not verify_signature(snap_meta, role=SNAPSHOT, threshold=N_snap):
+        return REJECT(&quot;snapshot 元数据签名不足&quot;)
+
+    tgt_meta  = fetch_targets_metadata(snap_meta.targets_ref)
+    if not verify_signature(tgt_meta, role=TARGETS, threshold=N_tgt):
+        return REJECT(&quot;targets 元数据签名不足&quot;)
+
+    # ---- 第 2 层：定向性（Director 仓库：这辆车该装哪个版本）----
+    director_meta = fetch_director_metadata(vin = self.vin)
+    if not verify_signature(director_meta, role=DIRECTOR, threshold=N_dir):
+        return REJECT(&quot;director 元数据签名不足&quot;)
+    if director_meta.target_version != package.version:
+        return REJECT(&quot;包版本与定向声明不一致&quot;)
+
+    # ---- 第 3 层：包体完整性（内容哈希与长度）----
+    if hash(package.image) != tgt_meta.hash:
+        return REJECT(&quot;镜像哈希不匹配&quot;)
+    if package.manifest_hash != tgt_meta.manifest_hash:
+        return REJECT(&quot;Manifest 哈希不匹配&quot;)
+
+    # ---- 第 4 层：Manifest 与依赖条件（SUIT 类信息模型）----
+    manifest = parse_manifest(package)
+    if not verify_manifest_signature(manifest):
+        return REJECT(&quot;Manifest 签名无效&quot;)
+    if not check_conditions(manifest, current_hw = self.hw_rev,
+                                      current_fw = self.fw_rev,
+                                      free_space = self.storage_free):
+        return REJECT(&quot;前置条件不满足&quot;)
+
+    # ---- 第 5 层：回滚保护（存储于 L0，单调不可回退）----
+    if package.version &lt; hardware_min_version:
+        return REJECT(&quot;低于硬件版本下界：拒绝降级&quot;)
+    if package.security_level &lt; hardware_min_security_level:
+        return REJECT(&quot;安全等级降级被拒&quot;)
+
+    # ---- 第 6 层：执行（原子切换 + 失败回退到上一可用槽）----
+    stage_to_inactive_slot(package)
+    if not verify_staged_image():
+        return REJECT(&quot;暂存镜像校验失败&quot;)
+    set_boot_slot(inactive_slot)
+    pending_confirm = True     # A/B 槽：启动确认成功后再固化
+    return ACCEPT_PENDING_REBOOT</code></pre>
+<p><strong>片段 C 的顺序逻辑（为什么必须是这个顺序）</strong>：先建立"元数据信任"（否则后面的哈希都是不可信的哈希），再确认"定向性"（否则可能把 A 车的包装到 B 车），再验证"包体内容"（成本最高的操作放后），最后才是"回滚保护"与"执行"。<strong>本报告判断</strong>：这个顺序的核心原则是"<strong>先验证便宜的信任前提，再做昂贵的完整性计算</strong>"，同时把"单调性检查"放在最靠近写入的位置，避免"验完又被降级"的窗口（工程推理，非事实）。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-43">
+  <div class="sec-head"><span class="sec-badge">10</span><h2>02.9 通用方案的已知薄弱点（≥ 8 条）</h2></div>
+<p>本节列出<strong>通用方案本身</strong>（而非任何具体实现）的结构性薄弱点。每条按"<strong>薄弱点 → 真实世界可利用性 → 缓解</strong>"三段给出。<strong>所有真实性判断均为机制层推理</strong>；信源档案未采集任何具体漏洞案例，故本节<strong>不引用任何 CVE、不指向任何具体产品</strong>。</p>
+<p><strong>薄弱点 1：Bearer 令牌的"持有即证明"属性。</strong></p>
+<ul><li>真实世界可利用性：令牌可被复制，一旦经日志、调试输出、中间件、客户端存储泄露，攻击者无需私钥即可冒充调用者。可利用性<strong>高</strong>——它是 OAuth 2.0 的固有语义而非实现缺陷。</li><li>缓解：改用发送方约束令牌（mTLS 绑定 / DPoP 类，RFC 8705 <code>[A]</code>、RFC 9449 <code>[A]</code>）；缩短令牌有效期（RFC 6749 <code>[A]</code>）；禁止令牌出现在 URL 与日志中（RFC 6750 <code>[A]</code> 讨论 Bearer 使用风险）。</li></ul>
+<p><strong>薄弱点 2：证书吊销传播存在时间窗口。</strong></p>
+<ul><li>真实世界可利用性：被吊销的设备证书在被实际拒绝之前（CRL 更新周期 / OCSP 缓存 / 车端缓存），仍可成功完成握手。可利用性<strong>中高</strong>，取决于部署参数。</li><li>缓解：短有效期兜底（RFC 5280 <code>[A]</code>、RFC 6960 <code>[A]</code>）；关键事件（如车主报失）走"主动断开 + 服务端黑名单"而非仅依赖吊销列表；对高风险资源叠加实时授权判定而非仅看证书状态。</li></ul>
+<p><strong>薄弱点 3：0-RTT 与时间戳窗口对时钟的强依赖。</strong></p>
+<ul><li>真实世界可利用性：车辆时钟可被篡改或漂移（长期停放的车辆、无网环境）；若时间戳窗口判定依赖本地时钟，则窗口形同虚设。可利用性<strong>中</strong>。</li><li>缓解：引入可信时间基准（RFC 3161 <code>[A]</code> 思路）；对时间不可信场景改用 nonce/序列号（02.3.4）；对时钟跳变做检测。</li></ul>
+<p><strong>薄弱点 4：TEE / SE 的"实现级"信任无法仅靠规范保证。</strong></p>
+<ul><li>真实世界可利用性：TEE 与富 OS 共享 SoC，隔离基于实现；TA 设计不当或 TEE OS 缺陷会击穿边界。可利用性<strong>中</strong>——但一旦被利用，后果为 Critical 级（可触及根密钥）。</li><li>缓解：优先选择可审计实现（如 OP-TEE <code>[A]</code>）；限制 TA 接口暴露面并校验调用方；不把 TEE 作为唯一防线（纵深防御，配合 L0 的不可导出密钥与 L2 的绑定令牌）。</li></ul>
+<p><strong>薄弱点 5：密钥的硬件保护无法覆盖"写代码的人"。</strong></p>
+<ul><li>真实世界可利用性：私钥虽在 SE/HSM 内不可导出，但<strong>持有该私钥的签名服务（或车端软件）可被诱导用私钥签名攻击者构造的载荷</strong>（签名预言机问题）。可利用性<strong>中</strong>，属应用层而非硬件层。</li><li>缓解：签名接口必须有输入校验（拒绝任意待签数据）；限制可签名的载荷结构（结构化而非裸签名）；审计签名调用频次与来源。</li></ul>
+<p><strong>薄弱点 6：授权判定的"对象级"缺失。</strong></p>
+<ul><li>真实世界可利用性：系统只校验"令牌有效且含所需 scope"，但不校验"该令牌在本对象上是否有权"——攻击者用自己的合法令牌访问他人车辆。这是 API 安全中最普遍的越权模式（OWASP-API 类：对象级授权失效）。可利用性<strong>高</strong>。</li><li>缓解：强制对象级授权判定（RFC 9396 <code>[A]</code> 提供结构化权限描述）；"以 A 车令牌访问 B 车"作为回归测试用例（见 02.7 的 A-03 验证方法）；资源标识避免可枚举的连续 ID。</li></ul>
+<p><strong>薄弱点 7：授权撤销与下游状态不同步。</strong></p>
+<ul><li>真实世界可利用性：撤销授权后，已下发的长期令牌、已配置的车端推送、已配对的密钥可能仍生效。</li><li>缓解：撤销即联动回收下游配置（Tesla "scope 撤销后配置被从车辆移除" <code>[A]</code> 是公开实例）；令牌短寿命；定期对账"云端有效授权集合"与"车端有效凭证集合"。</li></ul>
+<p><strong>薄弱点 8：OTA 签名验证与回滚保护的"二选一"错误。</strong></p>
+<ul><li>真实世界可利用性：只做签名验证不做单调性检查的系统，可被"重放合法旧包"降级攻击击穿。可利用性<strong>中高</strong>——攻击者无需伪造签名。</li><li>缓解：版本下界存于不可回退的硬件位置（02.6.1）；TUF 类防冻结机制（<code>[A]</code>）；显式降级通道 + 审计。</li></ul>
+<p><strong>薄弱点 9：供应链的"传递依赖黑箱"。</strong></p>
+<ul><li>真实世界可利用性：Tier-1/Tier-2 交付物中嵌入的第三方组件不可见，导致漏洞爆发时无法快速回答影响范围。可利用性<strong>中</strong>（风险在响应速度而非直接入侵）。</li><li>缓解：SBOM（SPDX <code>[A]</code> / CycloneDX <code>[B]</code>）+ 构建完整性（SLSA v1.0 <code>[A]</code>、in-toto <code>[B]</code>）；在采购契约中把 SBOM 交付设为强制项。</li></ul>
+<p><strong>薄弱点 10：近场通道的便捷性与抗中继能力的张力。</strong></p>
+<ul><li>真实世界可利用性：BLE 类通道仅凭信号强度判断距离，易受中继；若厂商为便捷性弱化 NFC 备用或省略测距校验，可被中继攻击绕过。可利用性<strong>中</strong>。</li><li>缓解：以 UWB 测距为主（CCC 3.0 明载 BLE+UWB，NFC 为强制备用 <code>[A]</code>）；凭证存于 SE；对"距离判定"与"动作授权"做双重校验。</li></ul>
+<p><strong>薄弱点 11：影响范围控制的数值参数成为新的单点。</strong></p>
+<ul><li>真实世界可利用性：速率限制与配额是保护，但<strong>若配置过松则形同虚设，过紧则成为拒绝服务的放大器</strong>（合法客户端被误限）。可利用性<strong>低–中</strong>（可用性风险）。</li><li>缓解：分级限额（不同命令不同配额）；对限额调整做变更管理与灰度；监控误限率。</li></ul>
+<p><strong>薄弱点 12：审计日志的"记了但不可用"。</strong></p>
+<ul><li>真实世界可利用性：日志不含授权决策依据（只记状态码）、日志可被内部人员修改、日志保留期短于事件发现周期——三者任一都会使事后追溯失效。可利用性<strong>低</strong>（在安全事件中放大损失）。</li><li>缓解：02.5.4 的五要素记录；只追加与完整性保护；保留期与合规要求对齐。</li></ul>
+<p><strong>本节与 <code>00-engagement-plan.md</code> §3.3 严重度的对应：</strong> 上述薄弱点 1、6 对应 <strong>High</strong>（单一凭证/单点越权可横向影响）；薄弱点 4、8 在被利用后可升级至 <strong>Critical</strong>（根密钥或全车队更新权）；薄弱点 2、3、5、7、9、10 对应 <strong>Medium</strong>；薄弱点 11、12 对应 <strong>Low–Medium</strong>（可用性与可观测性）。<strong>该对应关系为本报告判断（推测，非事实）</strong>；§3.3 的判据原本面向具体发现的定级，此处用于对通用薄弱点做相对排序。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-44">
+  <div class="sec-head"><span class="sec-badge">11</span><h2>02.10 本章待补证清单</h2></div>
+<p>本章在写作中遇到的、<strong>本次调研未能取得一手来源</strong>的对象，逐项登记如下。<strong>统一声明</strong>：下表所有条目均为"<strong>本次未找到公开来源 / 未取到正文</strong>"，<strong>一律不等同于"该机制不存在"或"该企业不具备该能力"</strong>（对齐信源档案 §0 与 <code>00-engagement-plan.md</code> §3.2 红线 4）。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>待补证对象</th><th>本次状态</th><th>影响本章哪一节</th><th>建议补证方式</th></tr></thead><tbody><tr><td>1</td><td>TCG TPM 2.0 规范正文</td><td><code>[未验证]</code>：<code>trustedcomputinggroup.org</code> 403/超时</td><td>02.2.1</td><td>会员渠道获取规范正文</td></tr><tr><td>2</td><td>SHE（Secure Hardware Extension）规范</td><td><code>[未找到可核验公开一手 URL]</code>：成员制规范</td><td>02.2.1</td><td>通过行业协会/成员渠道获取</td></tr><tr><td>3</td><td>EVITA 三级（Full/Medium/Light）的技术指标细则</td><td><code>[B]</code>：仅取证"定义了三级分级"</td><td>02.2.3</td><td>获取项目公开出版物/论文</td></tr><tr><td>4</td><td>AUTOSAR Classic Platform（Crypto Stack / SecOC / IdsM）规范</td><td><code>[未验证]</code>：<code>autosar.org</code> 超时</td><td>02.2.2、02.2.4、02.5.4</td><td>AUTOSAR 会员渠道获取规范</td></tr><tr><td>5</td><td>车载 Hypervisor 分域的规范依据</td><td>未找到公开来源</td><td>02.2.2、02.5.2</td><td>虚拟化供应商技术白皮书</td></tr><tr><td>6</td><td>四家器件厂商（Infineon/NXP/Renesas/TI）型号级安全特性</td><td><code>[C]</code>/<code>[未验证]</code>：仅站点可达</td><td>02.2.6</td><td>器件数据手册、Design Win 公告</td></tr><tr><td>7</td><td>任何车企的车端 HSM/SE/TEE 搭载证据</td><td>未找到公开来源（信源档案 §8 亦列为缺口）</td><td>02.2 全节</td><td>T-BOX 拆解、器件选型逆向、芯片厂公告</td></tr><tr><td>8</td><td>任何车企的 TLS 终结点位置披露</td><td>未找到公开来源</td><td>02.3.5</td><td>架构白皮书、抓包分析（须授权）</td></tr><tr><td>9</td><td>车企车端证书续期/轮换机制</td><td>未找到公开来源</td><td>02.3.3</td><td>RFI；沙箱观察</td></tr><tr><td>10</td><td>车企是否启用 TLS 0-RTT</td><td>未找到公开来源</td><td>02.3.2</td><td>抓包 + 客户端配置分析</td></tr><tr><td>11</td><td>国内 9 家车企的 mTLS / 国密 / 证书轮换 / HSM 一手来源</td><td>未找到公开来源（信源档案 §7.10 第 5 条）</td><td>02.2、02.3 相关节</td><td>RFI / 采购安全白皮书 / 专利与招标文件</td></tr><tr><td>12</td><td>IEEE 802.15.4z（UWB 物理层增强）</td><td><code>[未验证]</code>：未取得可核验官方 URL</td><td>02.3.6</td><td>IEEE 标准购买渠道</td></tr><tr><td>13</td><td>IEEE 1609.2 / 美国 SCMS</td><td><code>[C]</code> / <code>[未验证]</code></td><td>02.3.1</td><td>标准正文与官方体系文档</td></tr><tr><td>14</td><td>ISO/SAE 21434 / ISO 24089 正文</td><td><code>[未验证]</code>：<code>iso.org</code> Cloudflare 拦截</td><td>02.6.4</td><td>标准购买渠道或 SAE 页面</td></tr><tr><td>15</td><td>UN R155 / R156 条款与时间表</td><td><code>[未验证]</code>：<code>unece.org</code> 全站拦截</td><td>02.6.4</td><td>官方 PDF 直链；换出口 IP</td></tr><tr><td>16</td><td>GDPR / 欧盟 Data Act 2023/2854 正文</td><td><code>[C]</code>：EUR-Lex 返回 202 异步状态</td><td>02.6.2</td><td>EUR-Lex 正式版 PDF</td></tr><tr><td>17</td><td>ISO 15118-2 / -20（Plug &amp; Charge）</td><td><code>[未验证]</code>：标准号需复核</td><td>（充电授权方向，本章未展开）</td><td>标准购买渠道</td></tr><tr><td>18</td><td>SPIFFE 等服务身份规范</td><td>信源档案未采集</td><td>02.5.1</td><td>官方规范站点</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-45">
+  <div class="sec-head"><span class="sec-badge">12</span><h2>02.11 本章小结</h2></div>
+<p>本章以"通用基准线"为目标，把车云安全解构为 6 层（L0 芯片/硬件根信任 → L1 车端执行环境 → L2 通信与 PKI → L3 授权与身份 → L4 应用与平台 → L5 生命周期与合规），并为每层给出可信基、威胁面、控制点、代表规范与可验证证据（02.1.3）。核心结论可归纳为八条：</p>
+<p><strong>一、分层是手段，不是目的。</strong> 六层模型的价值在于<strong>把"信任依赖"与"攻击面"成对地摆出来</strong>（02.1.4 要点一），从而在评审时能沿层追问"这一层的可信基靠什么验证"，避免"信任了一个无法验证的组件"。</p>
+<p><strong>二、车云安全存在明确的层间依赖：L3 依赖 L2，L2 依赖 L0，L5 反向加固全栈。</strong> 其中最后一条在车云场景中的权重高于传统 IT——因为车辆交付后唯一的修复通道是 OTA（02.1.5、02.6.1）。</p>
+<p><strong>三、硬件层的第一决策是"私钥在哪里"，且答案的强度差异极大。</strong> SE/eSE、车载 HSM、TPM 2.0（本次未取证）、SHE（本次未找到可核验一手来源）四类器件的能力边界不同（02.2.1）；EVITA 的 Full/Medium/Light 分级说明"是否有 HSM"是一个连续谱而非二分问题（02.2.3）。</p>
+<p><strong>四、规范引用密度不等于实现成熟度。</strong> 本章在 02.6.4 专门做了一张"证据强度差异表"，显式区分 <code>[A]</code>（国标正文可得）与 <code>[未验证]</code>/<code>[C]</code>（ISO 21434、UN R155/R156、GDPR 等只能引用编号与主题），并据此确立了"不给条款号"的写作纪律。这是本报告可信度的基础。</p>
+<p><strong>五、通信层的三个决定性选择是：双向认证、禁用降级、区分幂等性。</strong> mTLS 提供"哪辆车"的身份（02.3.1）；TLS 1.3 的 0-RTT 只应服务幂等只读请求（02.3.2）；防重放需要协议层机制（nonce/序列号/时间戳）与业务层机制（幂等键）并存（02.3.4）。</p>
+<p><strong>六、在中国市场，国密不是"可选项"而是合规路径，其国际落点是 RFC 8998。</strong> 国密算法族有完整的 GB/T 标准体系（SM2/SM3/SM4 及其使用与消息语法规范），而 RFC 8998 是其在 TLS 1.3 中的唯一国际规范落点（02.2.5）。车云链路若需同时满足国密与现代性，这是唯一的技术交点。</p>
+<p><strong>七、授权层是车云安全的核心矛盾，但本章只给接口不展开。</strong> 三个结构性原因（调用者链条最长、动作后果不可逆、撤销必须实时）与 10 条控制点清单已在本章声明坐标（02.4），其机制、令牌、资源级授权、威胁、工程、逐家实践、合规与参考表的展开在 <code>10</code>–<code>19</code> 号文件。</p>
+<p><strong>八、通用方案本身有结构性薄弱点，且多数不在"密码被破解"层面。</strong> 02.9 列出的 12 条薄弱点中，可利用性最高的是"Bearer 令牌可复制"（薄弱点 1）与"对象级授权缺失"（薄弱点 6）——两者都是<strong>授权层</strong>问题，而非通信或硬件层问题。<strong>本报告判断</strong>：这一分布本身就是本章最重要的发现之一——<strong>车云安全的短板集中在授权，而不在密码</strong>（推测，非事实；基于本章 02.7 映射表的威胁分布与 02.9 的薄弱点定级）。</p>
+<p><strong>本章与后续章节的接口：</strong></p>
+<ul><li><strong>第 3 部分（<code>10</code>–<code>19</code> 号文件）</strong>：接收本章 L3 的全部展开职责（02.4.2 已给出 10 条控制点的坐标）。</li><li><strong>第 4/5 部分（<code>16</code>/<code>17</code>/<code>20</code>/<code>21</code> 号文件）</strong>：以本章六层模型为对标框架，逐家回答"该车企在哪一层有公开证据、证据强度如何、在哪一层无公开证据"。</li><li><strong>第 6 部分（<code>30-comparison.md</code>）</strong>：以 02.7 的映射表为共同语言，做跨车企与跨市场的控制点覆盖对比。</li><li><strong>第 7 部分（<code>31-summary-trends.md</code>）</strong>：以 02.9 的薄弱点为趋势判断的输入。</li></ul>
+<p><strong>最后一条纪律重申</strong>：本章所有"未找到公开来源"的表述，<strong>都是本次调研的披露缺口，不是能力缺口</strong>（信源档案 §0；<code>00-engagement-plan.md</code> §3.2 红线 4）。本章 02.10 已把全部缺口逐项登记并给出补证动作，供终审与后续工作流使用。</p>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 65,122 字符</div>
+  </div>
+</footer>
+</body>
+</html>

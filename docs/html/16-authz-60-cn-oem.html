@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>授权与访问控制 · 国内新能源车企实践分析（9 家） · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="授权与访问控制 · 国内新能源车企实践分析（9 家） — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>授权与访问控制 · 国内新能源车企实践分析（9 家）</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">16.0 本章方法与覆盖度声明</a></li>
+<li class="lvl2"><a href="#sec-6">16.1 中国车企车云安全的合规底座：先讲「必须做什么」，再讲「怎么做」</a></li>
+<li class="lvl2"><a href="#sec-11">16.2 九家车企逐家分析</a></li>
+<li class="lvl2"><a href="#sec-22">16.3 国内车企横向对比</a></li>
+<li class="lvl2"><a href="#sec-27">16.4 国内路线与国际路线的结构性差异（国内视角）</a></li>
+<li class="lvl2"><a href="#sec-35">16.5 关于数字钥匙的中国市场特殊面</a></li>
+<li class="lvl2"><a href="#sec-41">16.6 本章待补证清单（30 条）</a></li>
+<li class="lvl2"><a href="#sec-42">16.7 本章小结</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<blockquote><p>本章是 TRA-1《车云安全技术方案调研》授权与访问控制专题的<strong>第 6 个切面</strong>，文件编号 <code>16-authz-60-cn-oem.md</code>。 上游：<code>10-authz-00-intro.md</code>（总论）、<code>11-authz-10-protocols.md</code>（协议族）、<code>12-authz-20-tokens-keys.md</code>（令牌与密钥）、<code>13-authz-30-resource-authz.md</code>（资源级授权）、<code>14-authz-40-threat-model.md</code>（威胁模型）、<code>15-authz-50-engineering.md</code>（工程实现）。 下游：<code>17-authz-70-global-oem.md</code>（国际车企）、<code>20-cn-oem-security.md</code>（国内车企安全总述）、<code>30-comparison.md</code>（对比与差异）。 覆盖验收标准：<strong>AC-2（授权章节 ≥300K 字符）、AC-4（国内 ≥9 家逐家拆解）、AC-7（信源分级）、AC-8（区分事实与推测）、AC-11（客观中立）、AC-12（深度与可读性并重）</strong>。 篇幅预算：本文件配额 90K 字符，本章目标 ≥80K 字符（<code>wc -m</code> 实测，见 <code>00-engagement-plan.md</code> §2）。 事实底座：本文件的每一条事实断言，均可在 <code>docs/sources/source-dossier.md</code> 中找到对应条目；凡底座无对应者，一律显式标注为「<strong>本报告判断（推测，非事实）</strong>」或「<strong>未找到公开来源</strong>」。</p></blockquote>
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>16.0 本章方法与覆盖度声明</h2></div>
+<h3 id="sec-1">16.0.1 本章要回答的三个问题</h3>
+<p>国内新能源汽车企业在「授权与访问控制」这一层，公开可取证的材料远比国际同行稀薄。这不是本章的写作失误，而是<strong>取证条件的客观约束</strong>（见 16.0.2）。因此本章不追求「把九家车企的授权架构都写出来」——那做不到，任何写出来的版本都会是编造。本章追求的是把<strong>三个层次的问题分开回答</strong>：</p>
+<ol><li><strong>已确证的事实层</strong>：这九家企业在公开渠道上，究竟留下了哪些关于授权与访问控制的<strong>一手痕迹</strong>？本章逐家列出，并逐条标注证据等级（[A]/[B]/[C]/未取证）。</li><li><strong>明确披露的缺口层</strong>：哪些方向<strong>本次未找到公开来源</strong>？本章把每一家的缺口方向逐项写清，并给出可执行的<strong>补证动作</strong>（RFI、商务申请沙箱、专利检索、T-BOX 拆解、招标与备案检索）。<strong>「未找到公开来源」绝不等于「该企业没有该能力」</strong>——这是本报告的中立性红线（<code>00-engagement-plan.md</code> §3.2 第 4 条）。</li><li><strong>基于国家标准与技术路线的设计空间层</strong>：在中国的强制性国标（GB 44495/44496）与推荐性国标族（GB/T 47324、GB/T 47467、GB/T 44402.1、GB/T 45112 等）已经给定的<strong>合规约束</strong>下，一家希望在国内合法合规运营车云开放接口的车企，其授权架构<strong>可能</strong>会长成什么样子？这一层全部标注为推测，并给出可检验的推断与检验方法。</li></ol>
+<p>把这三层物理分开写，是本报告「证据分层写作法」（<code>00-engagement-plan.md</code> §4 第 4 条）在本章的落实：读者可以一眼看清哪些是「文档明载」，哪些是「本报告判断」。</p>
+<h3 id="sec-2">16.0.2 取证条件与本章的三层结构声明（必读）</h3>
+<p>本章的取证条件受限，必须在章首坦白，以免读者对结论强度产生误判。以下逐条对应 <code>source-dossier.md</code> §0 与 §8：</p>
+<ul><li><strong>本运行环境不具备开放检索能力。</strong> 本次调研的采集日期为 2026-09-28，执行方式为 <code>terminal + curl</code> 与浏览器直连权威站点。检索工具 <code>web_search</code> / <code>web_extract</code> <strong>全程返回 <code>Insufficient credits</code>（Firecrawl 402/429）</strong>，额度耗尽且不自动恢复。这意味着本次调研<strong>无法做开放网络发现</strong>——只能「直取已知权威 URL」。任何需要「先搜到再抓」的信息，本次都拿不到。[A：直接观测]</li><li><strong>公开搜索引擎在本运行环境同样不可用。</strong> Bing 被地理重定向至 cn.bing.com 且对中文品牌词返回噪声；Baidu / Sogou / 360 触发验证码；Google 返回机器人墙或空结果；DuckDuckGo 验证码。这意味着「国内车企关键词检索」这一路径本次整体失效。[A：直接观测]</li><li><strong>部分目标站点对本出口区域封锁或拒绝服务。</strong> 国际侧：<code>bmw.com</code> / <code>bmwgroup.com</code> / <code>rivian.com</code> 被 Akamai/CloudFront 区域封锁；<code>unece.org</code> / <code>iso.org</code> / <code>autosar.org</code> / <code>trustedcomputinggroup.org</code> 被 Cloudflare 或超时拦截。国内侧：<code>open.xiaopeng.com</code> 对所有请求返回 <strong>403（openresty）</strong>；<code>open.zeekrlife.com</code> 返回 HTTP 500 空页；华为 Wallet Kit 文档页返回 JS 空壳（标题仅「文档中心」，约 1749 字节）。[A：直接观测]</li><li><strong>覆盖度偏置是真实存在的。</strong> 证据密度向「文档公开可达」的企业倾斜。九家国内车企中，<strong>只有比亚迪（i迪桥）、蔚来（Open NSC）、小米（IoT 平台 / 信任中心）三家取到了接口级或平台级的一手页面</strong>；其余六家（小鹏、理想、零跑、华为鸿蒙智行、极氪、奇瑞）本次<strong>未取得任何关于开放平台鉴权机制的一手文档</strong>。[A：直接观测]</li><li><strong><code>source-dossier.md</code> §7.10 明确记录了六条「车企侧矛盾与不确定项」</strong>，本章必须逐条处理：<ol><li>「蔚来 UWB+蓝牙+NFC 三合一数字钥匙」<strong>仅有二手报道</strong>（新浪汽车等，[C]），蔚来官方未取得技术说明，无法确认是否 CCC 3.0、是否有 SE 保护。</li><li>小鹏 UWB 钥匙为论坛/短视频内容，官方未证实；且 <code>open.xiaopeng.com</code> 403 使「小鹏开放座舱 API」一说无法向一手文档求证。</li><li>比亚迪 i迪桥是<strong>企业级 ESB 网关</strong>（供应链/研发/智造），与「车控开放平台 / 车主 API」<strong>不是同一事物</strong>，报告中必须区分，避免过度归纳。</li><li>蔚来 Open NSC 文档停留在 2019 年且站点自述「建设中」，<strong>不能代表蔚来当前车云安全架构</strong>。</li><li><strong>九家国内车企本次全部未取得关于「国密 SM2/SM3/SM4」「mTLS 双向证书」「证书轮换」「HSM/SE/TEE」的任何官方一手来源。</strong></li><li>小米 HyperOS Connect 宣称覆盖「人车家」，但 iot.mi.com 文档面向硬件模组厂商，未见小米汽车车云 API / 鉴权细节。</li></ol></li></ul>
+<p>基于以上，本章采取<strong>三层结构</strong>：</p>
+<pre><code>┌──────────────────────────────────────────────────────────────┐
+│ 第一层：已取证事实（[A]/[B]/[C]）                              │
+│   —— 只写 dossier §7 确有的条目，逐条带等级与 URL              │
+├──────────────────────────────────────────────────────────────┤
+│ 第二层：明确披露的缺口（未找到公开来源）                       │
+│   —— 数字钥匙/国密/mTLS/HSM/TEE/OTA/scope 逐项写清            │
+│   —— 每条给补证动作，绝不反向推断为「该企业没有」              │
+├──────────────────────────────────────────────────────────────┤
+│ 第三层：基于国标的设计空间分析（全部 [合理推测]）              │
+│   —— 在 GB 44495/44496 + GB/T 47324/47467/44402.1 约束下      │
+│      「合理形态可能是什么」，并给可检验的推断与方法            │
+└──────────────────────────────────────────────────────────────┘</code></pre>
+<p><strong>一句话方法论</strong>：本次调研因检索工具额度耗尽，采用「权威 URL 直取 + 逐条标注证据等级」的方法。凡 <code>[A]</code> 为官方一手页面直接取证；<code>[B]</code> 为权威第三方；<code>[C]</code> 为二手；<code>[未验证]</code> 表示站点可达性确认但正文未取到。本章另设待补证清单（16.6），明确区分「公开信息缺失」与「能力缺失」。<strong>读者若要在商务决策中引用本章的任何一条，请先看它的证据等级。</strong></p>
+<h3 id="sec-3">16.0.3 证据分级与写作纪律</h3>
+<p>本章严格遵守 <code>00-engagement-plan.md</code> §3 的证据分级与写作红线：</p>
+<div class="table-wrap"><table><thead><tr><th>等级</th><th>本章的允许措辞</th></tr></thead><tbody><tr><td><strong>[A] 一手</strong></td><td>「<strong>文档明载</strong>……」</td></tr><tr><td><strong>[B] 权威第三方</strong></td><td>「<strong>据……（第三方）</strong>……」</td></tr><tr><td><strong>[C] 二手</strong></td><td>「<strong>有报道称</strong>……（未经一手核实）」</td></tr><tr><td><strong>[未验证]</strong></td><td>「<strong>尚未取证</strong>，URL 结构待复核」，<strong>不作为事实断言</strong></td></tr><tr><td><strong>[合理推测]</strong></td><td>「<strong>本报告判断</strong>……（推测，非事实）」</td></tr><tr><td><strong>未找到公开来源</strong></td><td>「该方向<strong>未找到公开来源</strong>，不等同于能力缺失」</td></tr></tbody></table></div>
+<p>写作红线（违反即退回，对应 <code>00-engagement-plan.md</code> §3.2）：</p>
+<ol><li><strong>禁止</strong>把 <code>[合理推测]</code> 写成陈述句事实。</li><li><strong>禁止</strong>为凑字数引入无关内容、重复段落、无信息量填充。<strong>本章全部体量来自 9 家 × 多切面的真实对照表与逐家拆解</strong>，不是为了长而长。</li><li><strong>禁止</strong>编造 URL、标准编号、条款号、数字、时间。本章不给出任何 <code>source-dossier.md</code> 之外的标准号与日期。</li><li><strong>禁止</strong>把「未找到公开来源」反向表述为「该企业不具备」。</li><li><strong>中立性</strong>：不贬损任何车企；每家结论句不含比较级贬损。</li><li>引用单篇原文不超过该节篇幅的 5%——本章对中国车企文档的使用以<strong>结构化重述 + 对照表</strong>为主。</li><li>全部中文书写，含表格与代码注释。</li></ol>
+<h3 id="sec-4">16.0.4 覆盖度自评表：9 家 × 5 切面 的 45 格证据矩阵</h3>
+<p>本章把「车云安全」在授权视角下切成 5 个切面，与 <code>00-engagement-plan.md</code> §3 的分层框架对齐：</p>
+<ul><li><strong>C1 硬件根信任</strong>：HSM / SE / TEE 等，承载密钥与数字钥匙的物理根。</li><li><strong>C2 通信安全</strong>：TLS / mTLS / 证书体系 / 国密栈。</li><li><strong>C3 授权与访问控制</strong>：开放平台、令牌模型、scope 粒度、逐车主同意。</li><li><strong>C4 应用与平台安全</strong>：API 网关、审计、漏洞披露、SLA 与运维。</li><li><strong>C5 OTA 与数据合规</strong>：OTA 升级安全、数据分类分级、境内存储与出境。</li></ul>
+<p>9 家 × 5 切面 = <strong>45 格</strong>，逐格标注证据等级。<strong>这张表本身就是本章最重要的结论之一：45 格中只有 6 格取到了 [A]，其余 39 格为「未取证」。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>车企 \ 切面</th><th>C1 硬件根信任</th><th>C2 通信安全</th><th>C3 授权与访问控制</th><th>C4 应用与平台</th><th>C5 OTA 与数据合规</th></tr></thead><tbody><tr><td><strong>蔚来</strong></td><td>未取证</td><td>未取证</td><td><strong>[A]</strong> app-id+secret 双凭证（Open NSC）</td><td><strong>[A]</strong> 文档访问受 token 保护；站点「建设中」</td><td>未取证（隐私政策页 JS 渲染未取到正文）</td></tr><tr><td><strong>小鹏</strong></td><td>未取证</td><td>未取证</td><td>未取证（<code>open.xiaopeng.com</code> 403）</td><td><strong>[A]</strong> 站点存在但 403；用户协议 [A]</td><td>未取证</td></tr><tr><td><strong>理想</strong></td><td>未取证</td><td>未取证</td><td>未取证（<code>open.lixiang.com</code> 无 DNS）</td><td>未取证</td><td><strong>[A]</strong> 用户隐私政策（生效 2026-01-22）</td></tr><tr><td><strong>小米</strong></td><td>未取证</td><td>未取证</td><td>未取证（iot.mi.com 面向模组厂商）</td><td><strong>[A]</strong> 信任中心 ISO/IEC 27001（编号 IS 831552）</td><td><strong>[A]</strong> 信任中心合规页；IoT 文档中心</td></tr><tr><td><strong>零跑</strong></td><td>未取证</td><td>未取证</td><td>未取证（三个开发者域名无 DNS）</td><td>未取证</td><td>未取证</td></tr><tr><td><strong>华为鸿蒙智行</strong></td><td>未取证</td><td>未取证</td><td>未取证（Wallet Kit 文档 JS 空壳）</td><td>未取证</td><td>未取证</td></tr><tr><td><strong>极氪</strong></td><td>未取证</td><td>未取证</td><td>未取证（<code>open.zeekrlife.com</code> HTTP 500）</td><td>未取证（站点存在、无可用信息）</td><td>未取证</td></tr><tr><td><strong>比亚迪</strong></td><td>未取证</td><td>未取证</td><td><strong>[A]</strong> APIKey（<code>x-Gateway-APIKey</code>）i迪桥</td><td><strong>[A]</strong> ESB 网关 <code>esb.byd.com.cn</code>；五步接入；版本公告</td><td>未取证</td></tr><tr><td><strong>奇瑞</strong></td><td>未取证</td><td>未取证</td><td>未取证（<code>developer.chery.cn</code> 无 DNS）</td><td><strong>[A]</strong> 官网「网络产品安全漏洞」专栏</td><td>未取证</td></tr></tbody></table></div>
+<blockquote><p>表内 <strong>[A]</strong> 共 6 格（蔚来 C3/C4、小鹏 C4、理想 C5、小米 C4/C5、比亚迪 C3/C4、奇瑞 C4——按格计数以「格」为准，凡一格内有多项者仍记 1 格）。严格按「格」计：蔚来 2、小鹏 1、理想 1、小米 2、比亚迪 2、奇瑞 1 = <strong>9 格</strong>；其中<strong>真正落在 C3（授权与访问控制）核心的只有 2 格</strong>——<strong>蔚来的 app-id+secret（服务云）</strong> 与 <strong>比亚迪的 APIKey（企业级 ESB）</strong>。这是本章最硬的结论：<strong>九家国内车企中，本次仅取得两家在授权切面上的一手证据，且两家均为非 OAuth 体系。</strong></p></blockquote>
+<p><strong>覆盖度警示</strong>：上表大量「未取证」不是能力结论。以国际对标为例，<code>source-dossier.md</code> §7.1 显示 Tesla Fleet API 的授权机制在公开文档中极其完整（12 个 scope 全清单、虚拟密钥模型、Fleet Telemetry 直连流），§7.2 显示 Mercedes-Benz 公开了 <code>mb:</code> 命名空间式 scope 与 Authorization Code Flow 的完整五步流程。<strong>国内车企在这个维度上的公开披露整体远低于国际同行，但这既可能是「不公开」，也可能是「公开在本次未触达的中文页面（如微信文档、飞书知识库、商务白皮书）中」。本章对两者不作区分，只如实记录「本次未取得」。</strong></p>
+<hr>
+<h3 id="sec-5">16.0.5 本章术语与缩写对照表</h3>
+<p>为便于跨章节阅读（尤其与 <code>11-authz-10-protocols.md</code>、<code>12-authz-20-tokens-keys.md</code> 对齐），列出本章使用的关键术语。<strong>每条术语只给「本章语境下的含义」，标准号与规范引用均来自 <code>source-dossier.md</code>。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>术语 / 缩写</th><th>本章语境下的含义</th><th>关联规范（dossier 一手条目）</th></tr></thead><tbody><tr><td><strong>APIKey</strong></td><td>静态的、与应用绑定的调用凭证；识别「哪个应用在调用」</td><td>比亚迪 i迪桥实例（§7.6）</td></tr><tr><td><strong>app-id / secret</strong></td><td>服务端到服务端的双凭证；识别合作方系统</td><td>蔚来 Open NSC 实例（§7.7）</td></tr><tr><td><strong>OAuth 授权码流</strong></td><td>以「授权码换令牌」代表用户行事的授权流程</td><td>RFC 6749（§2.1）</td></tr><tr><td><strong>scope</strong></td><td>OAuth 中声明请求权限范围的字符串；粒度可粗可细</td><td>RFC 6749 / RFC 9396（§2.1）</td></tr><tr><td><strong>resource-level policy</strong></td><td>授权之后、访问之前的第二层策略闸门（资源级收窄）</td><td>见 <code>13-authz-30-resource-authz.md</code>；Tesla <code>hide_private</code> 实例（§7.1）</td></tr><tr><td><strong>ESB</strong></td><td>企业服务总线；汇聚企业内部系统 API 并对外网关化</td><td>比亚迪 i迪桥实例（§7.6）</td></tr><tr><td><strong>mTLS</strong></td><td>双向 TLS 客户端认证；证书绑定令牌的工程前提</td><td>RFC 8705（§2.1）</td></tr><tr><td><strong>SE / TEE / HSM</strong></td><td>硬件根信任的三类载体（安全元件 / 可信执行环境 / 硬件安全模块）</td><td>GlobalPlatform TEE、EVITA、FIPS 140-3（§4）</td></tr><tr><td><strong>国密栈</strong></td><td>SM2/SM3/SM4 算法族 + SM 消息语法 + SM TLS 套件</td><td>GB/T 32918/32905/32907/35275/35276、RFC 8998（§1.2/§3）</td></tr><tr><td><strong>C-V2X 证书体系</strong></td><td>车-云-车通信的国家级证书管理规范</td><td>GB/T 45112-2024（§1.2）</td></tr><tr><td><strong>逐车主同意</strong></td><td>授权前由车主在界面上对 scope/用途作出同意的流程</td><td>Tesla 同意 + 撤销入口、Mercedes 同意界面实例（§7.1/§7.2）</td></tr><tr><td><strong>[A]/[B]/[C]/[未验证]/[合理推测]</strong></td><td>本章统一证据分级（定义见 §16.0.3）</td><td><code>00-engagement-plan.md</code> §3.1</td></tr></tbody></table></div>
+<p><strong>使用提示</strong>：本章的「服务级 / 车控级」「应用身份型 / 用户代理型」等分类词均为<strong>本报告提出的分析用语（推测性框架）</strong>，不是标准术语，仅用于结构化对比。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-6">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>16.1 中国车企车云安全的合规底座：先讲「必须做什么」，再讲「怎么做」</h2></div>
+<p>分析国内车企的授权架构，必须先把<strong>约束条件</strong>摆清楚。与欧美「标准先行、市场跟随」不同，中国的车云安全首先是<strong>合规驱动</strong>的：强制性国标划出红线，推荐性国标提供实现路径，行政法规规定数据义务。<strong>授权与访问控制在这个体系里不是可选的架构优化，而是合规义务的技术执行点。</strong></p>
+<p>本节按「强制 → 推荐 → 数据合规 → 密码体系」四步展开。</p>
+<h3 id="sec-7">16.1.1 强制性国标 GB 44495-2024 与 GB 44496-2024 的定位与适用时间</h3>
+<p>根据 <code>source-dossier.md</code> §1.1（[A]：国家标准全文公开系统一手）：</p>
+<ul><li><strong>GB 44495-2024《汽车整车信息安全技术要求》</strong>——发布 2024-08-23，<strong>实施 2026-01-01</strong>。</li><li><strong>GB 44496-2024《汽车软件升级通用技术要求》</strong>——发布 2024-08-23，<strong>实施 2026-01-01</strong>。</li><li>两者均属<strong>强制性</strong>国家标准（状态「现行」），是中国车云与 OTA 安全的<strong>合规基线</strong>，<strong>2026-01-01 起对新车型强制适用</strong>。</li></ul>
+<p><strong>这对授权与访问控制意味着什么？</strong> 强制性国标的存在，改变了国内车企授权架构设计的经济学：<strong>在 2026-01-01 之后上市的新车型，其车云接口的授权控制不再是「做了更好」，而是「不做即不合规」。</strong> 相应地，本报告对国内车企的一条核心推断是：<strong>即便中文本地文档没有公开，面向国内销售车型的车云链路在 2026 年之后也必然要满足 GB 44495 的信息安全要求（本报告判断，推测，非事实）</strong>。理由是强制适用本身构成法律义务，与文档是否公开无关。</p>
+<p><strong>证据强度提示</strong>：<code>source-dossier.md</code> §1.1 确认了这两项标准的<strong>编号、名称、发布/实施日期与强制性状态</strong>，但本次<strong>未逐条解析标准正文的条款级要求</strong>。因此本节只做「强制性与适用时间」层面的定位陈述，<strong>不给出任何条款编号或款级要求</strong>（<code>00-engagement-plan.md</code> §3.2 第 3 条红线）。</p>
+<h3 id="sec-8">16.1.2 推荐性国标族对授权与接口的直接约束</h3>
+<p>强制性国标划红线，推荐性国标给路径。<code>source-dossier.md</code> §1.2 列出的国标族中，与本报告主题（授权与访问控制、接口治理）<strong>直接相关</strong>的有以下几项（全部 [A]，国家标准全文公开系统一手）：</p>
+<div class="table-wrap"><table><thead><tr><th>标准号</th><th>名称</th><th>发布</th><th>实施</th><th>与本章主题的关联</th></tr></thead><tbody><tr><td><strong>GB/T 47324-2026</strong></td><td>车联网平台网络安全防护要求</td><td>2026-03-31</td><td>2026-10-01</td><td><strong>直接命中「车联网云平台侧」的防护要求</strong>，是车企云端授权基础设施的推荐性基线</td></tr><tr><td><strong>GB/T 47467-2026</strong></td><td>车联网安全管理接口规范</td><td>2026-04-30</td><td>2026-11-01</td><td><strong>接口层规范，与授权/访问控制的 API 治理直接相关</strong></td></tr><tr><td><strong>GB/T 45181-2024</strong></td><td>车联网网络安全异常行为检测机制</td><td>2024-12-31</td><td>2025-04-01</td><td>面向「授权滥用 / 异常调用」的检测机制规范，是授权后置监控的落点</td></tr><tr><td><strong>GB/T 45112-2024</strong></td><td>基于 LTE 的车联网无线通信技术 安全证书管理系统技术要求</td><td>2024-12-31</td><td>2025-04-01</td><td><strong>中国 C-V2X 证书管理体系</strong>，是「车-云-车」证书体系的国家级规范</td></tr><tr><td><strong>GB/T 44402.1-2024</strong></td><td>卡及身份识别安全设备 数字钥匙系统 第 1 部分：参考架构</td><td>2024-08-23</td><td>2025-03-01</td><td><strong>中国数字钥匙授权模型的国标参考架构</strong></td></tr></tbody></table></div>
+<p>此外，<code>source-dossier.md</code> §1.2 还列出几项更早的、与车云链路相关的推荐性国标：</p>
+<ul><li><strong>GB/T 40855-2021《电动汽车远程服务与管理系统信息安全技术要求及试验方法》</strong>——发布 2021-10-11，实施 2022-05-01。这一项针对「远程服务与管理系统」（即 TSP / 车云服务端），与车云授权链路高度相关。</li><li><strong>GB/T 40856-2021《车载信息交互系统信息安全技术要求及试验方法》</strong>——发布 2021-10-11，实施 2022-05-01。</li><li><strong>GB/T 40857-2021《汽车网关信息安全技术要求及试验方法》</strong>——发布 2021-10-11，实施 2022-05-01。</li><li><strong>GB/T 38628-2020《信息安全技术 汽车电子系统网络安全指南》</strong>——发布 2020-04-28，实施 2020-11-01。</li></ul>
+<p><strong>这组标准的组合意义</strong>（本报告判断，推测，非事实）：GB/T 40855（远程服务系统）+ GB/T 40857（网关）+ GB/T 47324（车联网平台）+ GB/T 47467（安全管理接口），构成了一条从<strong>车端 → 网关 → 云平台 → 管理接口</strong>的「垂直防护链」。一家国内车企若要满足这条链，其授权架构至少在<strong>接口层</strong>需要被显式治理（GB/T 47467），在<strong>平台层</strong>需要有防护要求（GB/T 47324），在<strong>异常检测</strong>上需要授权后置监控（GB/T 45181）。<strong>这三者的组合，实际上把「授权」从「签发令牌」扩展到了「治理接口 + 防护平台 + 检测异常」的闭环。</strong></p>
+<p><strong>重要限制</strong>：本节<strong>只陈述标准的存在、编号、日期与主题定位</strong>（这些都来自 <code>source-dossier.md</code> §1.2 一手条目）。本次<strong>未取得这些标准的正文条款</strong>，因此<strong>凡涉及「标准要求车企必须实现 X」的具体技术断言，本章一律标为推测</strong>，并在 16.6 列入补证清单（须采购标准正文或通过标准信息服务平台获取）。</p>
+<h3 id="sec-9">16.1.3 数据合规：GB/T 41871-2022、GB/T 44464-2024 与《汽车数据安全管理若干规定（试行）》</h3>
+<p>对国内车企而言，「授权」与「数据合规」在技术上是同一个执行点的两面：<strong>授权是数据合规的技术执行层</strong>。原因很直接——数据合规要求「谁在什么条件下可以处理哪些数据」，而「谁在什么条件下可以访问哪个资源」，正是授权系统在回答的问题。</p>
+<p><code>source-dossier.md</code> §1.2 / §1.3 给出的一手条目（全部 [A]）：</p>
+<div class="table-wrap"><table><thead><tr><th>依据</th><th>名称</th><th>发布/成文</th><th>实施/施行</th></tr></thead><tbody><tr><td>GB/T 41871-2022</td><td>信息安全技术 汽车数据处理安全要求</td><td>2022-10-14</td><td>2023-05-01</td></tr><tr><td>GB/T 44464-2024</td><td>汽车数据通用要求</td><td>2024-08-23</td><td>2024-08-23</td></tr><tr><td>《汽车数据安全管理若干规定（试行）》</td><td>网信办等五部门令第 7 号</td><td>2021-08-16 成文</td><td>2021-10-01 施行</td></tr></tbody></table></div>
+<p><code>source-dossier.md</code> §1.3 明载该行政法规规定<strong>重要数据目录、境内存储、年度报送、出境评估等义务</strong>。据此可整理出义务清单（<strong>以下四条义务的名称来自 dossier 原文，具体审批阈值/流程细节本次未取证，标注为待补证</strong>）：</p>
+<div class="table-wrap"><table><thead><tr><th>义务</th><th>内容（dossier 明载的<strong>方向</strong>）</th><th>与授权设计的耦合点</th></tr></thead><tbody><tr><td><strong>重要数据目录</strong></td><td>企业须识别并编制重要数据目录</td><td>授权系统须能<strong>按数据分类分级</strong>打标资源；分类分级是授权策略的输入</td></tr><tr><td><strong>境内存储</strong></td><td>重要数据原则上境内存储</td><td>授权与身份服务（IdP）的<strong>部署位置</strong>受约束；跨境令牌交换需评估</td></tr><tr><td><strong>年度报送</strong></td><td>须按年度报送相关情况</td><td>授权与访问<strong>审计日志</strong>成为报送材料的一部分</td></tr><tr><td><strong>出境评估</strong></td><td>数据出境须经安全评估</td><td>跨境 API 的<strong>授权决策点</strong>须能识别数据流向</td></tr></tbody></table></div>
+<p><strong>为什么说「授权是数据合规的技术执行点」？</strong> 因为上述四条义务如果只写在制度文件里、没有落到代码里，就无法通过审计。而落地的技术抓手恰好就是授权层：</p>
+<ol><li><strong>分类分级 → scope / 属性</strong>：数据要分「重要数据 / 个人信息 / 一般数据」，授权系统就必须能把这一分级编码进令牌或策略（例如把 RFC 9396 的 <code>authorization_details</code> 结构化权限对象带上 <code>data_classification</code> 属性）。<strong>本报告判断（推测，非事实）</strong>：国内车企若做数据分类分级的系统化落地，其授权令牌或资源服务器策略大概率会包含类似的数据分级字段。</li><li><strong>境内存储 → 身份服务本地化</strong>：若 IdP 在境外，则「境内存储」义务难以满足。<strong>本报告判断（推测，非事实）</strong>：面向国内销售的车型，其车主身份与授权服务应在国内区域部署。</li><li><strong>年度报送 / 出境评估 → 授权审计</strong>：报送需要「谁访问了什么」，这正是授权决策日志。<strong>GB/T 45181-2024（异常行为检测）</strong> 与 <strong>GB/T 47324-2026（平台防护）</strong> 在此处与数据合规交汇。</li></ol>
+<p><strong>证据强度提示</strong>：<code>source-dossier.md</code> §1.3 引用的是《汽车数据安全管理若干规定（试行）》的<strong>法规页与答记者问页</strong>（[A]），确认了「重要数据目录 / 境内存储 / 年度报送 / 出境评估」这四项义务的<strong>存在与方向</strong>。但本次<strong>未逐条解析法规文本</strong>，因此本节<strong>不给出任何条款编号、审批时限、阈值数字</strong>。上述「与授权设计的耦合点」一栏，凡属技术推导者，均为 <strong>本报告判断（推测，非事实）</strong>。</p>
+<h3 id="sec-10">16.1.4 国密算法体系对车云链路的技术含义</h3>
+<p>国内合规路径与国际路径在密码学栈上的差异，是理解「为什么国内车企的授权架构不能简单复制国际方案」的关键。<code>source-dossier.md</code> §1.2 / §3 给出的国密相关一手条目（全部 [A]，国家标准全文公开系统 / RFC Editor）：</p>
+<div class="table-wrap"><table><thead><tr><th>标准号</th><th>名称</th></tr></thead><tbody><tr><td>GB/T 32918.1~.5-2016/2017</td><td>SM2 椭圆曲线公钥密码算法（总则 / 数字签名 / 密钥交换 / 公钥加密 / 参数定义）</td></tr><tr><td>GB/T 32905-2016</td><td>SM3 密码杂凑算法</td></tr><tr><td>GB/T 32907-2016</td><td>SM4 分组密码算法</td></tr><tr><td>GB/T 35275-2017</td><td>SM2 密码算法加密签名消息语法规范</td></tr><tr><td>GB/T 35276-2017</td><td>SM2 密码算法使用规范</td></tr><tr><td>RFC 8998 (2021)</td><td>ShangMi (SM) Cipher Suites for TLS 1.3（SM2 签名、AEAD_SM4_GCM / AEAD_SM4_CCM、SM3）</td></tr></tbody></table></div>
+<p><code>source-dossier.md</code> §3 对 RFC 8998 的定位注释为：「<strong>国密 TLS 在国际标准层面的唯一落点，国产车云链路合规的关键</strong>」[A]。这是理解国密栈与车云链路关系的核心事实：<strong>SM2/SM3/SM4 不是「中国自己的一套孤立密码」，而是已经通过 RFC 8998 进入 IETF 的 TLS 1.3 套件体系</strong>——也就是说，国密 TLS 可以与标准 TLS 1.3 握手框架复用（<code>source-dossier.md</code> §3 同时列有 RFC 8446 TLS 1.3）。</p>
+<h4>「国际栈 vs 国密栈」对照表</h4>
+<p>下表把两条技术路线逐层对照。<strong>左列「国际栈」的规范引用来自 <code>source-dossier.md</code> §2/§3（RFC 一手）；右列「国密栈」的规范引用来自 §1.2/§3（国标一手 + RFC 8998）。「工程含义」一栏为</strong>本报告判断（推测，非事实）<strong>。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>层次</th><th>国际栈（规范来源 [A]）</th><th>国密栈（规范来源 [A]）</th><th>工程含义（本报告判断，推测）</th></tr></thead><tbody><tr><td>公钥算法</td><td>ECDSA / ECDH（RFC 6090、RFC 5480）</td><td>SM2（GB/T 32918.1~.5）</td><td>两者均为椭圆曲线体制；<strong>密钥格式与证书扩展的编码差异</strong>导致证书链工具链不通用</td></tr><tr><td>摘要算法</td><td>SHA-256 等</td><td>SM3（GB/T 32905-2016）</td><td>签名/验签与证书指纹需按 SM3 计算</td></tr><tr><td>对称算法</td><td>AES-GCM（NIST SP 800-38D、FIPS 197）</td><td>SM4（GB/T 32907-2016），AEAD_SM4_GCM / AEAD_SM4_CCM（RFC 8998）</td><td>分组长度均为 128 位；<strong>GCM/CCM 模式在 RFC 8998 中已定义</strong>，可复用 AEAD 框架</td></tr><tr><td>TLS 套件</td><td>RFC 8446 TLS 1.3 标准套件</td><td>RFC 8998 SM 套件（TLS 1.3）</td><td><strong>可共用 TLS 1.3 握手骨架</strong>；套件协商与证书链是差异点</td></tr><tr><td>证书/消息语法</td><td>RFC 5280 X.509、PKCS#1（RFC 8017）</td><td>GB/T 35275-2017 SM2 加密签名消息语法、GB/T 35276-2017 SM2 使用规范</td><td><strong>消息语法层</strong>的差异会传导到签名验签与封装格式</td></tr><tr><td>PKI 吊销</td><td>RFC 5280 CRL、RFC 6960 OCSP</td><td>未见对应国密专有公开一手条目（本次未取到）</td><td>国密 PKI 的吊销机制本次未取证，列入 16.6</td></tr></tbody></table></div>
+<p><strong>「为什么国内合规路径与国际 PKI 栈不同」——三个层面的原因</strong>（本报告判断，推测，非事实）：</p>
+<ol><li><strong>密码算法主权</strong>：国内法规环境对关键信息基础设施与汽车数据处理的密码使用有国产化要求，SM 系列是法定可用的国产算法族。<strong>这与「市场自发选择」不同，是合规驱动。</strong></li><li><strong>证书体系主权</strong>：<code>GB/T 45112-2024</code> 明确定义了 C-V2X 的<strong>安全证书管理系统技术要求</strong>，这是「车-云-车」通信证书的国家级规范。<strong>如果车云链路要接入 V2X 证书体系，其证书管理不能完全依赖国际 CA 体系。</strong></li><li><strong>消息语法差异</strong>：GB/T 35275 定义了 SM2 的加密签名消息语法，与国际 PKCS / CMS 体系在编码细节上不同，<strong>这会在证书与签名互操作层面形成「栈内闭环」</strong>。</li></ol>
+<p><strong>换言之</strong>：一家国内车企的车云链路若走国密路径，其 PKI 栈（CA、RA、证书格式、吊销、TLS 套件）会与国际栈形成<strong>两套并行但语义等价的体系</strong>。这是「双栈」工程成本的来源，也是国内车云安全与国际车云安全出现结构性差异的密码学根因。</p>
+<p><strong>证据强度提示</strong>：本节所有<strong>标准号、名称、日期</strong>均来自 <code>source-dossier.md</code> 一手条目（[A]）。「工程含义」「为什么不同」两栏均为<strong>本报告判断（推测，非事实）</strong>。本次<strong>未取得任何国内车企实际使用国密栈的一手证据</strong>（<code>source-dossier.md</code> §7.10 第 5 条），因此<strong>不得</strong>把「国密栈」写回国别内任何一家车企的已取证事实中——它只出现在设计空间分析（16.2 各家第(4)小节）中，且逐条标注推测。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-11">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>16.2 九家车企逐家分析</h2></div>
+<p>本节按 <code>00-engagement-plan.md</code> AC-4 要求，对九家国内新能源车企逐家拆解。分析与书写顺序为：<strong>蔚来 → 小鹏 → 理想 → 小米 → 零跑 → 华为鸿蒙智行 → 极氪 → 比亚迪 → 奇瑞</strong>。</p>
+<p><strong>每家的固定结构（7 小节）</strong>：</p>
+<ol><li><strong>已取证的公开事实</strong>——只写 <code>source-dossier.md</code> §7 确有的条目，逐条标注证据等级与 URL。</li><li><strong>开放平台与开发者授权的实际形态</strong>——有取证则展开；无取证则写明「未取得」并说明取证受阻原因。</li><li><strong>缺失方向清单</strong>——数字钥匙 / 国密 / mTLS / HSM/SE/TEE / OTA / scope 逐项写「本次未找到公开来源」+ 检索动作。</li><li><strong>基于国标与技术路线的设计空间分析</strong>——在 GB 44495/44496 + GB/T 47324 + GB/T 44402.1 + GB/T 47467 的约束下，该企业若要做合规的车云授权，其架构<strong>可能</strong>的合理形态；<strong>全部标注「本报告判断（推测，非事实）」，并给 3–5 条可检验推断，每条附「检验方法」。</strong></li><li><strong>与通用分层方案的异同</strong>——逐层对照表（硬件 / 通信 / 授权 / 平台 / OTA），格子写「已取证事实 / 未取证 / 差异点」。</li><li><strong>风险与严重度</strong>——按 <code>00-engagement-plan.md</code> §3.3 口径；<strong>无证据者不得给严重度，写「无法判定：无公开证据」。</strong></li><li><strong>待补证动作</strong>——RFI / 商务申请沙箱 / 专利检索 / T-BOX 拆解 / 招标与备案信息检索。</li></ol>
+<p><strong>通用分层方案（本节对照基准，定义在 <code>02-general-layered-security.md</code>）</strong>：</p>
+<pre><code>L1 硬件根信任层   —— HSM/SE/TEE，密钥与凭证的物理根
+L2 通信安全层     —— TLS/mTLS、证书体系、国密栈
+L3 授权与访问控制层 —— 授权协议、令牌模型、scope/资源级策略、逐车主同意
+L4 应用与平台层   —— API 网关、审计、限流、漏洞披露与运维
+L5 生命周期与合规层 —— OTA 安全、数据分类分级、境内存储、出境评估</code></pre>
+<hr>
+<h3 id="sec-12">16.2.1 蔚来 NIO</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.7 记录了蔚来 Open NSC 的取证结果（全部 [A]，一手开发者站点）：</p>
+<ul><li>官方开放平台为 GitBook 托管的「<strong>Open NSC（NIO Service Cloud，蔚来服务云）</strong>」，入口 <code>https://developer.nio.com/</code> —— [A]</li><li><strong>鉴权为 app-id + secret 双凭证，非 OAuth</strong>：文档明载「app-id 和 secret 是系统对接调用的唯一凭证……通过商务渠道获取」 —— <code>https://developer.nio.com/docs/open-nsc/spec/integration-process.html</code> —— [A]</li><li>环境划分：stg <code>https://open-stg.nio.com</code>，prod <code>https://open.nio.com</code> —— <code>https://developer.nio.com/docs/open-nsc/spec/env.html</code> —— [A]</li><li><strong>接口规范正文受 token 保护</strong>：文档明载「请联系文档提供人获取文档访问 token」 —— <code>https://developer.nio.com/docs/open-nsc/spec/interface.html</code> —— [A]</li><li>文档首页标注「文档最后更新于：2019-08-13，字段后续还有可能微调」，站点自述「正在建设中」 —— <code>https://developer.nio.com/</code> —— [A]</li><li>平台业务范围为<strong>服务云</strong>（一键加电 / 维保 / 拖车 / 租车 / 代泊 / 航班），<strong>不含车控 / 数字钥匙 API</strong> —— [A]</li><li>蔚来隐私政策页 <code>https://www.nio.cn/privacy-policy</code> —— [A，JS 渲染，正文未取到]</li></ul>
+<p><code>source-dossier.md</code> §7.10 第 1 条与第 4 条是对上述事实的两条重要「护栏」：</p>
+<ul><li>第 1 条：<strong>「蔚来 UWB+蓝牙+NFC 三合一数字钥匙」仅有二手报道</strong>（新浪汽车等，<code>https://auto.sina.cn/2026-07-18/detail-iniicyyt8275101.d.html</code>，[C]），蔚来官方未取得技术说明；<strong>无法确认是否 CCC 3.0、是否有 SE 保护。</strong></li><li>第 4 条：<strong>Open NSC 文档停留在 2019 年且站点自述「建设中」，不能代表蔚来当前车云安全架构。</strong></li></ul>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p><strong>唯一有取证的部分是「服务云开放」</strong>，其形态可以精确描述如下：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>已取证事实（[A]）</th><th>说明</th></tr></thead><tbody><tr><td>平台名</td><td>Open NSC（NIO Service Cloud）</td><td>服务云，非车控云</td></tr><tr><td>托管方式</td><td>GitBook</td><td>文档托管在第三方 GitBook</td></tr><tr><td>鉴权凭证</td><td><strong>app-id + secret 双凭证</strong></td><td>系统对接调用的<strong>唯一凭证</strong></td></tr><tr><td>凭证发放</td><td><strong>通过商务渠道获取</strong></td><td>非自助注册、非 OAuth 授权码</td></tr><tr><td>环境</td><td>stg / prod 两套域名</td><td><code>open-stg.nio.com</code> / <code>open.nio.com</code></td></tr><tr><td>文档访问控制</td><td><strong>接口规范正文需文档 access token</strong></td><td><strong>平台侧把「文档访问」本身也纳入授权控制</strong></td></tr><tr><td>业务范围</td><td>一键加电 / 维保 / 拖车 / 租车 / 代泊 / 航班</td><td>服务云业务</td></tr><tr><td>是否含车控</td><td><strong>否</strong></td><td>文档明载不含车控 / 数字钥匙 API</td></tr><tr><td>时效性</td><td>文档最后更新 2019-08-13</td><td>站点自述「建设中」</td></tr></tbody></table></div>
+<p><strong>关键观察一：蔚来把「文档访问」纳入授权控制。</strong> <code>interface.html</code> 页面明载「请联系文档提供人获取文档访问 token」[A]。这在工程上是一种<strong>信息层面的访问控制</strong>：不是所有拿到 Open NSC 入口的人都能读到接口规范，须持有文档 token。<strong>本报告判断（推测，非事实）</strong>：这种设计通常出现在「接口尚在商务定制阶段、需要按合作方逐份签署协议」的场景中，与蔚来 app-id/secret「通过商务渠道获取」的表述在逻辑上一致。</p>
+<p><strong>关键观察二：蔚来走的是 app-id + secret 而非 OAuth。</strong> 与 <code>source-dossier.md</code> §7.1 Tesla（OAuth authorization_code + scope 全清单）与 §7.2 Mercedes-Benz（OAuth Authorization Code Flow + <code>mb:</code> 命名空间 scope + <code>openid</code>/<code>offline_access</code>）相比，蔚来 Open NSC 采用的是<strong>服务端到服务端的双凭证模型</strong>（app-id + secret）。<strong>这是「服务集成型」授权，而非「代表车主行事型」授权</strong>——它解决的是「哪个合作方在调用接口」，而不是「车主是否同意该合作方访问其车辆」。<strong>本报告判断（推测，非事实）</strong>：app-id+secret 模型之所以在服务云场景够用，是因为服务云业务（加电、维保）的处理对象通常是「订单与服务履约」，不是「逐车主的敏感车辆控制」，对逐车主同意的合规压力较小。</p>
+<p><strong>关键观察三：时效性护栏。</strong> 任何人引用蔚来 Open NSC 的证据时，必须同时引用「2019-08-13」这个时间戳。<strong>蔚来在 2019 年之后的数字钥匙、车控授权、UWB 等能力，本次没有任何一手来源。</strong> 蔚来官方对「UWB+蓝牙+NFC 三合一数字钥匙」的技术说明本次未取得（§7.10 第 1 条，仅二手报道 [C]）。</p>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong>；仅二手报道 [C]</td><td>已检索：<code>developer.nio.com</code>、<code>www.nio.cn</code>；待执行：钱包生态文档、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：开发者站点无密码学章节；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：Open NSC 无 mTLS 文档；待执行：商务沙箱抓包（须授权）</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：开发者站点无硬件章节；待执行：T-BOX 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：开发者站点无 OTA 规范；待执行：OTA 服务条款、GB 44496 合规声明</td></tr><tr><td>scope 粒度</td><td><strong>未找到公开来源</strong>（因平台非 OAuth，天然无 scope）</td><td>已检索：Open NSC 无 scope；待执行：车控平台是否另有 OAuth 授权服务器的验证</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：无同意界面文档；待执行：NIO App 隐私设置逆向（静态）</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 蔚来计划在国内销售车型上提供车云开放能力（车控或车辆数据 API）；(b) 该能力面向第三方开发者或合作方；(c) 适用 GB 44495/44496（2026-01-01 强制）。若前提不成立（例如蔚来仅提供内部接口），则下列推断不适用。</p>
+<p><strong>可检验的推断（每条均标「本报告判断（推测，非事实）」并附检验方法）</strong>：</p>
+<p><strong>推断 N-1</strong>：本报告判断（推测，非事实）——蔚来若开放车控类 API，其授权模型<strong>大概率会从 app-id+secret 升级为 OAuth 授权码流 + 逐车主同意</strong>，因为车控资源涉及车主个人数据与物理安全，服务云式的「双凭证」无法表达「车主是否同意」。<strong>检验方法</strong>：检索蔚来是否有类似 Tesla <code>auth.nio.com</code> / <code>fleet-auth.*</code> 的 OAuth 授权端点域名；或检索其 <code>.well-known/oauth-authorization-server</code> / <code>.well-known/openid-configuration</code> 是否发布（对应 RFC 8414 / OIDC Discovery，<code>source-dossier.md</code> §2.1）。<strong>若检不到，只说明未公开，不说明不存在。</strong></p>
+<p><strong>推断 N-2</strong>：本报告判断（推测，非事实）——蔚来若需满足 GB/T 47324-2026（车联网平台网络安全防护要求），其云端授权基础设施<strong>大概率包含独立的身份提供者（IdP）与 API 网关分离部署</strong>，且 stg/prod 环境隔离（这与其现有 stg/prod 双环境事实一致）。<strong>检验方法</strong>：DNS 记录与证书透明度日志（CT log）检索 <code>*.nio.com</code> 子域；或商务申请沙箱后观察令牌端点与 API 端点是否分属不同主机（Tesla 的 <code>/token</code> 与 Fleet API 分属不同主机，见 <code>source-dossier.md</code> §7.1，可作对照样本）。</p>
+<p><strong>推断 N-3</strong>：本报告判断（推测，非事实）——若蔚来数字钥匙采用 UWB，侧信道（中继攻击）防护会是其安全设计的重点，因为 UWB 距离测距（ranging）本身就是为抗中继设计。<strong>但本报告不能认定蔚来采用 CCC 3.0 或 UWB</strong>——<code>source-dossier.md</code> §7.10 第 1 条明确只有二手报道（[C]）。<strong>检验方法</strong>：检索 CCC Digital Key 认证产品列表（<code>https://carconnectivity.org/digital-key/</code>，[A]）是否含蔚来车型；检索蔚来专利库中 UWB/安全测距相关专利。</p>
+<p><strong>推断 N-4</strong>：本报告判断（推测，非事实）——蔚来若要满足《汽车数据安全管理若干规定（试行）》的境内存储与出境评估义务（§16.1.3），其车主身份与授权服务应在国内区域部署。<strong>检验方法</strong>：检索蔚来隐私政策（须渲染 JS 后读取正文，本次因 JS 渲染未取到，见 §7.7）中关于数据存储地域的表述；检索其云服务供应商（如公有云）的公开案例。</p>
+<p><strong>推断 N-5</strong>：本报告判断（推测，非事实）——蔚来 Open NSC「文档访问需 token」的做法，<strong>可能</strong>被其车控开放平台延续为「按合作方逐份授权文档访问」的治理惯例。<strong>检验方法</strong>：商务渠道申请开发者账号，观察是否仍为「文档 token + 商务签署」流程。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>蔚来已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE 承载密钥</td><td><strong>未取证</strong></td><td>无法对照；数字钥匙 SE 保护未证实（§7.10 第 1 条）</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>[A] app-id + secret 双凭证</strong>（服务云）</td><td><strong>结构性差异</strong>：服务集成型而非代表车主型；无 scope、无逐车主同意证据</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计 + 限流</td><td><strong>部分 [A]</strong>：文档访问受 token 保护；stg/prod 环境隔离；站点「建设中」</td><td>平台治理细节未取证（限流 / 审计未知）</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>未取证</strong>（隐私政策 JS 未取到正文）</td><td>无法对照</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> 按 <code>00-engagement-plan.md</code> §3.3 口径，本章<strong>不得</strong>在没有证据的情况下给蔚来任何严重度评级。本次唯一可观察的<strong>结构性事实</strong>是：蔚来公开的 Open NSC 文档停留在 2019-08-13 [A]，且站点自述「建设中」[A]。<strong>「文档陈旧」本身是「文档与可观测性」层面的观察，但 dossier 未记载任何授权漏洞，因此不得据文档陈旧推断授权风险。</strong> 本章只如实记录：<strong>关于蔚来车云授权安全的风险评级，本次无法判定。</strong></p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>N-A1</td><td>发起 RFI（信息征询函）至蔚来商务/安全团队</td><td>获取 Open NSC 现行版本、车控开放平台是否存在</td></tr><tr><td>N-A2</td><td>商务渠道申请 Open NSC 沙箱账号</td><td>实测 app-id/secret 的令牌机制、是否有 OAuth</td></tr><tr><td>N-A3</td><td>检索蔚来专利（UWB / 安全测距 / 数字钥匙）</td><td>确认数字钥匙技术路线（不用二手报道）</td></tr><tr><td>N-A4</td><td>T-BOX / 数字钥匙模块拆解（须授权）</td><td>确认 SE/TEE 硬件根</td></tr><tr><td>N-A5</td><td>检索 CCC 认证产品列表</td><td>确认是否 CCC 3.0 认证</td></tr><tr><td>N-A6</td><td>JS 渲染抓取蔚来隐私政策正文</td><td>确认数据存储地域、出境安排</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-13">16.2.2 小鹏 XPeng</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.9 记录了小鹏的取证结果：</p>
+<ul><li><code>open.xiaopeng.com/dev/</code> <strong>站点存在，但对所有请求（curl 常规 UA、浏览器）返回 403 Forbidden（openresty）</strong> —— [A：站点存在，内容不可验证]</li><li><code>xmart.xiaopeng.com</code> <strong>有 DNS 解析（47.96.221.177）但证书无效</strong>（<code>ERR_CERT_AUTHORITY_INVALID</code>） —— [未找到可验证公开来源]</li><li>小鹏用户协议 <code>https://login.xiaopeng.com/policy.html</code>，主体<strong>广州智鹏车联网科技有限公司</strong> —— [A]</li></ul>
+<p><code>source-dossier.md</code> §7.10 第 2 条：<strong>小鹏 UWB 钥匙为论坛/短视频内容，官方未证实具体车型与安全实现；<code>open.xiaopeng.com</code> 403 使「小鹏开放座舱 API」一说无法向一手文档求证。</strong></p>
+<p><strong>解读这三条证据的属性</strong>：</p>
+<ol><li><code>open.xiaopeng.com/dev/</code> 的 <strong>403 是站点级拒绝</strong>（openresty 返回），不是 404。<strong>「存在但拒绝服务」与「不存在」是两件不同的事</strong>：403 说明域名与路径在运行，只是访问被策略拒绝（可能要求特定 UA、IP 白名单、登录态或 Geo 策略）。<strong>本次无法核实其鉴权机制 / scope / 令牌有效期。</strong> 这是「取证受阻」，不是「能力缺失」。</li><li><code>xmart.xiaopeng.com</code> 的<strong>证书无效</strong>是一条值得记录的技术观察：证书权威校验失败（<code>ERR_CERT_AUTHORITY_INVALID</code>）意味着浏览器无法建立可信 TLS。<strong>本报告不推断其成因</strong>（可能是内部/测试环境、自签证书、或证书链配置问题），<strong>也不据此评价其生产环境安全性</strong>——因为它可能只是非生产子域。<strong>本次未取得任何一手说明。</strong></li><li>用户协议页 [A] 只提供了<strong>主体信息</strong>（广州智鹏车联网科技有限公司），未提供授权技术细节。</li></ol>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p><strong>本次未取得任何关于小鹏开放平台鉴权机制的一手文档。</strong> 现有证据只能支持以下<strong>受限陈述</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>对象</th><th>观察（[A] 直接观测）</th><th>能得出的结论</th><th>不能得出的结论</th></tr></thead><tbody><tr><td><code>open.xiaopeng.com/dev/</code></td><td>HTTP 403（openresty）</td><td>站点/路径存在且被拒绝服务</td><td><strong>不能</strong>得出「小鹏无开放平台」，也<strong>不能</strong>得出「小鹏开放平台用某鉴权方式」</td></tr><tr><td><code>xmart.xiaopeng.com</code></td><td>DNS 47.96.221.177，证书无效</td><td>子域存在；TLS 校验失败</td><td><strong>不能</strong>据此评价生产安全</td></tr><tr><td><code>login.xiaopeng.com/policy.html</code></td><td>主体广州智鹏车联网科技有限公司</td><td>身份/协议主体信息</td><td>不能得出授权技术细节</td></tr></tbody></table></div>
+<p><strong>方法论要点</strong>：403 是本报告<strong>不能穿透的取证墙</strong>。任何「小鹏用 OAuth / 用 APIKey / 用国密」的说法，在本次取证条件下<strong>都是编造</strong>。本章因此<strong>拒绝给出小鹏鉴权形态的任何非推测结论</strong>。这与 <code>source-dossier.md</code> §0 的覆盖度偏置说明一致：证据密度向「文档公开可达」的企业倾斜，小鹏恰好是「文档存在但拒绝访问」的典型。</p>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong>；仅论坛/短视频 [C]</td><td>已检索：<code>open.xiaopeng.com</code> 403；待执行：CCC 认证清单、官方发布</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：403 拒访；待执行：商务沙箱（须授权）</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：T-BOX 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：OTA 服务条款、合规声明</td></tr><tr><td>scope 粒度</td><td><strong>未找到公开来源</strong>（文档 403）</td><td>已检索：403；待执行：商务申请</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：无；待执行：XPeng App 隐私设置（静态）</td></tr><tr><td>开放平台鉴权机制</td><td><strong>未找到公开来源</strong>（403）</td><td>已检索：curl 常规 UA + 浏览器，均 403；待执行：换出口 IP / 商务白名单</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 小鹏在国内销售车型上提供车云开放能力；(b) 面向第三方开发者或合作方；(c) 适用 GB 44495/44496（2026-01-01 强制）。若 <code>open.xiaopeng.com</code> 实为纯内部/合作方专用网关（不需公开放），部分推断不适用。</p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 X-1</strong>：本报告判断（推测，非事实）——<strong><code>open.xiaopeng.com</code> 的 403 更可能来自「访问策略」而非「服务下线」</strong>，因为 openresty 的 403 通常由访问控制规则（allow/deny、auth_request、UA/IP 过滤）触发。<strong>检验方法</strong>：以不同出口 IP、带/不带登录 Cookie、不同 Accept-Language 重试并记录响应头（尤其 <code>Server</code>、<code>Set-Cookie</code>、<code>WWW-Authenticate</code>）。<strong>响应头若出现 <code>WWW-Authenticate</code>，可反推其认证方向（对应 RFC 6750 的 <code>WWW-Authenticate</code> 语义，<code>source-dossier.md</code> §2.1）</strong>——但本次未取得，故仅为检验设计。</p>
+<p><strong>推断 X-2</strong>：本报告判断（推测，非事实）——若小鹏开放平台面向第三方<strong>车主数据/车控</strong>，其授权模型<strong>大概率会包含 OAuth 授权码流</strong>（对应 RFC 6749，<code>source-dossier.md</code> §2.1），因为国内合规（§16.1.3）要求可追溯的「逐车主同意」。<strong>检验方法</strong>：检索 <code>open.xiaopeng.com</code> 是否发布 <code>/.well-known/openid-configuration</code> 或 <code>/.well-known/oauth-authorization-server</code>（RFC 8414 / OIDC Discovery）；检索是否有 <code>auth.*.xiaopeng.com</code> 授权端点域名。</p>
+<p><strong>推断 X-3</strong>：本报告判断（推测，非事实）——小鹏若需满足 GB/T 47467-2026（车联网安全管理接口规范），其管理接口<strong>大概率会有独立的鉴权与管理面</strong>（即「安全管理接口」与「业务 API」分离）。<strong>检验方法</strong>：观察其开放平台是否存在 <code>admin</code>/<code>management</code> 类路径与对应文档。</p>
+<p><strong>推断 X-4</strong>：本报告判断（推测，非事实）——<code>xmart.xiaopeng.com</code> 的证书无效<strong>可能是非生产环境或过渡状态</strong>，而非生产链路特征。<strong>但本报告不作此结论</strong>，因为它可能只是未配置好证书的内部服务。<strong>检验方法</strong>：检索证书透明度日志（CT log）中该域名与 <code>*.xiaopeng.com</code> 的证书签发记录与有效期。</p>
+<p><strong>推断 X-5</strong>：本报告判断（推测，非事实）——小鹏若采用 UWB 数字钥匙，其安全设计会涉及抗中继；<strong>但本次仅有 [C] 级二手材料，不足以支撑任何技术断言</strong>（§7.10 第 2 条）。<strong>检验方法</strong>：官方车型配置页的安全说明、CCC/FiRa 认证清单（<code>source-dossier.md</code> §5）。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>小鹏已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>观察 [A]：<code>xmart.xiaopeng.com</code> 证书无效</strong>（成因未取证）</td><td>仅一条非生产可能的 TLS 观察，不足以对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>未取证（403）</strong></td><td>无法对照</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计</td><td><strong>观察 [A]：<code>open.xiaopeng.com</code> 403（openresty）</strong></td><td>网关「存在但拒访」，细节未取证</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>未取证</strong></td><td>无法对照</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> 本次未取得任何关于小鹏授权机制的一手文档，因此<strong>不得</strong>给出任何严重度评级。<code>open.xiaopeng.com</code> 的 403 与 <code>xmart.xiaopeng.com</code> 的证书无效<strong>均不构成安全发现</strong>：403 是访问策略，证书无效可能出现在非生产子域。<strong>本章只记录观察，不给评级。</strong></p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>X-A1</td><td>换出口 IP / 代理重跑 <code>open.xiaopeng.com/dev/</code></td><td>排除区域封锁，尝试取得文档</td></tr><tr><td>X-A2</td><td>商务渠道申请沙箱账号（白名单）</td><td>实测鉴权机制、scope、令牌有效期</td></tr><tr><td>X-A3</td><td>检索 CT log 中小鹏证书签发记录</td><td>确认 <code>xmart.*</code> 是否生产环境</td></tr><tr><td>X-A4</td><td>检索 <code>.well-known</code> 授权服务器元数据</td><td>判断是否 OAuth/OIDC</td></tr><tr><td>X-A5</td><td>专利检索（UWB / 数字钥匙 / 车辆授权）</td><td>确认技术路线</td></tr><tr><td>X-A6</td><td>RFI 至广州智鹏车联网科技有限公司</td><td>获取开放平台现行文档</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-14">16.2.3 理想 Li Auto</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.9 记录了理想的取证结果：</p>
+<ul><li>理想官方用户隐私政策，<strong>生效日期 2026-01-22</strong>，主体为<strong>北京车励行信息技术有限公司、北京罗克维尔斯科技有限公司</strong>；覆盖范围含<strong>官网 / App / 小程序 / 车机端</strong> —— <code>https://www.lixiang.com/agreement/privacy.html</code> —— [A]</li><li><strong><code>open.lixiang.com</code>、<code>developer.lixiang.com</code> 均无 DNS 解析</strong> —— [未找到公开来源]</li></ul>
+<p><strong>解读</strong>：</p>
+<ol><li>理想是九家中<strong>为数不多取到了「生效日期明确」的隐私政策</strong>的企业，这条 [A] 证据的价值在于：它确认了理想<strong>对车主数据处理的公开承诺载体存在</strong>，且覆盖「车机端」（隐私政策的适用范围明确写到了车机，说明其数据处理边界涵盖车端）。但<strong>隐私政策本身不是授权技术文档</strong>——它讲的是「承诺与义务」，不是「令牌与 scope」。</li><li><code>open.lixiang.com</code> 与 <code>developer.lixiang.com</code> <strong>无 DNS 解析</strong>，是比 403 更彻底的「此路不通」：DNS 无解析意味着在公网 DNS 层面这两个域名不存在。<strong>这不能推出「理想无开放平台」</strong>——开放平台可能：(a) 命名不同（如 <code>open.chehejia.com</code> 之类）；(b) 只对合作方提供、无公网入口；(c) 本次 DNS 查询环境受限。<strong>本次未取得任何关于理想开放平台的证据。</strong></li></ol>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p><strong>本次未取得</strong>。可用证据仅有隐私政策页（[A]，覆盖官网/App/小程序/车机端）。因此本节只能做<strong>受限陈述</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>已取证</th><th>未取证</th></tr></thead><tbody><tr><td>车主数据处理的公开承诺</td><td>[A] 隐私政策，生效 2026-01-22，主体两家公司</td><td>具体数据分类分级、存储地域表述（本次未解析正文条款）</td></tr><tr><td>开放平台</td><td>—</td><td><strong>未取得</strong>：<code>open.lixiang.com</code> / <code>developer.lixiang.com</code> 无 DNS</td></tr><tr><td>鉴权机制</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>车控 API</td><td>—</td><td><strong>未取得</strong></td></tr></tbody></table></div>
+<p><strong>主体结构观察</strong>（[A] 事实）：理想隐私政策载两个主体——<strong>北京车励行信息技术有限公司、北京罗克维尔斯科技有限公司</strong>。这提示理想的数据处理涉及<strong>多主体分工</strong>。<strong>本报告判断（推测，非事实）</strong>：多主体常见于「一家承担 App/服务、一家承担车机/车联网」的分工，这会带来<strong>跨主体数据流动与授权边界</strong>问题（谁是可授权的数据控制者）。但本次未取得任何一手说明，<strong>该判断仅作检验起点，不作事实</strong>。</p>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong></td><td>已检索：无开发者站点；待执行：官方车型页、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：商务沙箱</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：T-BOX 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：OTA 服务条款、GB 44496 合规声明</td></tr><tr><td>scope 粒度</td><td><strong>未找到公开来源</strong></td><td>已检索：无开放平台；待执行：商务申请</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong>（隐私政策正文未解析）</td><td>已检索：隐私政策页可达；待执行：解析 App 内同意流程</td></tr><tr><td>开放平台存在性</td><td><strong>未找到公开来源</strong>（两个域名无 DNS）</td><td>已检索：<code>open.</code> / <code>developer.</code> 两个子域；待执行：备案信息检索、换命名探测</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 理想在国内销售车型上提供面向第三方的车云开放能力；(b) 适用 GB 44495/44496（2026-01-01 强制）与数据合规法规（§16.1.3）。若理想仅提供自营 App 而不开第三方 API，则「开放平台授权」相关推断不适用，但其<strong>内部授权架构仍需满足同等合规要求</strong>。</p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 L-1</strong>：本报告判断（推测，非事实）——理想的<strong>主体二元结构</strong>（车励行 + 罗克维尔斯）<strong>可能在授权架构上表现为「身份主体」与「数据处理主体」的分离</strong>：一个主体负责车主身份与登录，另一个负责车辆数据处理。<strong>检验方法</strong>：解析理想隐私政策正文（本次未解析）中关于「数据控制者 / 受托处理」的表述；检索 App 的隐私设置页所列主体；比对两家公司的工商经营范围。</p>
+<p><strong>推断 L-2</strong>：本报告判断（推测，非事实）——理想若开放车主数据 API，其授权模型<strong>大概率采用 OAuth 授权码流 + 逐车主同意</strong>，以承载数据分类分级（§16.1.3）的合规要求。<strong>检验方法</strong>：探测 <code>open.lixiang.*</code> / <code>auth.lixiang.*</code> / <code>sso.lixiang.*</code> 等域名的 <code>.well-known/openid-configuration</code>；检索理想是否有面向开发者的 OAuth 文档。</p>
+<p><strong>推断 L-3</strong>：本报告判断（推测，非事实）——理想若需满足 GB 44496-2024（软件升级通用技术要求），其 OTA 链路<strong>大概率会有独立的升级授权与签名校验</strong>，因为 OTA 是「车辆控制权」级别的高敏感操作。<strong>检验方法</strong>：检索理想 OTA 服务条款、升级说明文档；检索其是否公开 Uptane/TUF 类双仓库模型（<code>source-dossier.md</code> §6）。</p>
+<p><strong>推断 L-4</strong>：本报告判断（推测，非事实）——理想隐私政策覆盖「车机端」[A]，意味着其<strong>车主同意的采集点可能延伸到车机屏</strong>。<strong>检验方法</strong>：检索车机端隐私设置的公开说明、OTA 更新日志中与隐私设置相关的条目。</p>
+<p><strong>推断 L-5</strong>：本报告判断（推测，非事实）——<code>open.lixiang.com</code> 无 DNS 也可能只是命名差异，<strong>本报告不据此推断理想无开放平台</strong>。<strong>检验方法</strong>：检索工信部 ICP 备案中「理想/车和家/车励行/罗克维尔斯」名下域名清单；检索理想投资者关系材料中的开发者生态章节。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>理想已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计</td><td><strong>未取证</strong>（无开放平台入口）</td><td>无法对照</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>[A] 隐私政策（生效 2026-01-22，覆盖官网/App/小程序/车机端）</strong></td><td>有公开承诺载体，但无技术实现细节</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> 理想本次唯一的一手证据是隐私政策的存在与生效日期，<strong>不含任何授权机制信息</strong>，因此不给任何严重度评级。按 §3.3，「文档与可观测性缺失」本身属 Low，但本章<strong>不能</strong>把「本次未取到文档」等同于「理想文档缺失」——这是 <code>00-engagement-plan.md</code> §3.2 第 4 条的中立性红线。</p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>L-A1</td><td>解析理想隐私政策正文（含车机端章节）</td><td>确认数据分类分级、存储地域、主体分工</td></tr><tr><td>L-A2</td><td>ICP 备案检索（车和家 / 车励行 / 罗克维尔斯）</td><td>发现未公开命名的开放平台域名</td></tr><tr><td>L-A3</td><td>探测 <code>*.lixiang.*</code> 的 <code>.well-known</code> 元数据</td><td>判断是否有 OAuth/OIDC 授权服务器</td></tr><tr><td>L-A4</td><td>检索理想专利（数字钥匙 / 车辆授权 / OTA 安全）</td><td>确认技术路线</td></tr><tr><td>L-A5</td><td>RFI 至北京车励行信息技术有限公司</td><td>获取开放平台与安全白皮书</td></tr><tr><td>L-A6</td><td>车机端隐私设置静态分析（须授权）</td><td>确认车主同意采集点</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-15">16.2.4 小米 Xiaomi</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.8 记录了小米的取证结果（全部 [A]）：</p>
+<ul><li>官方开发者平台为「<strong>小米 IoT 开发者平台</strong>」<code>https://iot.mi.com/</code>，<strong>2026 年品牌为「小米澎湃智联」</strong>，与 <strong>Xiaomi HyperOS Connect</strong> 联动，宣称「<strong>人车家全生态</strong>」 —— [A]</li><li>文档中心 <code>https://iot.mi.com/v2/new/doc/home</code>（<strong>HTTP 200</strong>，标题「小米IoT文档与资源中心」） —— [A]</li><li>合规与安全入口：<strong>小米信任中心</strong> <code>https://trust.mi.com/zh-CN/compliance</code>，<strong>载明 ISO/IEC 27001 认证（编号 IS 831552，范围含小米科技 IT 运维与云服务）</strong>，并自述定期发布安全与隐私白皮书 —— [A]</li><li>平台接入流程「<strong>成为开发者 → 创建产品 → 研发配置 → 认证发布</strong>」，<strong>面向硬件模组厂商</strong>，<strong>非面向车企的车云 API 开放平台</strong> —— <code>https://iot.mi.com/</code> —— [A]</li><li><strong>未取到</strong>：小米汽车（<code>xiaomiev.com</code>）专属开放平台、车控 API、OAuth scope、数字钥匙官方技术文档。<strong>小米汽车官网可达但无开发者入口。</strong> —— [未找到公开来源]</li></ul>
+<p><code>source-dossier.md</code> §7.10 第 6 条：<strong>Xiaomi HyperOS Connect 宣称覆盖「人车家」，但 iot.mi.com 文档面向硬件模组厂商，未见小米汽车车云 API / 鉴权细节。</strong></p>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p>小米是九家中<strong>唯一提供了可核验的第三方安全认证编号</strong>的企业（ISO/IEC 27001，编号 IS 831552，[A]）。这一点在本章的「应用与平台安全」切面上具有独立价值。形态可归纳为：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>已取证事实（[A]）</th><th>性质</th></tr></thead><tbody><tr><td>开发者平台</td><td>小米 IoT 开发者平台（<code>iot.mi.com</code>）</td><td><strong>IoT 模组级</strong>，非车云 API 级</td></tr><tr><td>品牌</td><td>2026 年为「小米澎湃智联」</td><td>与 HyperOS Connect 联动</td></tr><tr><td>生态叙事</td><td>「人车家全生态」</td><td>营销/生态定位表述</td></tr><tr><td>文档中心</td><td><code>iot.mi.com/v2/new/doc/home</code>（HTTP 200）</td><td>面向 IoT 开发者文档</td></tr><tr><td>接入流程</td><td>成为开发者 → 创建产品 → 研发配置 → 认证发布</td><td><strong>面向硬件模组厂商</strong></td></tr><tr><td>第三方认证</td><td><strong>ISO/IEC 27001，编号 IS 831552</strong>，范围含小米科技 IT 运维与云服务</td><td><strong>可核验的第三方管理体系认证</strong></td></tr><tr><td>安全披露载体</td><td>信任中心自述「定期发布安全与隐私白皮书」</td><td>存在披露习惯</td></tr><tr><td>车云专属平台</td><td><strong>未取到</strong>（<code>xiaomiev.com</code> 无开发者入口）</td><td>缺口</td></tr></tbody></table></div>
+<p><strong>关键观察一：ISO/IEC 27001 认证是本报告中唯一可核验编号的管理体系认证。</strong> <code>source-dossier.md</code> §7.8 明载：小米信任中心载明 <strong>ISO/IEC 27001 认证（编号 IS 831552，范围含小米科技 IT 运维与云服务）</strong> [A]。<strong>本报告判断（推测，非事实）</strong>：ISO/IEC 27001 覆盖「IT 运维与云服务」范围，说明小米的云侧运营管理体系接受了第三方审计；<strong>但 ISO/IEC 27001 是管理体系标准（ISMS），不直接证明某项授权技术机制（如 OAuth scope、mTLS）的存在</strong>——两者是不同层面的证据，不可混淆。这一点必须在引用时保持严谨。</p>
+<p><strong>关键观察二：小米的开放平台是「IoT 模组平台」，不是「车云 API 平台」。</strong> 接入流程面向硬件模组厂商（创建产品、研发配置、认证发布），这与 <code>source-dossier.md</code> §7.1 的 Tesla Fleet API（面向第三方应用、OAuth 代表车主行事）<strong>在性质上完全不同</strong>。<strong>小米汽车的「车云写接口 / 车控 API」本次未取得任何一手来源</strong>（§7.10 第 6 条）。<strong>因此不能把小米 IoT 平台的鉴权模型当作小米汽车的鉴权模型</strong>——这是一个极易产生过度归纳的陷阱，本章明确拒绝此归纳。</p>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong></td><td>已检索：<code>iot.mi.com</code>、<code>xiaomiev.com</code>；待执行：小米钱包文档（须登录）、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：信任中心无密码学文档；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：Io 文档无 mTLS；待执行：商务沙箱</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：T-BOX / 手机 SE 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：OTA 服务条款、合规声明</td></tr><tr><td>车控 API scope</td><td><strong>未找到公开来源</strong>（无车云开发者平台）</td><td>已检索：<code>xiaomiev.com</code> 无开发者入口；待执行：商务申请</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：无；待执行：HyperOS / 小米汽车 App 隐私设置静态分析</td></tr><tr><td>车云专属开放平台</td><td><strong>未找到公开来源</strong></td><td>已检索：<code>xiaomiev.com</code>；待执行：ICP 备案、<code>open.mi.com</code> 类命名探测</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 小米汽车在国内销售车型上提供车云开放能力（或至少内部车云接口）；(b) 适用 GB 44495/44496（2026-01-01 强制）与数据合规法规（§16.1.3）。小米汽车的「人车家」生态若通过 HyperOS 打通手机—车机—IoT，则其授权体系还需处理<strong>跨设备身份</strong>问题，这一点在下面推断 M-2。</p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 M-1</strong>：本报告判断（推测，非事实）——小米若要开放车控 API 给第三方，其授权体系<strong>大概率会复用小米账号（Xiaomi Account）作为身份源</strong>，因为「人车家全生态」的叙事要求统一身份。<strong>检验方法</strong>：检索小米汽车 App 的登录页是否使用小米账号；检索 <code>account.xiaomi.com</code> 是否为车云接口的授权端点；检索是否有面向开发的 OAuth scope 文档。</p>
+<p><strong>推断 M-2</strong>：本报告判断（推测，非事实）——<strong>「人车家」跨设备场景会引入「委派授权（delegation）」需求</strong>：手机上的授权可能需向车机或 IoT 设备传递有限权限。这与 OAuth Token Exchange（RFC 8693，<code>source-dossier.md</code> §2.1）的「代理链授权」模型直接对应。<strong>检验方法</strong>：检索小米是否公开跨设备授权的令牌交换机制；检索 HyperOS 互通（HyperOS Connect）开发者文档中的权限模型描述。</p>
+<p><strong>推断 M-3</strong>：本报告判断（推测，非事实）——小米具备 ISO/IEC 27001（编号 IS 831552）认证 [A]，<strong>其云侧运营流程大概率已建立「变更管理 / 访问控制 / 日志留存」类体系化控制</strong>；这些控制是授权系统可靠运行的组织前提。<strong>检验方法</strong>：索取小米信任中心发布的安全与隐私白皮书（<code>trust.mi.com/zh-CN/compliance</code> 自述定期发布）；核验 ISO 认证范围原文。</p>
+<p><strong>推断 M-4</strong>：本报告判断（推测，非事实）——小米汽车若采用数字钥匙，<strong>鉴于小米同时是手机厂商（持有手机 SE / 钱包能力）</strong>，其数字钥匙<strong>可能具有「手机侧硬件根掌控」的独特优势</strong>（手机厂商与车企的双重身份）。<strong>但本报告不得据此断言其实现细节</strong>——本次未取得任何数字钥匙一手文档。<strong>检验方法</strong>：检索小米钱包（Mi Wallet）对数字车钥匙的支持说明；检索 CCC 认证清单；检索小米汽车官方车型页的钥匙说明。</p>
+<p><strong>推断 M-5</strong>：本报告判断（推测，非事实）——小米的车云接口<strong>可能尚在「内部/生态早期」阶段</strong>，未对外发布独立开发者平台，因此本次检索不到车云 API 文档；<strong>这是「未公开」而非「不存在」</strong>。<strong>检验方法</strong>：检索小米汽车 OTA 更新日志中提及的接口/服务；检索小米招聘信息中「车云 / 开放平台 / 授权」岗位的技术关键词（仅作方向性参考，不作事实）。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>小米已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong>（但小米为手机厂商，存在手机 SE/钱包生态，本次未取证）</td><td>潜在优势方向，但无一手证据</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>未取证</strong>（IoT 平台面向模组厂商，非车云）</td><td>无车云授权证据；不得以 IoT 平台鉴权外推</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计 + 漏洞披露</td><td><strong>[A] ISO/IEC 27001（编号 IS 831552，范围含 IT 运维与云服务）</strong>；信任中心；IoT 文档中心</td><td><strong>管理体系层面有第三方认证</strong>，但非技术授权机制证据</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>[A] 信任中心合规页；自述定期发布安全与隐私白皮书</strong></td><td>有披露习惯，但车云具体未知</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> 本章<strong>不给小米车云授权任何严重度评级</strong>。小米的 ISO/IEC 27001 认证（编号 IS 831552）[A] 是<strong>正面</strong>的第三方管理体系证据，但它<strong>不能</strong>被反向用作「车云授权机制已获认证」的证明——ISMS 覆盖范围是「ITES 运维与云服务」，与「车控 API 的授权协议实现」是不同层面的对象。<strong>本章严格区分二者。</strong></p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>M-A1</td><td>检索小米汽车（<code>xiaomiev.com</code>）开发者/开放平台入口</td><td>确认是否存在车云 API 平台</td></tr><tr><td>M-A2</td><td>索取小米信任中心的安全与隐私白皮书</td><td>获取云侧访问控制与授权说明</td></tr><tr><td>M-A3</td><td>核验 ISO/IEC 27001 认证证书范围原文</td><td>确认范围是否延伸至车云</td></tr><tr><td>M-A4</td><td>检索小米钱包对数字车钥匙的支持</td><td>确认数字钥匙技术路线与硬件根</td></tr><tr><td>M-A5</td><td>专利检索（跨设备授权 / 车辆授权 / 数字钥匙）</td><td>确认「人车家」授权模型</td></tr><tr><td>M-A6</td><td>静态分析小米汽车 App 隐私与授权设置</td><td>确认逐车主同意界面</td></tr><tr><td>M-A7</td><td>RFI 至小米汽车业务部门</td><td>获取车云授权技术材料</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-16">16.2.5 零跑 Leapmotor</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.9 记录了零跑的取证结果：</p>
+<ul><li><code>cn.leapmotor.com</code> <strong>可达</strong>，但<strong>无开放平台入口</strong> —— [A]</li><li><code>developer.leapmotor.com</code>、<code>dev.leapmotor.com</code>、<code>open.leapmotor.com</code> <strong>均无 DNS</strong> —— [未找到公开来源]</li></ul>
+<p><strong>解读</strong>：零跑是九家中<strong>证据最薄的一家</strong>（与华为、极氪处境相近）。可确证的只有两条：</p>
+<ol><li>官网 <code>cn.leapmotor.com</code> 可达 [A]——说明存在公开网络入口，但<strong>本次未发现任何开发者/开放平台入口</strong>。</li><li>三个常见的开发者子域命名（<code>developer.</code> / <code>dev.</code> / <code>open.</code>）<strong>均无 DNS</strong> [未找到公开来源]。</li></ol>
+<p><strong>必须强调的解读纪律</strong>：域名无 DNS <strong>绝不等于</strong>「零跑没有开放平台」。可能性至少有三种：(a) 零跑使用不同命名；(b) 零跑只对合作方提供、无公网域名；(c) 本次 DNS 查询环境受限。<strong><code>source-dossier.md</code> §0 覆盖度偏置说明明确：证据密度向「文档公开可达」的企业倾斜，零跑处于该偏置的薄弱端。</strong> 因此本节<strong>不给零跑任何技术形态陈述</strong>，只记录取证结果与缺口。</p>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p><strong>本次未取得</strong>，且可用证据不足以展开。受限陈述如下：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>已取证</th><th>未取证</th></tr></thead><tbody><tr><td>官网</td><td>[A] <code>cn.leapmotor.com</code> 可达</td><td>无开放平台入口</td></tr><tr><td>开发者子域</td><td>[未找到公开来源] <code>developer.</code> / <code>dev.</code> / <code>open.</code> 三个无 DNS</td><td>实际命名未知</td></tr><tr><td>鉴权机制</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>车控 / 数字钥匙 API</td><td>—</td><td><strong>未取得</strong></td></tr></tbody></table></div>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong></td><td>已检索：官网无入口；待执行：官网车型页、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：商务沙箱</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：T-BOX 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：官网无技术文档；待执行：OTA 服务条款、合规声明</td></tr><tr><td>scope 粒度</td><td><strong>未找到公开来源</strong></td><td>已检索：无开放平台；待执行：商务申请</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：无；待执行：App 隐私设置静态分析</td></tr><tr><td>开放平台存在性</td><td><strong>未找到公开来源</strong>（三域名无 DNS）</td><td>已检索：<code>developer.</code> / <code>dev.</code> / <code>open.</code>；待执行：ICP 备案、合作案例分析</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 零跑在国内销售车型上提供车云能力（含内部接口）；(b) 适用 GB 44495/44496（2026-01-01 强制）与数据合规法规（§16.1.3）；(c) 若零跑未来向第三方开放数据/车控 API，则 16.3 的阶段判断适用。</p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 Z-1</strong>：本报告判断（推测，非事实）——<strong>零跑即便不开第三方平台，其自营 App 与车云链路仍需满足 GB 44495/44496 的合规要求</strong>（强制适用与是否开放平台无关）。因此<strong>「无开放平台」不等于「无授权安全需求」</strong>：自营 App 到车云、车云到车端的链路同样需要鉴权与访问控制。<strong>检验方法</strong>：检索零跑 App 是否使用 OAuth/OIDC 类登录流程（观察登录页的跳转与 <code>state</code>/<code>nonce</code> 参数，对应 RFC 6749 / OIDC，<code>source-dossier.md</code> §2.1）。</p>
+<p><strong>推断 Z-2</strong>：本报告判断（推测，非事实）——零跑若要满足 GB/T 47324-2026（车联网平台网络安全防护要求），其云侧<strong>大概率存在平台级防护措施</strong>（如 WAF、网关、日志），但<strong>本次无一手证据</strong>。<strong>检验方法</strong>：检索零跑公司公开的安全资质、云服务供应商案例、ISO 认证（若公开）。</p>
+<p><strong>推断 Z-3</strong>：本报告判断（推测，非事实）——零跑若采用数字钥匙（无论 BLE/UWB/NFC），其安全实现<strong>必然涉及某种硬件根或安全存储</strong>，否则无法满足抗复制要求；<strong>但本次未取得任何一手来源，不作技术断言</strong>。<strong>检验方法</strong>：官网车型页钥匙说明、CCC/FiRa 认证清单、专利检索。</p>
+<p><strong>推断 Z-4</strong>：本报告判断（推测，非事实）——零跑（作为 Stellantis 合作方之一，若相关）<strong>可能面临跨境数据/授权边界问题</strong>，这会加强其数据本地化设计的动机。<strong>注意：本报告不引用任何未经 dossier 证实的合作细节作为事实</strong>，此处仅作为<strong>检验方向提示</strong>。<strong>检验方法</strong>：检索零跑隐私政策中数据存储地域条款；检索其合作伙伴公告中的数据处理安排。</p>
+<p><strong>推断 Z-5</strong>：本报告判断（推测，非事实）——<code>developer./dev./open.</code> 三域名无 DNS，<strong>可能</strong>意味着零跑尚未提供面向公网的开发者平台。<strong>检验方法</strong>：ICP 备案检索（浙江零跑科技股份有限公司名下域名）；检索其公开招聘信息中「开放平台 / 车云」岗位描述。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>零跑已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计</td><td><strong>未取证</strong>（官网可达，无开放平台入口）</td><td>无法对照</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>未取证</strong></td><td>无法对照</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> 零跑本次未取得任何关于车云授权的证据，<strong>不给任何严重度评级</strong>。按 §3.3 口径，本章<strong>不得</strong>把「本次未检索到」当作风险项。</p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>Z-A1</td><td>ICP 备案检索（浙江零跑科技股份有限公司）</td><td>发现可能的开发者域名</td></tr><tr><td>Z-A2</td><td>检索零跑 App 登录流程（静态）</td><td>判断是否使用 OAuth/OIDC</td></tr><tr><td>Z-A3</td><td>专利检索（数字钥匙 / 车辆授权 / 车云安全）</td><td>确认技术路线</td></tr><tr><td>Z-A4</td><td>检索零跑安全资质（ISO 认证等）</td><td>确认是否有第三方体系认证</td></tr><tr><td>Z-A5</td><td>RFI 至零跑科技</td><td>获取车云安全与开放平台材料</td></tr><tr><td>Z-A6</td><td>检索零跑合作伙伴公告中的数据安排</td><td>确认跨境数据/授权边界（如相关）</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-17">16.2.6 华为鸿蒙智行 HIMA（华为开发者生态）</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.9 记录了华为的取证结果：</p>
+<ul><li>华为开发者联盟统一入口 <code>https://developer.huawei.com/consumer/cn/</code> —— [A]</li><li><strong>尝试抓取 Wallet Kit 数字车钥匙文档（<code>/doc/harmonyos-guides/wallet-kit-*</code>）与安全文档，均返回 JS 空壳页</strong>（标题仅「文档中心」，约 <strong>1749 字节</strong>），<strong>正文无法取证</strong> —— [未找到可验证公开来源]</li></ul>
+<p><strong>术语澄清（本章必须先行说明）</strong>：本文的「华为鸿蒙智行」指 <code>00-engagement-plan.md</code> AC-4 列出的国内九家之一，其技术证据在本次取证中表现为<strong>华为开发者生态（HarmonyOS 文档 / Wallet Kit）</strong>。<strong>「鸿蒙智行」是生态联盟/品牌层面，而本次唯一可触达的技术入口是华为开发者联盟。</strong> 本章因此以「华为开发者生态」为取证对象，并明确：本次<strong>未取得「鸿蒙智行」合作车型专属的授权架构文档</strong>。</p>
+<p><strong>解读这条唯一的技术观察</strong>：Wallet Kit 文档返回 <strong>JS 空壳（约 1749 字节）</strong>，说明该文档页是<strong>前端动态渲染</strong>的——内容需由 JavaScript 运行后从后端接口拉取，<code>curl</code> 类直连只能拿到骨架 HTML。<strong>「抓不到正文」的原因是渲染方式与登录态要求，不是文档不存在</strong>（页面标题「文档中心」本身说明文档站点在运行）。<strong><code>source-dossier.md</code> §8 的补证方式明确写「用带 JS 渲染的抓取（须登录）」</strong>——这为 16.6 的补证清单提供了直接依据。</p>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p><strong>本次未取得任何关于华为车云授权机制的一手文档。</strong> 可确证的：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>已取证</th><th>性质</th></tr></thead><tbody><tr><td>开发者入口</td><td>[A] <code>developer.huawei.com/consumer/cn/</code></td><td>统一开发者联盟门户</td></tr><tr><td>数字车钥匙文档</td><td>[未找到可验证公开来源] <code>/doc/harmonyos-guides/wallet-kit-*</code> 返回 JS 空壳（约 1749 字节）</td><td>文档站存在，正文未取到</td></tr><tr><td>鉴权机制</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>scope 粒度</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>车控 API</td><td>—</td><td><strong>未取得</strong></td></tr></tbody></table></div>
+<p><strong>为什么华为这条证据链特别值得「诚实标注」？</strong> 因为华为是<strong>同时具备「芯片—操作系统—云—终端—车 BU」全栈能力的厂商</strong>，外界对它的技术预期很高。<strong>但本报告的证据纪律要求：预期高 ≠ 证据足。</strong> 本次<strong>未取得</strong>任何一手车云授权文档，因此<strong>不得</strong>用「华为全栈能力」的行业印象来填补取证缺口。这一点与 <code>source-dossier.md</code> §0 的告诫完全一致：<strong>「未找到公开来源」= 披露缺口，绝不等于能力缺口（亦不等于能力优势）。</strong></p>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到可验证公开来源</strong></td><td>已检索：Wallet Kit 文档（JS 空壳）；待执行：带 JS 渲染 + 登录抓取、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：开发者站无可达密码学文档；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：商务沙箱</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：T-BOX / 麒麟/鸿蒙安全组件拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：OTA 服务条款、合规声明</td></tr><tr><td>车控 API scope</td><td><strong>未找到公开来源</strong></td><td>已检索：文档 JS 空壳；待执行：登录后抓取</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：无；待执行：鸿蒙座舱 / 华为钱包隐私设置静态分析</td></tr><tr><td>鸿蒙智行专属授权架构</td><td><strong>未找到公开来源</strong></td><td>已检索：无专属文档；待执行：合作车型技术通告、RFI</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 鸿蒙智行合作车型在国内销售并联网；(b) 适用 GB 44495/44496（2026-01-01 强制）与 GB/T 44402.1-2024（数字钥匙参考架构）；(c) 鸿蒙座舱/华为钱包参与钥匙与授权链路。<strong>若鸿蒙智行的车云授权由整车厂（如赛力斯等合作方）自行实现，则「华为侧」与「整车厂侧」的授权边界需要分别评估——本章提示这一边界问题，但不作事实判断。</strong></p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 H-1</strong>：本报告判断（推测，非事实）——<strong>华为的数字车钥匙能力很可能通过「钱包（Wallet）+ 安全芯片」的路径实现</strong>，因为 Wallet Kit 是其开发者文档的一条独立产品线（<code>source-dossier.md</code> §7.9 记载了 Wallet Kit 数字车钥匙文档路径的存在）。<strong>但请注意：本次仅确认了文档路径的存在与 JS 空壳返回，未取得正文，因此「钱包 + 安全芯片」为推测，非事实。</strong> <strong>检验方法</strong>：以带 JS 渲染的抓取并附带开发者登录态重取 Wallet Kit 文档；检索华为钱包对数字车钥匙的支持说明。</p>
+<p><strong>推断 H-2</strong>：本报告判断（推测，非事实）——<strong>华为若参与数字钥匙链路，会面临「GB/T 44402.1-2024 参考架构」与「CCC 数字钥匙」两套体系的适配问题</strong>（§16.5 展开）。GB/T 44402.1 是中国数字钥匙的第 1 部分：参考架构 [A]（<code>source-dossier.md</code> §1.2），而 CCC 3.0 是国际主流实现（§5）。<strong>检验方法</strong>：检索 Wallet Kit 文档中是否引用 GB/T 44402.1 或 CCC；检索华为是否加入 CCC 或参与国标编制。</p>
+<p><strong>推断 H-3</strong>：本报告判断（推测，非事实）——<strong>鸿蒙生态（HarmonyOS）的分布式能力会引入「设备间授权」问题</strong>：手机—车机—手表等设备间的权限传递需要跨设备令牌或凭证。这与 OAuth Token Exchange（RFC 8693，<code>source-dossier.md</code> §2.1）的代理链模型对应。<strong>检验方法</strong>：检索 HarmonyOS 开发者文档中「分布式」相关的权限模型描述（须登录抓取）。</p>
+<p><strong>推断 H-4</strong>：本报告判断（推测，非事实）——<strong>华为若采用自研安全芯片/安全 OS（如 TEE 类），其硬件根信任可能与国密 SM2/SM3/SM4 结合</strong>（§16.1.4）。<strong>但本次未取得任何一手来源</strong>（<code>source-dossier.md</code> §7.10 第 5 条明确九家车企均未取得国密证据），<strong>该推断纯为设计空间假设，不作事实</strong>。<strong>检验方法</strong>：专利检索（华为在车云安全/密钥管理方向）；器件选型逆向（须授权）。</p>
+<p><strong>推断 H-5</strong>：本报告判断（推测，非事实）——<strong>鸿蒙智行作为「生态联盟」模式，其授权治理可能呈现「华为平台 + 合作整车厂」的双主体结构</strong>：平台侧提供座舱 OS 与云底座，整车厂侧掌握车辆身份与车控权限。<strong>这会带来「信任边界的划分」问题</strong>（谁是可授权的车辆资源所有者）。<strong>检验方法</strong>：检索鸿蒙智行合作车型的用户协议/隐私政策中主体划分；检索双方在数据安全责任上的公开表述。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>华为鸿蒙智行已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong>（Wallet Kit 文档路径存在，正文未取到）</td><td>潜在路径为「钱包 + 安全芯片」，未证实</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>未取证</strong></td><td>无法对照；存在「平台 + 整车厂」双主体边界的结构性问题</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计</td><td><strong>观察 [A]：<code>developer.huawei.com/consumer/cn/</code> 可达</strong></td><td>开发者门户存在，车云文档未取到</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>未取证</strong></td><td>无法对照</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> 本次唯一技术观察是文档页的渲染方式（JS 空壳），<strong>它不是安全发现</strong>。本章<strong>不给华为鸿蒙智行车云授权任何严重度评级</strong>。</p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>H-A1</td><td>带 JS 渲染 + 开发者登录态抓取 Wallet Kit 文档</td><td>取得数字车钥匙正文</td></tr><tr><td>H-A2</td><td>检索 HarmonyOS 分布式权限模型文档</td><td>确认跨设备授权机制</td></tr><tr><td>H-A3</td><td>检索华为是否加入/参与 CCC 与数字钥匙国标</td><td>确认适配路线</td></tr><tr><td>H-A4</td><td>专利检索（车云授权 / 密钥管理 / 数字钥匙）</td><td>确认技术路线</td></tr><tr><td>H-A5</td><td>RFI 至华为车 BU / 鸿蒙智行合作方</td><td>获取车云授权架构与信任边界说明</td></tr><tr><td>H-A6</td><td>检索鸿蒙智行合作车型隐私政策主体划分</td><td>确认双主体信任边界</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-18">16.2.7 极氪 ZEEKR</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.9 记录了极氪的取证结果：</p>
+<ul><li><code>open.zeekrlife.com</code> <strong>返回 HTTP 500 空页</strong> —— [A：站点存在，无可用信息]</li><li><code>www.zeekrlife.com</code> 为官网，<strong>但未发现开发者 / 开放平台入口</strong> —— [A：站点存在，无可用信息]</li></ul>
+<p><strong>解读</strong>：</p>
+<ol><li><code>open.zeekrlife.com</code> 返回 <strong>HTTP 500（空页）</strong>。这里必须区分「500 空页」与「403 拒绝服务」：500 是<strong>服务器内部错误</strong>——服务在运行但其处理请求时出错（更可能是后端异常或空配置），<strong>不是访问策略拒绝</strong>。<strong>本报告不推断 500 的成因</strong>（可能是未完成部署、后端依赖故障、或裸域名无内容）。但它同样意味着：<strong><code>open.zeekrlife.com</code> 这个「开放平台」命名的域名在公网上是存在的</strong>（否则会 DNS 失败或返回默认页），只是本次未取到任何内容。</li><li><code>www.zeekrlife.com</code> 为官网 [A]，<strong>未发现开发者入口</strong>。</li></ol>
+<p><strong>交叉意义</strong>：<code>open.zeekrlife.com</code> 的<strong>命名</strong>本身是一条弱信号——它表明极氪<strong>至少在 DNS 层面规划了「open」子域</strong>。<strong>本报告判断（推测，非事实）</strong>：这通常意味着存在（或曾存在）一个面向外部/合作方的开放接口规划。<strong>但这仅为命名层面的观察，不是能力证明。</strong> 使用 <code>zeekrlife.com</code>（而非 <code>zeekr.com</code>）作为域名，也提示其服务品牌的命名体系。</p>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p><strong>本次未取得可用内容</strong>。受限陈述：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>已取证</th><th>性质</th></tr></thead><tbody><tr><td><code>open.zeekrlife.com</code></td><td>[A] HTTP 500 空页</td><td>命名存在，内容不可用（成因为内部错误）</td></tr><tr><td><code>www.zeekrlife.com</code></td><td>[A] 官网</td><td>无开发者入口</td></tr><tr><td>鉴权机制</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>scope 粒度</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>车控 API</td><td>—</td><td><strong>未取得</strong></td></tr></tbody></table></div>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong></td><td>已检索：官网无开发者入口；待执行：官网车型页、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：商务沙箱</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：T-BOX 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：OTA 服务条款、合规声明</td></tr><tr><td>scope 粒度</td><td><strong>未找到公开来源</strong></td><td>已检索：<code>open.zeekrlife.com</code> 500；待执行：换时间窗口重试、商务申请</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：无；待执行：ZEEKR App 隐私设置静态分析</td></tr><tr><td>开放平台内容</td><td><strong>未找到公开来源</strong>（HTTP 500 空页）</td><td>已检索：<code>open.zeekrlife.com</code>；待执行：重复探测（500 可能是瞬态）、ICP 备案</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 极氪在国内销售车型上提供车云能力；(b) 适用 GB 44495/44496（2026-01-01 强制）与数据合规法规（§16.1.3）；(c) <code>open.zeekrlife.com</code> 若代表一个面向合作方的开放接口规划，则其授权设计适用下列推断。</p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 K-1</strong>：本报告判断（推测，非事实）——<strong><code>open.zeekrlife.com</code> 的 HTTP 500 可能是瞬态（未部署完整 / 后端故障），而非永久下线</strong>。HTTP 500 与「域名不存在」不同，它说明服务端在处理请求时遇到了内部错误。<strong>检验方法</strong>：在不同时间窗口重复探测并记录响应码序列（500 恒定 vs 间歇）；检查是否返回 <code>Retry-After</code> 或维护页。</p>
+<p><strong>推断 K-2</strong>：本报告判断（推测，非事实）——极氪若要满足 GB 44495/44496，其车云链路（含自营 App）<strong>必然需要某种鉴权与授权机制</strong>，无论其开放平台是否对外公布。<strong>检验方法</strong>：静态分析 ZEEKR App 的登录与令牌流程（是否出现 <code>access_token</code>/<code>refresh_token</code>/<code>expires_in</code> 等 OAuth 特征字段，对应 RFC 6749 / RFC 6750，<code>source-dossier.md</code> §2.1）。</p>
+<p><strong>推断 K-3</strong>：本报告判断（推测，非事实）——若 <code>open.zeekrlife.com</code> 面向第三方（如充电、售后、保险合作方），其授权模型<strong>可能采用 app-key/secret 类服务集成模型</strong>（类似蔚来 Open NSC 或比亚迪 i迪桥），而<strong>未必是 OAuth 代表车主模型</strong>。<strong>这是一个可被证伪的方向性推测，不是结论。</strong> <strong>检验方法</strong>：取到文档后检查鉴权头名称（如 <code>x-Gateway-APIKey</code> 类）或 OAuth 授权端点。</p>
+<p><strong>推断 K-4</strong>：本报告判断（推测，非事实）——极氪若采用数字钥匙，其安全实现需满足抗复制（涉及硬件根或安全存储）；<strong>本次无一手来源，不作技术断言</strong>。<strong>检验方法</strong>：官网车型页钥匙说明、CCC/FiRa 认证清单、专利检索。</p>
+<p><strong>推断 K-5</strong>：本报告判断（推测，非事实）——极氪作为吉利控股体系内品牌，其车云平台<strong>可能共享集团级云底座</strong>，从而在授权治理上呈现「集团统一 + 品牌定制」的结构（与 §16.3.3 讨论的「集团统一开放平台」治理结构相关）。<strong>本报告不引用任何未取证的合作细节作为事实。</strong> <strong>检验方法</strong>：检索吉利集团层面的云/安全平台公开材料；检索极氪与集团在数据平台上的公开表述。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>极氪已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计</td><td><strong>观察 [A]：<code>open.zeekrlife.com</code> 存在（HTTP 500 空页）</strong></td><td>命名存在，内容不可用</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>未取证</strong></td><td>无法对照</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> HTTP 500 空页是<strong>服务可用性层面的观察</strong>，在<strong>无更多信息时不能判定为安全发现</strong>（可能是部署中间态，也可能是后端故障，且本次未取得任何响应体内容）。本章<strong>不给极氪车云授权任何严重度评级</strong>。特别提示：<strong>不得</strong>将「开放平台域名返回 500」直接解读为「极氪平台不安全」——这是典型的不当推断，违反 §3.2 第 4 条。</p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>K-A1</td><td>多时间窗口重复探测 <code>open.zeekrlife.com</code></td><td>判断 500 是否瞬态</td></tr><tr><td>K-A2</td><td>静态分析 ZEEKR App 登录/令牌流程</td><td>判断是否 OAuth/OIDC</td></tr><tr><td>K-A3</td><td>ICP 备案检索（浙江极氪智能科技等主体）</td><td>发现其他开发者域名</td></tr><tr><td>K-A4</td><td>专利检索（数字钥匙 / 车辆授权）</td><td>确认技术路线</td></tr><tr><td>K-A5</td><td>RFI 至极氪商务/安全团队</td><td>获取开放平台与安全材料</td></tr><tr><td>K-A6</td><td>检索吉利集团云/安全平台公开材料</td><td>确认是否共享集团底座</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-19">16.2.8 比亚迪 BYD（i迪桥开放平台）</h3>
+<blockquote><p><strong>本章证据密度最高的国内车企。</strong> 比亚迪 i迪桥是<strong>本次唯一取得接口级一手取证的中国车企开放平台</strong>（<code>source-dossier.md</code> §7.6 全部 [A]）。但必须<strong>严格守住 §7.10 第 3 条的护栏</strong>：i迪桥是<strong>企业级 ESB/API 网关</strong>，与「车控开放平台 / 车主 API」<strong>不是同一事物</strong>。</p></blockquote>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.6 记录了比亚迪 i迪桥的取证结果（全部 [A]）：</p>
+<ul><li>官方开放平台名为「<strong>i迪桥</strong>」，站点 <code>https://open.byd.com/</code>；首页显示「<strong>12 已上线服务 / 60 服务总系统 / 53.8 亿+ 累计服务请求数</strong>」，<strong>© 2025 比亚迪提供计算服务</strong>，<strong>粤 ICP 备 10216027 号</strong> —— [A]</li><li><strong>鉴权方式为 APIKey（appKey）而非 OAuth</strong>：接口调用文档明确「<strong>用户创建应用 → 审核后生成 appKey 作为调用者身份识别</strong>」、「<strong><code>x-Gateway-APIKey</code>：应用的 appKey，用于调用接口鉴权，传入 Header 头</strong>」 —— <code>https://open.byd.com/platform?id=1848412878248345602</code>（<strong>文档发布 2024-01-23</strong>）—— [A]</li><li>网关示例域名 <strong><code>esb.byd.com.cn</code></strong>（示例 URL <code>https://esb.byd.com.cn/tong/restful/api/mdm07670/package_1</code>），文档注明「<strong>以上示例只作为参考不可实际调用</strong>」 —— 同上 —— [A]</li><li><strong>接入五步流程</strong>：登录平台 → 用户认证（公司/组织认证）→ 应用创建（获取调用 API 唯一凭证）→ 注册/订阅 → 服务访问授权后调试 —— <code>https://open.byd.com/</code> —— [A]</li><li>平台版本公告「<strong>i迪桥平台 3.3.4 版本全面升级</strong>」含 <strong>API 在线导出、API 提供者信息、API 注册暂存</strong> —— <code>https://open.byd.com/notices-details?id=1994268247284723713&amp;toB=1</code> —— [A]</li><li>对接邮箱 <code>openapi@byd.com</code> —— <code>https://open.byd.com/</code> —— [A]</li><li><strong>定位判断</strong>：i迪桥为<strong>企业级 ESB/API 网关</strong>（覆盖<strong>供应链 / 研发 / 智造 / 营销 / 物流 / 品质 / 财务七大领域</strong>），<strong>非车控开放平台</strong>；<strong>未见 mTLS / 国密 / 数字钥匙 / OAuth scope 文档</strong> —— [A，依据平台自述]</li></ul>
+<p><code>source-dossier.md</code> §7.10 第 3 条（<strong>本章必须处理的护栏</strong>）：<strong>比亚迪 i迪桥是企业级 ESB 网关（供应链/研发/智造），与「车控开放平台 / 车主 API」不是同一事物；未见其 OAuth 与数字钥匙能力。报告中必须区分，避免误导向「比亚迪车云授权=APIKey」的过度归纳。</strong></p>
+<h4>(2) 开放平台与开发者授权的实际形态（本章最详实的一手拆解）</h4>
+<h4>2.1 平台定位：企业级 ESB，而非车控云</h4>
+<p>首页数据揭示了 i迪桥的性质：</p>
+<div class="table-wrap"><table><thead><tr><th>首页指标（[A]）</th><th>数值</th><th>语义解读</th></tr></thead><tbody><tr><td>已上线服务</td><td><strong>12</strong></td><td>已上线的 API 服务数量</td></tr><tr><td>服务总系统</td><td><strong>60</strong></td><td>服务系统总数</td></tr><tr><td>累计服务请求数</td><td><strong>53.8 亿+</strong></td><td>说明有实际调用规模（企业侧集成）</td></tr><tr><td>版权</td><td>© 2025 比亚迪提供计算服务</td><td>运营主体为比亚迪</td></tr><tr><td>备案</td><td>粤 ICP 备 10216027 号</td><td>中国境内备案</td></tr></tbody></table></div>
+<p><strong>「12 已上线服务 / 60 服务总系统」的语义</strong>：「服务系统」量级（60）与「已上线服务」（12）的分野，符合<strong>企业内部系统 API 化</strong>的典型形态——即把企业内各业务系统（ERP、MES、SRM、CRM 等）的能力通过网关对外开放。<strong>本报告判断（推测，非事实）</strong>：这与「面向第三方开发者的车控开放平台」是<strong>两种不同的产品</strong>。前者的消费者是同为 B 端的供应商/合作伙伴（对接采购、物流、质保等），后者的消费者可能是第三方应用开发者（代表车主访问车辆）。<strong>比亚迪 i迪桥属于前者。</strong></p>
+<h4>2.2 鉴权形态：APIKey（appKey）+ Header 传递</h4>
+<p>这是本章<strong>唯一的一条国内车企「接口级鉴权头」一手证据</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>要素</th><th>文档明载（[A]）</th></tr></thead><tbody><tr><td>凭证类型</td><td><strong>APIKey（appKey）</strong></td></tr><tr><td>凭证生成</td><td>用户创建应用 → <strong>审核后生成 appKey</strong></td></tr><tr><td>凭证语义</td><td>appKey 作为<strong>调用者身份识别</strong></td></tr><tr><td>鉴权头名</td><td><strong><code>x-Gateway-APIKey</code></strong></td></tr><tr><td>传递位置</td><td><strong>Header 头</strong></td></tr><tr><td>文档发布时间</td><td><strong>2024-01-23</strong></td></tr></tbody></table></div>
+<p><strong>工程解读（本报告判断，推测，非事实）</strong>：<code>x-Gateway-APIKey</code> 这种「自定义 <code>x-</code> 前缀 + 网关（Gateway）语义」的鉴权头，是<strong>API 网关产品的常见模式</strong>：网关在入口校验 <code>x-Gateway-APIKey</code>，把 appKey 映射到某个已订阅的应用/租户，再决定放行哪些服务。<strong>它的授权粒度是「应用—服务订阅」级，而非「资源实例」级</strong>——也就是说，识别的是「哪个应用在调用哪个服务」，而不是「该应用是否有权访问某一辆具体车辆」。<strong>这是 ESB 场景的特征，也是与 OAuth + 资源级策略（RFC 9396 / RFC 8705，<code>source-dossier.md</code> §2.1）在模型上的根本差异。</strong></p>
+<p><strong>与 OAuth 的对照（本报告判断，推测，非事实）</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>i迪桥 APIKey（[A] 事实）</th><th>OAuth 授权码（[A] 规范，Tesla/Mercedes 为公开实例）</th></tr></thead><tbody><tr><td>身份对象</td><td><strong>应用（调用者）</strong></td><td>可达「用户 + 应用」双身份</td></tr><tr><td>凭证形态</td><td>静态 APIKey（可长期不变）</td><td>短期 access_token + 一次性 refresh_token</td></tr><tr><td>授权粒度</td><td>应用—服务订阅</td><td>scope + 资源级策略</td></tr><tr><td>逐车主同意</td><td>不涉及（B 端场景）</td><td>有（<code>code</code> 换 token 前的同意界面）</td></tr><tr><td>吊销/轮换</td><td>未见文档（<strong>未取证</strong>）</td><td>规范定义（RFC 7009 吊销，<code>source-dossier.md</code> §2.1）</td></tr></tbody></table></div>
+<blockquote><p><strong>上表右列的「规范」部分来自 <code>source-dossier.md</code> §2.1 的 RFC 一手条目；「Tesla/Mercedes 实例」来自 §7.1 / §7.2 的一手文档。本表用于说明「两种模型的结构差异」，不用于评价优劣。</strong></p></blockquote>
+<h4>2.3 网关与接口命名</h4>
+<ul><li>示例网关域名：<strong><code>esb.byd.com.cn</code></strong> [A]。<strong>「esb」即 Enterprise Service Bus（企业服务总线）</strong>，这一命名本身支持「企业级集成」的定位判断。</li><li>示例路径：<code>/tong/restful/api/mdm07670/package_1</code> [A]——含 <code>mdm</code> 字样（主数据管理，Master Data Management 的常见缩写）。<strong>本报告判断（推测，非事实）</strong>：<code>mdm07670</code> 可能是主数据类接口编号。<strong>但本报告不据此断言接口语义</strong>——文档已明确「以上示例只作为参考不可实际调用」。</li><li><strong>文档明载「以上示例只作为参考不可实际调用」</strong> —— [A]。这是一条重要的一手事实：<strong>比亚迪主动声明示例 URL 不可调用</strong>，这本身是一个合理的接口文档治理实践（防止示例被滥用）。</li></ul>
+<h4>2.4 接入五步流程（一手拆解）</h4>
+<p>文档明载的五步（[A]）：</p>
+<pre><code>① 登录平台
+      ↓
+② 用户认证（公司 / 组织认证）       ← 强调「组织」身份，非个人
+      ↓
+③ 应用创建（获取调用 API 唯一凭证）  ← 生成 appKey
+      ↓
+④ 注册 / 订阅                      ← 服务订阅（应用 ↔ 服务）
+      ↓
+⑤ 服务访问授权后调试               ← 授权后进入调试</code></pre>
+<p><strong>这五步揭示的授权治理特征（本报告判断，推测，非事实）</strong>：</p>
+<ul><li><strong>「公司/组织认证」（②）</strong> 说明接入主体是<strong>组织</strong>而非个人开发者——这进一步确认 i迪桥的 B 端定位。</li><li><strong>「应用创建 → 唯一凭证」（③）</strong> 说明凭证是<strong>应用级</strong>的（一个应用一个 appKey）。</li><li><strong>「注册/订阅」（④）+「授权后调试」（⑤）</strong> 说明存在一个<strong>「订阅—授权」两段式流程</strong>：应用先订阅服务，再由平台侧授权，授权通过后才可调试。<strong>这是「人工审核 + 订阅授权」的治理模型</strong>，与 OAuth 的自助式授权码流不同。</li></ul>
+<h4>2.5 平台版本与治理能力</h4>
+<p>「i迪桥平台 3.3.4 版本全面升级」公告含 [A]：</p>
+<ul><li><strong>API 在线导出</strong> —— 支持导出 API 定义（便于离线集成）。</li><li><strong>API 提供者信息</strong> —— 标注 API 的提供方（<strong>本报告判断，推测，非事实</strong>：这在多系统接入的 ESB 中用于溯源与责任划分）。</li><li><strong>API 注册暂存</strong> —— 注册草稿能力（降低误发布风险）。</li></ul>
+<p><strong>本报告判断（推测，非事实）</strong>：这三项升级（导出 / 提供者信息 / 注册暂存）都属于<strong>API 治理（API Governance）</strong>范畴，支持「这是一套企业级 API 生命周期治理平台」的判断。</p>
+<h4>2.6 严格区分：不把 i迪桥外推为「比亚迪车云授权」</h4>
+<p><strong>这是本节最重要的写作纪律声明。</strong> <code>source-dossier.md</code> §7.10 第 3 条明确要求：<strong>报告的读者不得从「i迪桥用 APIKey」推出「比亚迪车云授权 = APIKey」。</strong> 理由有三：</p>
+<ol><li><strong>业务域不同</strong>：i迪桥覆盖供应链/研发/智造/营销/物流/品质/财务 [A]，<strong>不覆盖车控/车主数据</strong>。</li><li><strong>消费者不同</strong>：i迪桥面向企业/组织（②）[A]，<strong>不面向车主或第三方车控应用</strong>。</li><li><strong>文档范围不同</strong>：i迪桥文档<strong>未见 OAuth scope / 数字钥匙 / mTLS / 国密</strong>[A，依据平台自述的空缺]——<strong>「未见」是取证结果，不是「不存在」。</strong></li></ol>
+<p>因此，本节对<strong>比亚迪车控/车主授权</strong>的结论是：<strong>本次未找到公开来源，不等同于能力缺失。</strong> 这一区分必须贯穿全章。</p>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong>（i迪桥文档无）</td><td>已检索：<code>open.byd.com</code>；待执行：比亚迪车型页、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：i迪桥文档无密码学章节；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：i迪桥文档无 mTLS；待执行：商务沙箱（须授权）</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：i迪桥文档无硬件章节；待执行：T-BOX 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：i迪桥无 OTA 文档；待执行：OTA 服务条款、GB 44496 合规声明</td></tr><tr><td>OAuth scope</td><td><strong>未找到公开来源</strong>（i迪桥为 APIKey）</td><td>已检索：i迪桥文档；待执行：验证是否存在面向车主的独立授权服务器</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：i迪桥为 B 端，无同意界面；待执行：比亚迪 App 隐私设置静态分析</td></tr><tr><td>车控/车主开放平台</td><td><strong>未找到公开来源</strong>（i迪桥非车控）</td><td>已检索：<code>open.byd.com</code>；待执行：ICP 备案、命名探测、RFI</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 比亚迪在国内销售车型上提供车控/车主数据能力；(b) 若向第三方开放，适用 GB 44495/44496（2026-01-01 强制）与数据合规法规（§16.1.3）；(c) i迪桥的现有 ESB 能力可作为<strong>工程组织基础</strong>（但业务域不同，不可直接复用授权模型）。</p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 B-1</strong>：本报告判断（推测，非事实）——<strong>若比亚迪开放车控/车主数据 API，其授权模型很可能不会复用 i迪桥的 APIKey 模型</strong>，因为车控涉及车主个人数据与物理安全，需要「代表车主行事」的授权语义（OAuth 授权码流，RFC 6749；资源级授权 RFC 9396）。<strong>但这是一个方向性推测，不是事实。</strong> <strong>检验方法</strong>：探测 <code>open.byd.com</code> 之外是否存在面向车主的授权端点（如 <code>auth.byd.com</code> / <code>*.byd.com</code> 的 <code>.well-known/openid-configuration</code>）；商务渠道核实。</p>
+<p><strong>推断 B-2</strong>：本报告判断（推测，非事实）——<strong>i迪桥的「网关 + 订阅授权」架构说明比亚迪已具备企业级 API 治理的组织能力</strong>，这会<strong>降低</strong>其推出车控开放平台的工程门槛（网关、应用管理、订阅授权、版本治理已在位）。<strong>检验方法</strong>：核实 i迪桥的网关产品来源；观察其是否扩展出面向车主的服务目录。</p>
+<p><strong>推断 B-3</strong>：本报告判断（推测，非事实）——<strong><code>x-Gateway-APIKey</code> 的 Header 鉴权若用于车云链路，将面临「凭证长期不变 + 无资源级粒度」的风险面</strong>；因此若比亚迪把 APIKey 模型延伸到车控，<strong>本报告判断</strong>其更可能叠加额外控制（如请求签名、时间戳、mTLS）。<strong>再次强调：这是基于模型的推断，非事实——dossier 未记载比亚迪车控链路的任何鉴权细节。</strong> <strong>检验方法</strong>：取到车控接口文档后检查是否含签名/时间戳/双向证书要求；对照 RFC 3161（时间戳）与 RFC 8705（mTLS 绑定，<code>source-dossier.md</code> §3/§2.1）。</p>
+<p><strong>推断 B-4</strong>：本报告判断（推测，非事实）——i迪桥示例 URL 中的 <code>mdm</code> 段提示其接入了<strong>主数据管理</strong>类接口，<strong>这类接口在车云场景中可能与「车辆主数据 / 用户主数据」相关</strong>——但这只是命名观察，<strong>本报告不据此断言比亚迪车控数据经 i迪桥流转</strong>。<strong>检验方法</strong>：ICP 与招投标信息检索；核实 i迪桥服务目录是否含车辆/车主域。</p>
+<p><strong>推断 B-5</strong>：本报告判断（推测，非事实）——比亚迪若需满足 GB/T 47467-2026（车联网安全管理接口规范），其<strong>安全管理接口很可能与业务 API 网关（i迪桥）分离</strong>，形成「业务面 + 管理面」双面结构（§16.5/16.4 展开）。<strong>检验方法</strong>：探测是否存在独立的管理接口域名与文档；检索比亚迪安全运营中心（SOC）公开材料。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>比亚迪已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong>（i迪桥文档未见 mTLS/国密）</td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>[A] APIKey（appKey）+ <code>x-Gateway-APIKey</code> Header</strong>（企业级 ESB）</td><td><strong>结构性差异</strong>：应用级凭证、订阅授权；<strong>非</strong> OAuth 车主授权；<strong>不得</strong>外推为车云授权模型</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计 + 生命周期治理</td><td><strong>[A] <code>esb.byd.com.cn</code> 网关；五步接入；3.3.4 版本（API 导出/提供者信息/注册暂存）</strong></td><td><strong>企业级 API 治理能力已确证</strong>（B 端域）</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>未取证</strong></td><td>无法对照</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>就 i迪桥已取证事实本身：无法判定风险等级（无授权漏洞证据）。</strong> 但本节可以给出<strong>一条模型层面的中性观察</strong>（不作为对比亚迪的评级）：</p>
+<ul><li><strong><code>x-Gateway-APIKey</code> 若作为长期静态凭证</strong>，其风险面在于「凭证泄露后的滥用与横向影响」。按 <code>00-engagement-plan.md</code> §3.3，「单一凭证被攻破可横向影响同账号其他租户」属 <strong>High</strong> 判据；「令牌生命周期管理不当（长效、无轮换、无吊销）」属 <strong>Medium</strong> 判据。<strong>但本报告的关键限制是：dossier 未记载 i迪桥 appKey 的有效期、轮换与吊销机制</strong>——因此<strong>本章不给出 i迪桥的严重度评级</strong>，只把它作为「工程实现参考」中的<strong>控制清单对象</strong>（对应 §3.3 Medium 处理方式：归入控制清单而非风险结论）。<strong>检验方法</strong>：商务渠道核实 appKey 的轮换/吊销策略。</li></ul>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>B-A1</td><td>商务渠道申请 i迪桥沙箱（<code>openapi@byd.com</code>）</td><td>实测 appKey 生命周期、是否叠加签名/mTLS</td></tr><tr><td>B-A2</td><td>探测 <code>*.byd.com</code> 的 <code>.well-known</code> 授权元数据</td><td>判断是否存在 OAuth/OIDC 车云授权</td></tr><tr><td>B-A3</td><td>RFI 至比亚迪信息安全团队</td><td>获取车云/车控授权架构与安全白皮书</td></tr><tr><td>B-A4</td><td>专利检索（数字钥匙 / 车云授权 / 密钥管理）</td><td>确认技术路线</td></tr><tr><td>B-A5</td><td>T-BOX / 数字钥匙模块拆解（须授权）</td><td>确认 SE/TEE/HSM 硬件根</td></tr><tr><td>B-A6</td><td>招投标与备案信息检索</td><td>确认安全管理接口、云平台供应商</td></tr><tr><td>B-A7</td><td>比亚迪 App 隐私与授权设置静态分析</td><td>确认逐车主同意界面</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-20">16.2.9 奇瑞 Chery</h3>
+<h4>(1) 已取证的公开事实</h4>
+<p><code>source-dossier.md</code> §7.9 记录了奇瑞的取证结果：</p>
+<ul><li>官网设「<strong>网络产品安全漏洞</strong>」专栏 <code>https://www.chery.cn/others/networksecurity/</code> —— [A，页面可达]</li><li><code>developer.chery.cn</code>、<code>open.chery.cn</code> <strong>无 DNS</strong> —— [未找到公开来源]</li></ul>
+<p><strong>解读</strong>：</p>
+<ol><li><strong>「网络产品安全漏洞」专栏是奇瑞本次唯一可确证的「安全治理载体」</strong>[A]。它的存在说明：奇瑞<strong>建立了公开的漏洞接收/披露入口</strong>。<strong>本报告判断（推测，非事实）</strong>：这类专栏通常承载「漏洞报告指引、SRC（安全应急响应中心）说明、致谢名单」等内容，是<strong>安全治理成熟度的一个正向信号</strong>（有对外协作渠道）。<strong>但本次未取到该专栏的具体内容</strong>，因此<strong>不能</strong>据此断言其漏洞披露政策的具体条款、是否提供赏金、响应时限等。<strong>这与 <code>source-dossier.md</code> §7.1 中 Tesla 的 Bugcrowd 页（含明确赏金档位与规则）在证据深度上</strong>差距明显**：Tesla 是 [A/B] 的详细规则页，奇瑞仅确认「专栏存在」。</li><li><code>developer.chery.cn</code>、<code>open.chery.cn</code> <strong>无 DNS</strong>[未找到公开来源]——与零跑、理想的情况相同。<strong>不得据此推断奇瑞无开放平台。</strong></li></ol>
+<p><strong>方法论提示（适用于本章全部九家）</strong>：奇瑞这条证据说明——<strong>「安全治理载体存在」与「授权技术机制可取证」是两件不同的事</strong>。有漏洞专栏 ≠ 有公开的授权架构文档；反之，无公开授权文档 ≠ 无授权机制。本章始终把这两者分开记录。</p>
+<h4>(2) 开放平台与开发者授权的实际形态</h4>
+<p><strong>本次未取得任何关于奇瑞开放平台鉴权机制的一手文档</strong>。可确证的：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>已取证</th><th>性质</th></tr></thead><tbody><tr><td>漏洞披露入口</td><td>[A] <code>https://www.chery.cn/others/networksecurity/</code> 页面可达</td><td><strong>安全治理载体存在</strong>（内容未取到）</td></tr><tr><td>开放平台</td><td>[未找到公开来源] <code>developer.chery.cn</code>、<code>open.chery.cn</code> 无 DNS</td><td>命名未命中</td></tr><tr><td>鉴权机制</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>scope 粒度</td><td>—</td><td><strong>未取得</strong></td></tr><tr><td>车控 API</td><td>—</td><td><strong>未取得</strong></td></tr></tbody></table></div>
+<h4>(3) 缺失方向清单</h4>
+<div class="table-wrap"><table><thead><tr><th>缺失方向</th><th>本次检索结果</th><th>检索动作（已执行 / 待执行）</th></tr></thead><tbody><tr><td>数字钥匙</td><td><strong>未找到公开来源</strong></td><td>已检索：<code>www.chery.cn</code> 无开发者入口；待执行：官网车型页、CCC 认证清单</td></tr><tr><td>国密 SM2/SM3/SM4</td><td><strong>未找到公开来源</strong></td><td>已检索：无技术文档；待执行：RFI、安全白皮书</td></tr><tr><td>mTLS / 双向证书</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：商务沙箱</td></tr><tr><td>HSM / SE / TEE</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：T-BOX 拆解、专利检索</td></tr><tr><td>OTA 安全</td><td><strong>未找到公开来源</strong></td><td>已检索：无可达文档；待执行：OTA 服务条款、合规声明</td></tr><tr><td>scope 粒度</td><td><strong>未找到公开来源</strong></td><td>已检索：无开放平台；待执行：商务申请</td></tr><tr><td>逐车主同意界面</td><td><strong>未找到公开来源</strong></td><td>已检索：无；待执行：奇瑞 App 隐私设置静态分析</td></tr><tr><td>漏洞披露政策细节</td><td><strong>未找到公开来源</strong>（仅确认专栏存在）</td><td>已检索：专栏 URL 可达；待执行：取专栏正文、SRC 说明、致谢页</td></tr></tbody></table></div>
+<h4>(4) 基于国标与技术路线的设计空间分析（全部为推测）</h4>
+<p><strong>前置条件</strong>：以下分析成立的前提是——(a) 奇瑞在国内销售车型上提供车云能力；(b) 适用 GB 44495/44496（2026-01-01 强制）与数据合规法规（§16.1.3）；(c) 若奇瑞未来向第三方开放数据/车控 API，则其授权设计适用下列推断。</p>
+<p><strong>可检验的推断</strong>：</p>
+<p><strong>推断 C-1</strong>：本报告判断（推测，非事实）——<strong>奇瑞已建立对外漏洞披露入口（[A] 专栏存在）</strong>，说明其<strong>具备安全事件响应与外部协作的组织通道</strong>；这会降低其推出开放平台时「漏洞响应能力不足」的组织风险。<strong>检验方法</strong>：取到专栏正文，核查是否含 SRC 规则、响应时限、致谢名单（对照 Tesla Bugcrowd 规则页的结构，<code>source-dossier.md</code> §7.1）。</p>
+<p><strong>推断 C-2</strong>：本报告判断（推测，非事实）——奇瑞若要满足 GB 44495/44496，其车云链路（含自营 App）<strong>必然需要鉴权与授权机制</strong>，无论开放平台是否公开。<strong>检验方法</strong>：静态分析奇瑞 App 的登录与令牌流程（是否出现 OAuth 特征字段）。</p>
+<p><strong>推断 C-3</strong>：本报告判断（推测，非事实）——奇瑞作为出口量较大的中国品牌，其车云平台<strong>可能同时面临「国内数据本地化」与「海外市场数据合规」双重约束</strong>，从而在授权/数据边界上出现「地域分区」设计。<strong>本报告不引用任何未取证的市场数据作为事实</strong>，此处仅作方向性提示。<strong>检验方法</strong>：检索奇瑞隐私政策中数据地域条款；检索其海外市场（如有）的数据处理说明。</p>
+<p><strong>推断 C-4</strong>：本报告判断（推测，非事实）——奇瑞若采用数字钥匙，其安全实现需涉及硬件根或安全存储；<strong>本次无一手来源，不作技术断言</strong>。<strong>检验方法</strong>：官网车型页钥匙说明、CCC/FiRa 认证清单、专利检索。</p>
+<p><strong>推断 C-5</strong>：本报告判断（推测，非事实）——奇瑞若需满足 GB/T 47324-2026（车联网平台网络安全防护要求），其云侧<strong>大概率存在平台级防护与授权治理</strong>（网关、日志、权限管理）；<strong>本次无一手证据</strong>。<strong>检验方法</strong>：RFI；检索云服务供应商案例；检索其安全资质。</p>
+<h4>(5) 与通用分层方案的异同（逐层对照）</h4>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>通用分层方案（基准）</th><th>奇瑞已取证事实 / 未取证</th><th>差异点</th></tr></thead><tbody><tr><td>L1 硬件根信任</td><td>HSM/SE/TEE</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L2 通信安全</td><td>TLS/mTLS + 证书体系</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L3 授权与访问控制</td><td>OAuth 授权码 + scope + 逐车主同意</td><td><strong>未取证</strong></td><td>无法对照</td></tr><tr><td>L4 应用与平台</td><td>API 网关 + 审计 + 漏洞披露</td><td><strong>[A] 官网「网络产品安全漏洞」专栏存在（内容未取到）</strong></td><td><strong>漏洞披露载体存在</strong>，授权治理细节未知</td></tr><tr><td>L5 生命周期与合规</td><td>OTA 安全 + 数据合规</td><td><strong>未取证</strong></td><td>无法对照</td></tr></tbody></table></div>
+<h4>(6) 风险与严重度</h4>
+<p><strong>无法判定：无公开证据。</strong> 奇瑞本次唯一的一手证据是<strong>漏洞披露专栏的存在</strong>——这是<strong>正向</strong>的安全治理信号，但<strong>不构成对授权安全的风险或评级依据</strong>。本章<strong>不给奇瑞车云授权任何严重度评级</strong>。</p>
+<h4>(7) 待补证动作</h4>
+<div class="table-wrap"><table><thead><tr><th>序号</th><th>补证动作</th><th>目标</th></tr></thead><tbody><tr><td>C-A1</td><td>取「网络产品安全漏洞」专栏正文</td><td>确认漏洞披露政策、SRC 规则、响应时限</td></tr><tr><td>C-A2</td><td>ICP 备案检索（奇瑞汽车股份有限公司等主体）</td><td>发现可能的开发者域名</td></tr><tr><td>C-A3</td><td>静态分析奇瑞 App 登录/令牌流程</td><td>判断是否 OAuth/OIDC</td></tr><tr><td>C-A4</td><td>专利检索（数字钥匙 / 车辆授权 / 车云安全）</td><td>确认技术路线</td></tr><tr><td>C-A5</td><td>RFI 至奇瑞信息安全团队</td><td>获取车云授权架构与安全白皮书</td></tr><tr><td>C-A6</td><td>检索奇瑞出口市场数据合规说明</td><td>确认地域分区边界</td></tr></tbody></table></div>
+<hr>
+<h3 id="sec-21">16.2.10 九家小结（事实密度对照）</h3>
+<p>把九家车企的<strong>已取证事实</strong>并排，可以看出本章最重要的结构性结论：<strong>九家在「授权与访问控制」切面上的公开一手证据呈极端不均分布。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>车企</th><th>授权切面一手证据</th><th>证据性质</th><th>可否据以描述「授权形态」</th></tr></thead><tbody><tr><td>比亚迪</td><td><strong>[A] APIKey（<code>x-Gateway-APIKey</code>）</strong></td><td>企业级 ESB</td><td><strong>可</strong>（但仅限 B 端 ESB 域，不可外推车控）</td></tr><tr><td>蔚来</td><td><strong>[A] app-id + secret 双凭证</strong></td><td>服务云（2019 时效）</td><td><strong>可</strong>（但仅限服务云，不代表当前架构）</td></tr><tr><td>小米</td><td>无车云授权证据；<strong>[A] IoT 平台（面向模组）+ ISO 27001</strong></td><td>IoT 平台 + 管理体系认证</td><td><strong>不可</strong>（不得以 IoT 平台外推车云）</td></tr><tr><td>小鹏</td><td><strong>未取证（403）</strong></td><td>—</td><td><strong>不可</strong></td></tr><tr><td>理想</td><td><strong>未取证（域名无 DNS）</strong></td><td>—</td><td><strong>不可</strong></td></tr><tr><td>零跑</td><td><strong>未取证（域名无 DNS）</strong></td><td>—</td><td><strong>不可</strong></td></tr><tr><td>华为鸿蒙智行</td><td><strong>未取证（文档 JS 空壳）</strong></td><td>—</td><td><strong>不可</strong></td></tr><tr><td>极氪</td><td><strong>未取证（HTTP 500 空页）</strong></td><td>—</td><td><strong>不可</strong></td></tr><tr><td>奇瑞</td><td><strong>未取证（无开放平台入口）</strong></td><td>—</td><td><strong>不可</strong></td></tr></tbody></table></div>
+<p><strong>结论</strong>：<strong>九家中，本次只有两家（比亚迪、蔚来）取得了可据以描述授权形态的一手证据，且两家均为非 OAuth 体系（APIKey / app-id+secret），均属「服务级」而非「车控级」开放。</strong> 这不是「国内车企都不做车控开放」的结论——<strong>它是本次取证的横截面，不是技术能力排名。</strong>（详见 16.3.2 的阶段判断说明。）</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-22">
+  <div class="sec-head"><span class="sec-badge">04</span><h2>16.3 国内车企横向对比</h2></div>
+<p>本节把 16.2 的逐家结果横向拉平，做三件事：(1) 授权形态对比矩阵；(2) 从「服务云开放」到「车控开放」的演进阶段判断；(3) 中国企业常见的三类授权治理结构与其信任边界差异。</p>
+<h3 id="sec-23">16.3.1 授权形态对比矩阵（9 家 × 7 列）</h3>
+<p><strong>填表纪律</strong>：每格只填<strong>已取证</strong>的内容；未取证一律写「未取证」；推测一律写「推测」并单独标注。证据等级列给出该行<strong>最高</strong>的证据等级。</p>
+<div class="table-wrap"><table><thead><tr><th>车企</th><th>① 是否公开开发者平台</th><th>② 鉴权形态</th><th>③ 是否 OAuth</th><th>④ scope 粒度</th><th>⑤ 是否逐车主同意</th><th>⑥ 证据等级</th><th>⑦ 备注</th></tr></thead><tbody><tr><td><strong>蔚来</strong></td><td>是（Open NSC，服务云；文档 2019）</td><td><strong>app-id + secret 双凭证</strong></td><td><strong>否</strong></td><td>未取证（非 OAuth，无 scope）</td><td>未取证</td><td><strong>[A]</strong></td><td>文档访问需 token；不含车控</td></tr><tr><td><strong>小鹏</strong></td><td>未取证（<code>open.xiaopeng.com</code> 403）</td><td>未取证</td><td>未取证</td><td>未取证</td><td>未取证</td><td><strong>[A：403 观测]</strong></td><td>站点存在但拒访</td></tr><tr><td><strong>理想</strong></td><td>未取证（两域名无 DNS）</td><td>未取证</td><td>未取证</td><td>未取证</td><td>未取证</td><td><strong>[A]</strong>（仅隐私政策）</td><td>隐私政策生效 2026-01-22</td></tr><tr><td><strong>小米</strong></td><td>是（IoT 平台；<strong>非车云</strong>）</td><td>未取证（车云）；IoT 平台面向模组</td><td>未取证</td><td>未取证</td><td>未取证</td><td><strong>[A]</strong>（ISO 27001 编号）</td><td>不得以 IoT 外推车云</td></tr><tr><td><strong>零跑</strong></td><td>未取证（三域名无 DNS）</td><td>未取证</td><td>未取证</td><td>未取证</td><td>未取证</td><td>未找到公开来源</td><td>—</td></tr><tr><td><strong>华为鸿蒙智行</strong></td><td>未取证（Wallet Kit 文档 JS 空壳）</td><td>未取证</td><td>未取证</td><td>未取证</td><td>未取证</td><td>[未验证]</td><td>双主体边界问题</td></tr><tr><td><strong>极氪</strong></td><td>未取证（<code>open.zeekrlife.com</code> HTTP 500）</td><td>未取证</td><td>未取证</td><td>未取证</td><td>未取证</td><td><strong>[A：500 观测]</strong></td><td>命名存在，内容不可用</td></tr><tr><td><strong>比亚迪</strong></td><td>是（i迪桥；<strong>企业级 ESB，非车控</strong>）</td><td><strong>APIKey（appKey）+ <code>x-Gateway-APIKey</code></strong></td><td><strong>否</strong></td><td>未取证（无 OAuth scope）</td><td>未取证（B 端场景）</td><td><strong>[A]</strong></td><td>覆盖七大企业领域</td></tr><tr><td><strong>奇瑞</strong></td><td>未取证（两域名无 DNS）</td><td>未取证</td><td>未取证</td><td>未取证</td><td>未取证</td><td><strong>[A]</strong>（仅漏洞专栏）</td><td>漏洞专栏存在</td></tr></tbody></table></div>
+<p><strong>阅读这张矩阵的四个要点</strong>：</p>
+<ol><li><strong>「是否公开开发者平台」列有 3 个「是」，但性质完全不同</strong>：蔚来是<strong>服务云</strong>（一键加电/维保等），比亚迪是<strong>企业级 ESB</strong>（供应链/研发/智造等），小米是<strong>IoT 模组平台</strong>。<strong>没有一家是「面向第三方车控应用的开放平台」</strong>——但请注意，这是<strong>本次取证横截面</strong>的结论（见 16.3.2 声明），不是「国内无车控开放」的结论。</li><li><strong>「是否 OAuth」列全部为「否」或「未取证」</strong>：两家有取证的企业（蔚来、比亚迪）均<strong>明确不是 OAuth</strong>（app-id+secret / APIKey）。这与国际对照样本形成鲜明对比——<code>source-dossier.md</code> §7.1 Tesla 与 §7.2 Mercedes-Benz 均为 OAuth 授权码流 [A]。</li><li><strong>「scope 粒度」列全为「未取证」</strong>：本次<strong>未取得任何一家国内车企的 scope 清单</strong>。这是本章最大的单一缺口。</li><li><strong>「是否逐车主同意」列全为「未取证」</strong>：这是<strong>授权合规意义上最关键的一列</strong>（§16.1.3 要求可追溯的同意），本次<strong>九家全部未取得证据</strong>。</li></ol>
+<blockquote><p><strong>矩阵的中立性声明</strong>：本矩阵的「未取证」密集分布<strong>不代表国内车企授权能力弱</strong>。它反映的是：<strong>（a）本次无开放检索能力（§16.0.2）；（b）国内车企的授权文档多为商务定向提供而非公开；（c）中文技术文档常托管在需登录/微信/飞书等本次不可达环境。</strong> 任何把本矩阵当作「能力排名」的用法都是对本章的误读。</p></blockquote>
+<h3 id="sec-24">16.3.2 从「服务云开放」到「车控开放」的演进阶段判断</h3>
+<p><strong>方法论前置声明（极重要）</strong>：本小节把车企放入 4 个阶段，<strong>目的是给「取证横截面」一个结构化坐标，不是给车企排技术能力。</strong> 阶段归属<strong>只依据已取证事实</strong>；无证据者一律归入「未取证」而非「落后」。</p>
+<p><strong>四阶段模型（本报告提出的分析框架，属 [合理推测] 框架）</strong>：</p>
+<pre><code>阶段 0  无开放平台
+        —— 无对外接口；仅自营 App ↔ 车云 ↔ 车端
+
+阶段 1  服务云开放（app-id + secret / APIKey）
+        —— 开放「服务履约类」接口（加电、维保、物流…）
+        —— 身份对象 = 合作方应用；无车主同意语义
+
+阶段 2  数据开放（OAuth 授权码）
+        —— 开放「车主数据」接口，以 OAuth 代表车主行事
+        —— 身份对象 = 车主 + 应用；有同意界面与 scope
+
+阶段 3  车控开放（OAuth + 资源级 + 虚拟密钥）
+        —— 开放「车辆控制」接口，需资源级策略 + 密钥绑定
+        —— 对应 RFC 9396（结构化权限）+ RFC 8705（证书绑定令牌）
+          + Tesla 虚拟密钥模型（source-dossier.md §7.1 实例）</code></pre>
+<p><strong>九家车企的阶段归属（仅依据已取证事实）</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>车企</th><th>阶段归属（依据取证）</th><th>依据</th><th>说明</th></tr></thead><tbody><tr><td>比亚迪</td><td><strong>阶段 1（服务层 ESB）</strong></td><td>[A] i迪桥 APIKey，七大企业领域</td><td><strong>企业级 ESB 是「服务云开放」的一种形态</strong>（B 端）</td></tr><tr><td>蔚来</td><td><strong>阶段 1（服务云）</strong></td><td>[A] app-id+secret，服务云业务</td><td>文档 2019 时效，不代表当前</td></tr><tr><td>小米</td><td><strong>无法归属</strong>（IoT 平台是产品级，非车云）</td><td>[A] IoT 平台面向模组厂商</td><td>车云阶段未取证</td></tr><tr><td>小鹏</td><td><strong>未取证</strong></td><td>403</td><td>不归入任何阶段</td></tr><tr><td>理想</td><td><strong>未取证</strong></td><td>域名无 DNS</td><td>不归入任何阶段</td></tr><tr><td>零跑</td><td><strong>未取证</strong></td><td>域名无 DNS</td><td>不归入任何阶段</td></tr><tr><td>华为鸿蒙智行</td><td><strong>未取证</strong></td><td>文档 JS 空壳</td><td>不归入任何阶段</td></tr><tr><td>极氪</td><td><strong>未取证</strong></td><td>HTTP 500</td><td>不归入任何阶段</td></tr><tr><td>奇瑞</td><td><strong>未取证</strong></td><td>无开放平台入口</td><td>不归入任何阶段</td></tr></tbody></table></div>
+<p><strong>本报告判断（推测，非事实）</strong>：<strong>从本报告掌握的国际一线样本（Tesla 阶段 3、Mercedes-Benz 阶段 2，均为 [A]）与传统车企的公开表现看，中国市场大概率也存在阶段 2/3 的实践</strong>——理由是 GB 44495/44496 于 2026-01-01 强制适用（§16.1.1），而车控开放若存在，其授权必然要满足该强制性要求。<strong>但本次取证完全没有触达这一层，因此结论只能是「未取证」。</strong> 这是本章贯穿始终的「取证边界」纪律。</p>
+<p><strong>阶段演进的三条可检验推断（均标推测）</strong>：</p>
+<ul><li><strong>推断 S-1（本报告判断，推测，非事实）</strong>：中国车企若从阶段 1 走向阶段 2/3，<strong>最可能的路径是「先服务云（B 端）→ 后车主数据（C 端）」</strong>，因为 B 端服务云的合规压力（无个人数据）小于 C 端车主数据（涉及个人信息与重要数据）。<strong>检验方法</strong>：跟踪各车企开放平台的服务目录是否从「履约类」扩展到「数据/车控类」。</li><li><strong>推断 S-2（本报告判断，推测，非事实）</strong>：阶段 2/3 的实现<strong>大概率会引入 OAuth 授权码流</strong>（因需要「代表车主行事」语义），这与阶段 1 的 app-key 模型有本质区别。<strong>检验方法</strong>：探测车企域名下的 <code>.well-known/oauth-authorization-server</code>（RFC 8414）。</li><li><strong>推断 S-3（本报告判断，推测，非事实）</strong>：阶段 3（车控开放）<strong>大概率会引入「密钥绑定令牌」或「虚拟密钥」类机制</strong>（RFC 8705 / DPoP RFC 9449，或 Tesla 式虚拟密钥），因为纯 Bearer 令牌无法满足车控的持有者约束需求。<strong>检验方法</strong>：检索车企是否有 <code>.well-known/appspecific/*.pem</code> 类的公钥托管路径（Tesla 用此模式，<code>source-dossier.md</code> §7.1）。</li></ul>
+<h3 id="sec-25">16.3.3 中国企业常见的三类授权治理结构（推演）</h3>
+<blockquote><p><strong>本节全部为推演（[合理推测]）</strong>，目的是为后续 RFI 提供「组织假设」。<strong>本节不对应任何单一车企的已取证事实</strong>，不得用于描述任何具体企业的实际组织结构。</p></blockquote>
+<p><strong>结构 A：集团统一开放平台</strong></p>
+<ul><li><strong>形态</strong>：由集团层面建设统一身份与开放平台，各品牌/子品牌接入。</li><li><strong>信任边界</strong>：单一身份源（IdP）服务多品牌 → <strong>边界在「集团边界」</strong>；一个品牌委派的合作方凭证若管理不当，理论上可影响同集团其他租户。</li><li><strong>授权后果（推测）</strong>：适合统一 scope 命名空间（如 Mercedes 的 <code>mb:</code> 命名空间式约定，<code>source-dossier.md</code> §7.2）；但跨品牌的资源隔离需在平台层显式实现。</li><li><strong>对本次取证的启示</strong>：若某车企属此类，其开放平台域名可能<strong>不带品牌名</strong>（如集团域名），这会解释「品牌子域无 DNS」的现象。</li></ul>
+<p><strong>结构 B：事业群各自平台</strong></p>
+<ul><li><strong>形态</strong>：各事业群（如服务、智造、营销）各自建设开放接口。</li><li><strong>信任边界</strong>：<strong>边界在「事业群边界」</strong>；跨事业群的数据流动需额外协调。</li><li><strong>授权后果（推测）</strong>：容易出现「多个网关、多套鉴权」。<strong>本报告判断（推测，非事实）</strong>：比亚迪 i迪桥（企业级 ESB，覆盖七大企业领域 [A]）的形态<strong>更接近结构 B 的「集团内多系统 API 化」</strong>，即以一个 ESB 汇聚多个事业域。</li><li><strong>对本次取证的启示</strong>：若属此类，<strong>「开放平台」可能不止一个</strong>，单一域名的检索会漏掉其他平台的入口。</li></ul>
+<p><strong>结构 C：供应商代运营</strong></p>
+<ul><li><strong>形态</strong>：开放平台/云底座由第三方云或系统集成商代建代营。</li><li><strong>信任边界</strong>：<strong>边界延伸到「供应商边界」</strong>；供应商的运维权限成为信任链的一部分。</li><li><strong>授权后果（推测）</strong>：授权策略的最终控制权与实现细节分属两家，<strong>审计需覆盖供应商侧</strong>。</li><li><strong>对本次取证的启示</strong>：若属此类，其开放平台文档可能由供应商模板生成，<strong>命名与风格可能趋同</strong>（这解释了为何多家车企的开放平台形态相似）。</li></ul>
+<p><strong>三类结构的信任边界对照（推演）</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>结构</th><th>信任边界止于</th><th>主要信任风险（推测）</th><th>授权治理重点（推测）</th></tr></thead><tbody><tr><td>A 集团统一</td><td>集团</td><td>跨品牌横向影响</td><td>统一 IdP + 资源级隔离</td></tr><tr><td>B 事业群各自</td><td>事业群</td><td>多套鉴权、策略不一致</td><td>统一网关 + 策略编排</td></tr><tr><td>C 供应商代运营</td><td>供应商</td><td>运维权限过大、审计盲区</td><td>供应商访问审计 + 权限最小化</td></tr></tbody></table></div>
+<blockquote><p><strong>再次强调</strong>：以上三类结构是<strong>组织假设</strong>，用于指导 16.6 的补证动作（例如：结构 B 假设下应检索「多个开放平台域名」），<strong>不构成对任何车企组织形态的事实断言</strong>。</p></blockquote>
+<hr>
+<h3 id="sec-26">16.3.4 按切面的缺口聚类分析</h3>
+<p>把 §16.0.4 的 45 格矩阵按<strong>切面</strong>（列）而非车企（行）重新聚类，可以看出一组更有解释力的结构。<strong>下表统计的是「本次取证的缺口分布」，不是「车企的能力分布」。</strong></p>
+<div class="table-wrap"><table><thead><tr><th>切面</th><th>取到 [A] 的车企数</th><th>未取证车企数</th><th>缺口性质（本报告判断，推测，非事实）</th></tr></thead><tbody><tr><td><strong>C1 硬件根信任</strong></td><td><strong>0</strong></td><td>9</td><td>硬件实现细节天然不公开；须靠拆解/专利补证</td></tr><tr><td><strong>C2 通信安全</strong></td><td><strong>0</strong></td><td>9</td><td>密码栈选择属敏感配置；须靠 RFI/白皮书补证</td></tr><tr><td><strong>C3 授权与访问控制</strong></td><td><strong>2</strong>（比亚迪 ESB、蔚来服务云）</td><td>7</td><td><strong>服务层可公开、车控层不公开</strong>；两格均为非 OAuth</td></tr><tr><td><strong>C4 应用与平台</strong></td><td><strong>4</strong>（蔚来、小米、比亚迪、奇瑞）</td><td>5</td><td>平台/治理层最易公开（文档站、认证、漏洞专栏）</td></tr><tr><td><strong>C5 OTA 与数据合规</strong></td><td><strong>2</strong>（理想、小米）</td><td>7</td><td>合规承诺载体（隐私政策/信任中心）可公开；OTA 技术细节不公开</td></tr></tbody></table></div>
+<p><strong>从这张聚类表可以读出三条结构性结论</strong>：</p>
+<ol><li><strong>「越靠近车辆物理安全，越不公开」</strong>（本报告判断，推测，非事实）：C1/C2（硬件与通信）取证率为 0，C3 仅服务层取证，C4/C5 的合规与文档层取证率最高。<strong>这符合敏感信息披露的一般规律</strong>——车企倾向公开「合规承诺」与「平台能力」，回避「密钥/算法/车控接口」细节。</li><li><strong>授权切面（C3）的取证集中度最高但层级最低</strong>：9 家中 7 家完全未取证，2 家取证的均是<strong>服务层</strong>（企业 ESB / 服务云），<strong>没有一家车控层</strong>。这一「服务层可公开 / 车控层不公开」的分野，是本章最重要的取证观察之一。</li><li><strong>合规层（C5）的公开度提示了补证路径</strong>：理想隐私政策（生效 2026-01-22）与小米信任中心（ISO 27001 编号 IS 831552）说明——<strong>合规承诺文件是公开信息「最容易触达」的一层</strong>。因此<strong>补证的优先级应为：先从合规文件切入（易得），再向授权技术文档推进（难得）</strong>。这正是 16.6 清单按「合规文件 → 商务沙箱 → 拆解」递进排列的依据。</li></ol>
+<p><strong>与 <code>source-dossier.md</code> §8 的呼应</strong>：§8 列出的「国内 9 家车企的车云通信安全（mTLS/国密）——未找到公开一手来源」与「TEE/SE/HSM 实现——未找到公开一手来源」，正是本聚类表中 C2/C1 两列为 0 的直接体现。<strong>本章的 45 格矩阵与 §8 的缺口表在结构上完全一致，互为交叉验证。</strong></p>
+<hr>
+</section>
+<section class="rep-section" id="sec-27">
+  <div class="sec-head"><span class="sec-badge">05</span><h2>16.4 国内路线与国际路线的结构性差异（国内视角）</h2></div>
+<blockquote><p><strong>本节定位</strong>：作为 <code>30-comparison.md</code> 对比章的输入，本节<strong>只给国内视角</strong>——即从本章已确证的国内取证事实出发，对照国际公开样本（主要来自 <code>source-dossier.md</code> §7.1 Tesla、§7.2 Mercedes-Benz、§7.3 VW/CARIAD），指出<strong>结构性差异</strong>。<strong>差异描述不等于优劣判断</strong>；每一条差异都同时给出「已取证锚点」与「推测成分」的标注。</p></blockquote>
+<p><strong>对照物说明</strong>：国际侧的可引用事实来自 <code>source-dossier.md</code> §7.1（Tesla Fleet API，证据最厚）、§7.2（Mercedes-Benz，<code>mb:</code> 命名空间 + Authorization Code Flow）。国内侧来自本章 16.2 的取证。<strong>注意</strong>：国际样本本身也是「公开文档可达的企业」，同样存在覆盖度偏置（§0）——因此本节是「两条被取证路径的差异」，不是「两个市场的全量差异」。</p>
+<h3 id="sec-28">16.4.1 差异维度一：合规驱动 vs 市场驱动</h3>
+<div class="table-wrap"><table><thead><tr><th>观察</th><th>国内（已取证锚点 / 推测）</th><th>国际（已取证锚点）</th></tr></thead><tbody><tr><td>强制基线</td><td><strong>GB 44495-2024 / GB 44496-2024，2026-01-01 强制适用</strong> [A]</td><td>UN R155/R156 等（<code>source-dossier.md</code> §1.4 标 [未验证]）</td></tr><tr><td>数据法规</td><td>《汽车数据安全管理若干规定（试行）》，重要数据目录/境内存储/年度报送/出境评估 [A]</td><td>欧盟 GDPR（§1.4 标 [C]）、Data Act 数据可携权（§1.4 标 [C]）</td></tr><tr><td>驱动逻辑</td><td><strong>本报告判断（推测，非事实）</strong>：国内车企的授权架构<strong>首先由合规定义下限</strong>，再由商务需求定义上限</td><td><strong>据 <code>source-dossier.md</code> §7.2</strong>：Mercedes 明确以「GDPR 合规 + 用户信任」为授权码流的理由 [A]</td></tr></tbody></table></div>
+<p><strong>结构性差异（本报告判断，推测，非事实）</strong>：国内路线的<strong>合规驱动力度更强、时间点更集中</strong>（2026-01-01 是一个硬节点），这会推动国内车企在<strong>短期</strong>内补齐授权与访问控制基线；但合规驱动也可能导致「<strong>满足最低要求即止</strong>」的倾向，而非国际样本中「以公开文档建立开发者生态」的<strong>主动披露动机</strong>。<strong>这一推测可直接检验</strong>：观察 2026 年后国内车企是否出现类似 Tesla <code>developer.tesla.com</code> 的完整公开授权文档。</p>
+<h3 id="sec-29">16.4.2 差异维度二：APIKey/ESB 体系 vs OAuth 授权码体系</h3>
+<div class="table-wrap"><table><thead><tr><th>观察</th><th>国内</th><th>国际</th></tr></thead><tbody><tr><td>有取证的两家鉴权形态</td><td><strong>蔚来 app-id+secret [A]；比亚迪 APIKey <code>x-Gateway-APIKey</code> [A]</strong></td><td><strong>Tesla OAuth authorization_code + scope 全清单 [A]；Mercedes Authorization Code Flow [A]</strong></td></tr><tr><td>身份对象</td><td>应用（合作方）</td><td>车主 + 应用</td></tr><tr><td>授权语义</td><td>订阅/审核</td><td>同意 + scope</td></tr><tr><td>令牌生命周期</td><td><strong>未取证</strong></td><td>规范定义（刷新令牌一次性、TTL 等，§7.1/§7.2 [A]）</td></tr></tbody></table></div>
+<p><strong>结构性差异（本报告判断，推测，非事实）</strong>：国内有取证的两家均落在「<strong>应用身份型</strong>」授权（APIKey/双凭证），而国际两家落在「<strong>用户代理型</strong>」授权（OAuth）。<strong>这一差异与 16.4.1 的「服务云开放」定位一致</strong>：应用身份型授权服务于 B 端集成，用户代理型授权服务于 C 端数据/车控。</p>
+<p><strong>但必须克制归纳</strong>：这<strong>只是两家</strong>的取证结果，且都是<strong>服务级</strong>平台。<strong>不得</strong>据此得出「中国车企不做 OAuth」的结论。<strong>检验方法</strong>：探测国内车企域名是否发布 OAuth 授权服务器元数据（RFC 8414）。</p>
+<h3 id="sec-30">16.4.3 差异维度三：服务云开放 vs 车控开放</h3>
+<div class="table-wrap"><table><thead><tr><th>观察</th><th>国内</th><th>国际</th></tr></thead><tbody><tr><td>有取证平台的业务域</td><td>蔚来 = 服务云（加电/维保）[A]；比亚迪 = 企业 ESB（七大领域）[A]；小米 = IoT 模组 [A]</td><td>Tesla = 车控 + 遥测 + 虚拟密钥 [A]</td></tr><tr><td>是否含车控</td><td><strong>三家均不含</strong>（均非车控开放）</td><td><strong>Tesla 明确含车控</strong>（<code>vehicle_cmds</code>、虚拟密钥）[A]</td></tr><tr><td>授权与车控的耦合</td><td><strong>未取证</strong></td><td>虚拟密钥 + 资源级（<code>hide_private</code>）[A]</td></tr></tbody></table></div>
+<p><strong>结构性差异（本报告判断，推测，非事实）</strong>：国际样本（Tesla）展示的是<strong>「车控开放」这一更激进的产品形态</strong>——把车控能力开放给第三方，并以「虚拟密钥 + 资源级策略」控制风险。国内有取证的平台<strong>均停留在服务云/企业集成层</strong>。<strong>这可能是「阶段差」，也可能是「披露差」</strong>——本报告无法区分（§16.3.2）。</p>
+<h3 id="sec-31">16.4.4 差异维度四：国密栈 vs 国际 PKI 栈</h3>
+<div class="table-wrap"><table><thead><tr><th>观察</th><th>国内</th><th>国际</th></tr></thead><tbody><tr><td>密码算法族</td><td>SM2/SM3/SM4（GB/T 32918/32905/32907）[A]</td><td>ECDSA/ECDH、AES（RFC 6090/5480、FIPS 197）[A]</td></tr><tr><td>消息语法</td><td>GB/T 35275-2017 / GB/T 35276-2017 [A]</td><td>RFC 5280 X.509 / CMS [A]</td></tr><tr><td>TLS 套件</td><td>RFC 8998（SM 套件，TLS 1.3）[A]</td><td>RFC 8446（标准套件）[A]</td></tr><tr><td>车企实际使用</td><td><strong>九家全部未取证</strong>（§7.10 第 5 条）</td><td><strong>未取证</strong>（本报告亦未取得 Tesla/Mercedes 明文使用国密/国际栈的密码套件清单）</td></tr></tbody></table></div>
+<p><strong>结构性差异（本报告判断，推测，非事实）</strong>：国内合规路径<strong>可能</strong>推动「国密栈」与「国际 PKI 栈」并存（双栈），带来证书链、消息语法、套件协商上的工程差异（详见 §16.1.4 的对照表）。<strong>但必须明确</strong>：<code>source-dossier.md</code> §7.10 第 5 条记载，<strong>九家国内车企本次全部未取得关于国密、mTLS、证书轮换的任何官方一手来源</strong>——<strong>因此「国内车企实际使用国密栈」是一个未取证命题，本章严禁将其写成事实。</strong> 同样，国际样本的密码套件细节本次也未取得明文。<strong>这是一条「理论差异明确、实证缺口巨大」的维度</strong>，须在 16.6 重点补证。</p>
+<h3 id="sec-32">16.4.5 差异维度五：数据本地化 vs 数据可携权</h3>
+<div class="table-wrap"><table><thead><tr><th>观察</th><th>国内</th><th>国际</th></tr></thead><tbody><tr><td>数据义务</td><td>境内存储 + 出境评估（§1.3 [A]）</td><td>数据可携权/互联产品数据访问权（欧盟 Data Act，§1.4 标 [C]）</td></tr><tr><td>对授权的影响</td><td><strong>本报告判断（推测，非事实）</strong>：授权决策点须识别数据流向，跨境令牌交换需评估</td><td><strong>据 §7.1</strong>：Tesla 车主可撤销授权（<code>revoke/consent</code> 端点 [A]），体现用户对授权的控制</td></tr></tbody></table></div>
+<p><strong>结构性差异（本报告判断，推测，非事实）</strong>：国内路线的重心是「<strong>数据不出境</strong>」，国际路线（尤其欧盟）的重心是「<strong>用户可携/可访问</strong>」。落在授权层：国内更强调<strong>地域与流向控制</strong>，国际更强调<strong>用户授权可视化与撤销</strong>（Tesla 的撤销入口是公开实例 [A]，Mercedes 的同意界面展示 scope 与 purpose URL [A]）。<strong>两条路线并不互斥</strong>，但它们塑造了不同的授权 UI/审计优先级。</p>
+<h3 id="sec-33">16.4.6 差异维度六：企业级开放 vs 消费者级开放</h3>
+<div class="table-wrap"><table><thead><tr><th>观察</th><th>国内</th><th>国际</th></tr></thead><tbody><tr><td>有取证平台的消费者</td><td>蔚来 = 商务渠道合作方 [A]；比亚迪 = 公司/组织 [A]；小米 = 硬件模组厂商 [A]</td><td>Tesla = 第三方应用开发者（代表车主）[A]；Mercedes = 开发者（代表终端用户）[A]</td></tr><tr><td>接入方式</td><td>商务渠道 / 组织认证 / 模组认证</td><td>自助注册 + OAuth 授权码</td></tr><tr><td>文档可达性</td><td>定向提供（蔚来文档需 token）[A]</td><td>公开文档（<code>developer.tesla.com</code>）[A]</td></tr></tbody></table></div>
+<p><strong>结构性差异（本报告判断，推测，非事实）</strong>：国内有取证的开放平台以「<strong>企业级/B 端</strong>」为主，接入靠商务渠道；国际样本以「<strong>消费者级/C 端</strong>」为主，接入靠自助 + OAuth。<strong>这直接导致取证难度差异</strong>：B 端定向开放的文档<strong>天然不可公开检索</strong>，这正是本章 45 格矩阵大面积「未取证」的结构性原因（§16.0.4）。</p>
+<h3 id="sec-34">16.4.7 六维度差异汇总表</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>国内倾向（取证/推测）</th><th>国际倾向（取证）</th><th>差异性质</th></tr></thead><tbody><tr><td>1 驱动力</td><td>合规驱动（GB 44495/44496 强制）[A]</td><td>市场/信任驱动（GDPR 主张 [A]）</td><td>制度性</td></tr><tr><td>2 鉴权体系</td><td>APIKey/双凭证（应用身份）[A]</td><td>OAuth 授权码（用户代理）[A]</td><td>模型性</td></tr><tr><td>3 开放层</td><td>服务云/企业 ESB [A]</td><td>车控 + 遥测 [A]</td><td>产品性</td></tr><tr><td>4 密码栈</td><td>国密栈（GB/T 32918 等）[A 规范] / <strong>车企实际使用未取证</strong></td><td>国际 PKI 栈 [A 规范] / 车企实际使用未取证</td><td>规范性（实证缺口）</td></tr><tr><td>5 数据重心</td><td>本地化 + 出境评估 [A]</td><td>可携/可访问（Data Act [C]）</td><td>政策性</td></tr><tr><td>6 开放对象</td><td>企业级（B 端）[A]</td><td>消费者级（C 端）[A]</td><td>生态性</td></tr></tbody></table></div>
+<blockquote><p><strong>本节对 <code>30-comparison.md</code> 的移交说明</strong>：以上 6 个维度可直接进入对比章的「差异归因」小节。<strong>归因时必须携带本节的证据等级标注</strong>——维度 4 尤其要写明「规范差异明确、车企实证缺失」。</p></blockquote>
+<hr>
+</section>
+<section class="rep-section" id="sec-35">
+  <div class="sec-head"><span class="sec-badge">06</span><h2>16.5 关于数字钥匙的中国市场特殊面</h2></div>
+<blockquote><p><strong>本节立场</strong>：数字钥匙是「授权与访问控制」在物理世界的延伸——<strong>一把数字钥匙就是一组被授权的密钥</strong>。但本章对数字钥匙的取证<strong>极为有限</strong>：<code>source-dossier.md</code> §5 提供的是<strong>国际规范侧</strong>的一手证据（CCC、FiRa），国内车企侧仅有二手材料（§7.10 第 1、2 条）。本节据此<strong>只讲「中国市场的结构性特殊面」与「规范层的意义」，可推测处一律标注</strong>。</p></blockquote>
+<h3 id="sec-36">16.5.1 CCC 3.0 的公开事实（国际规范侧，[A]/[B]）</h3>
+<p><code>source-dossier.md</code> §5 一手条目：</p>
+<ul><li><strong>CCC Digital Key Release 3.0 发布公告（2021-04-21）</strong>：新增 <strong>BLE + UWB</strong> 实现被动无钥匙进入与启动，<strong>NFC 保留为强制备用方案</strong>，<strong>密钥存储于 Secure Element</strong> —— Car Connectivity Consortium —— [A]</li><li>CCC Digital Key 主页面（跨 OS 生态、认证计划）—— <code>https://carconnectivity.org/digital-key/</code> —— [A]</li><li>CCC Digital Key Release 3 v1.1 规范向公众开放 —— [B]</li><li>CCC 与 FiRa Consortium 就 UWB 技术合作 —— [B]</li><li>FiRa 2.0（2023-11）/ Core 3.0（2025-01）/ Core 4.0（2025-12）—— [B]</li></ul>
+<p><strong>要点</strong>：CCC 3.0 的三项技术基元是 <strong>BLE（发现/唤醒）+ UWB（安全测距/抗中继）+ NFC（强制备用）</strong>，密钥存于 <strong>SE（Secure Element）</strong>[A]。这三者在国内市场的适配，是本小节的主题。</p>
+<h3 id="sec-37">16.5.2 GB/T 44402.1-2024 参考架构的意义（含推测标注）</h3>
+<p><code>source-dossier.md</code> §1.2 一手条目：<strong>GB/T 44402.1-2024《卡及身份识别安全设备 数字钥匙系统 第 1 部分：参考架构》</strong>，发布 2024-08-23，实施 2025-03-01 [A]，被 dossier 注释为「<strong>中国数字钥匙授权模型的国标参考架构</strong>」。</p>
+<p><strong>意义分析（区分事实与推测）</strong>：</p>
+<ul><li><strong>已确证事实 [A]</strong>：该标准存在，是「数字钥匙系统」系列标准的<strong>第 1 部分：参考架构</strong>，2025-03-01 实施。<strong>「第 1 部分：参考架构」的编号方式（<code>.1</code>）说明这是一个多部分标准（multi-part standard）</strong>，后续部分（<code>.2</code>、<code>.3</code>…）<strong>本次未取证</strong>，因此<strong>本报告不推测其后续部分的内容</strong>。</li><li><strong>本报告判断（推测，非事实）</strong>：该参考架构标准的实施（2025-03-01）为国内市场提供了<strong>与国际 CCC 体系并行的一套「国标参考架构」</strong>。这意味着国内车企的数字钥匙实现<strong>可能面临「CCC 兼容」与「国标符合」两条路线的取舍或并行</strong>。</li><li><strong>本报告判断（推测，非事实）</strong>：GB/T 44402.1 落在「卡及身份识别安全设备」标准体系下（标题前缀），<strong>这提示其安全模型可能与「安全元件/智能卡」体系更接近</strong>（即把数字钥匙视为一种安全设备凭证），而 CCC 体系则不限定具体安全元件实现。<strong>但本次未取得标准正文，该推断仅为方向性提示。</strong></li></ul>
+<h3 id="sec-38">16.5.3 国内适配的三个结构性问题</h3>
+<p><strong>问题一：UWB 的频谱与合规。</strong></p>
+<ul><li><strong>已确证 [A]</strong>：CCC 3.0 使用 UWB；FiRa 负责 UWB 技术规范（<code>source-dossier.md</code> §5）。</li><li><strong>本次未取证</strong>：IEEE 802.15.4z（UWB 物理层增强）在 dossier §5 中<strong>标为「未验证：未取得可核验官方 URL」</strong>。因此<strong>本章不给出 UWB 在国内的频谱/合规细节</strong>。</li><li><strong>本报告判断（推测，非事实）</strong>：UWB 的车载部署涉及频率与功率的监管，其国内适配<strong>可能需要额外的合规确认</strong>——但<strong>具体法规本次未取证，不作断言。</strong></li></ul>
+<p><strong>问题二：手机厂商钱包生态的中立性。</strong></p>
+<ul><li><strong>已确证 [A]</strong>：CCC 强调「跨 OS 生态」（<code>carconnectivity.org/digital-key/</code> [A]）；CC Digital Key 有认证计划 [A]。</li><li><strong>本次未取证</strong>：国内手机厂商钱包（如小米钱包、华为钱包）对数字车钥匙的具体支持<strong>本次未取得一手文档</strong>（§7.8 / §7.9 均记为未取到）。</li><li><strong>本报告判断（推测，非事实）</strong>：国内数字钥匙落地的关键环节之一是<strong>手机厂商钱包作为钥匙凭证的托管方</strong>；因此<strong>授权链中出现了「车企—手机厂商—车主」三方结构</strong>。这会引入新的信任边界：<strong>手机厂商钱包成为密钥托管方，其安全能力直接影响数字钥匙的整体安全性</strong>（§16.3.3 结构 C「供应商代运营」的变体）。</li><li><strong>检验方法</strong>：检索各手机厂商钱包对数字车钥匙的支持说明；检索 CCC/FiRa 认证清单是否含国内手机型号。</li></ul>
+<p><strong>问题三：二手报道与一手事实的鸿沟（§7.10 第 1、2 条）。</strong></p>
+<ul><li><strong>已确证 [C]</strong>：「蔚来 UWB+蓝牙+NFC 三合一数字钥匙」<strong>仅有二手报道</strong>（新浪汽车等）[C]，<strong>蔚来官方未取得技术说明</strong>；无法确认是否 CCC 3.0、是否有 SE 保护（§7.10 第 1 条）。</li><li><strong>已确证 [C]</strong>：小鹏 UWB 钥匙为<strong>论坛/短视频内容</strong>，官方未证实（§7.10 第 2 条）。</li><li><strong>本章纪律</strong>：<strong>这两条均不得作为技术事实写入。</strong> 它们只说明「中国市场存在 UWB 数字钥匙的市场传闻」，<strong>不说明任何车企的 CCC 符合性或 SE 使用情况</strong>。<strong>这正是本章反复强调的「未取证 ≠ 无能力，传闻 ≠ 事实」的双向纪律。</strong></li></ul>
+<h3 id="sec-39">16.5.4 数字钥匙的授权链结构（通用推演）</h3>
+<p><strong>本报告判断（推测，非事实）</strong>：把数字钥匙看作授权系统，其链路可抽象为：</p>
+<pre><code>车主身份（厂商 IdP）
+   │  ①授权（同意把钥匙发给谁）
+   ▼
+密钥签发（车企 KMS / 密钥服务器）
+   │  ②密钥分发（公钥/私钥或对称密钥）
+   ▼
+承运载体（手机 SE / 卡片 / 车端 SE）
+   │  ③本地持有（硬件保护）
+   ▼
+车端验证（车辆侧安全模块校验挑战-响应）
+   │  ④本地授权（是否放行解锁/启动）
+   ▼
+物理动作（车门/启动）</code></pre>
+<p><strong>这条链上「国标 vs CCC」的落点（本报告判断，推测，非事实）</strong>：CCC 3.0 明确把密钥存于 SE [A]，因此<strong>落点在「承运载体」与「车端验证」两环</strong>；GB/T 44402.1 作为参考架构 [A]，<strong>可能</strong>规定各环的接口与安全要求，但<strong>本次未取得正文，不展开</strong>。<strong>国内车企的实际落点（是否用 SE、用何算法、是否 UWB）本次九家全部未取证</strong>（§7.10 第 5 条）。</p>
+<h3 id="sec-40">16.5.5 本节小结（事实 vs 推测对照）</h3>
+<div class="table-wrap"><table><thead><tr><th>命题</th><th>状态</th></tr></thead><tbody><tr><td>CCC 3.0 = BLE + UWB + NFC，密钥存 SE</td><td><strong>[A] 事实</strong>（§5）</td></tr><tr><td>GB/T 44402.1-2024 是数字钥匙参考架构第 1 部分，2025-03-01 实施</td><td><strong>[A] 事实</strong>（§1.2）</td></tr><tr><td>国内车企是否采用 CCC 3.0 / UWB / SE</td><td><strong>未取证</strong>（§7.10 第 1、2、5 条；仅二手 [C]）</td></tr><tr><td>国内市场存在「CCC 与国标并行」的路线取舍</td><td><strong>推测</strong>（本报告判断）</td></tr><tr><td>手机厂商钱包成为密钥托管方引入三方信任边界</td><td><strong>推测</strong>（本报告判断）</td></tr><tr><td>数字钥匙授权链的环节划分</td><td><strong>推测</strong>（本报告判断）</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-41">
+  <div class="sec-head"><span class="sec-badge">07</span><h2>16.6 本章待补证清单（30 条）</h2></div>
+<blockquote><p><strong>本清单的性质</strong>：这是本章「缺口显式化」的落地（<code>00-engagement-plan.md</code> §4 第 6 条）。<strong>每一条都明确：车企 / 缺口方向 / 已检索对象 / 结果 / 补证动作。</strong> 全部条目的「结果」列<strong>只写取证事实</strong>，不含能力判断。<strong>本清单的存在本身，就是对「未找到公开来源 ≠ 能力缺失」这一原则的制度化。</strong></p><p><strong>与 <code>source-dossier.md</code> §8 的关系</strong>：§8 给出的是<strong>方法论层</strong>的缺口（10 类），本清单给出的是<strong>车企层</strong>的缺口（逐家逐方向）。两者互补。</p></blockquote>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>车企</th><th>缺口方向</th><th>已检索对象</th><th>结果</th><th>补证动作</th></tr></thead><tbody><tr><td>1</td><td>蔚来</td><td>车控/车主开放平台存在性</td><td><code>developer.nio.com</code>、<code>www.nio.cn</code></td><td>仅服务云（2019），无车控文档</td><td>RFI；探测 <code>auth.nio.com</code> 与 <code>.well-known/openid-configuration</code></td></tr><tr><td>2</td><td>蔚来</td><td>数字钥匙（UWB/SE/CCC）</td><td>开发者站点、隐私政策页</td><td>仅二手报道 [C]</td><td>检索 CCC 认证清单；专利检索；T-BOX 拆解</td></tr><tr><td>3</td><td>蔚来</td><td>国密 / mTLS</td><td>Open NSC 文档</td><td>未见任何密码学/mTLS 文档</td><td>RFI；沙箱抓包（须授权）；安全白皮书</td></tr><tr><td>4</td><td>蔚来</td><td>授权机制是否 OAuth</td><td>Open NSC 文档</td><td>app-id+secret（非 OAuth）</td><td>商务沙箱实测；探测授权端点</td></tr><tr><td>5</td><td>小鹏</td><td>开放平台鉴权机制</td><td><code>open.xiaopeng.com/dev/</code></td><td><strong>HTTP 403（openresty）</strong></td><td>换出口 IP / 代理重跑；商务申请白名单沙箱</td></tr><tr><td>6</td><td>小鹏</td><td><code>xmart.*</code> 生产属性</td><td><code>xmart.xiaopeng.com</code></td><td>证书无效（成因未取证）</td><td>CT log 检索；RFI</td></tr><tr><td>7</td><td>小鹏</td><td>数字钥匙（UWB）</td><td>官方渠道</td><td>仅论坛/短视频 [C]</td><td>官方车型页；CCC/FiRa 认证清单；专利检索</td></tr><tr><td>8</td><td>理想</td><td>开放平台存在性</td><td><code>open.lixiang.com</code>、<code>developer.lixiang.com</code></td><td><strong>均无 DNS</strong></td><td>ICP 备案检索；换命名探测；RFI</td></tr><tr><td>9</td><td>理想</td><td>数据主体分工</td><td>隐私政策页</td><td>两主体（车励行 + 罗克维尔斯），正文未解析</td><td>解析隐私政策正文；工商经营范围比对</td></tr><tr><td>10</td><td>理想</td><td>数字钥匙 / OTA 安全</td><td>官网</td><td>未找到公开来源</td><td>车型页；OTA 服务条款；专利检索</td></tr><tr><td>11</td><td>小米</td><td>车云开放平台存在性</td><td><code>xiaomiev.com</code></td><td>官网可达但无开发者入口</td><td>ICP 备案；命名探测；RFI</td></tr><tr><td>12</td><td>小米</td><td>ISO 27001 范围是否含车云</td><td><code>trust.mi.com/zh-CN/compliance</code></td><td>编号 IS 831552，范围含 IT 运维与云服务</td><td>核验证书范围原文；索取安全白皮书</td></tr><tr><td>13</td><td>小米</td><td>数字钥匙（钱包/SE）</td><td><code>iot.mi.com</code>、钱包文档</td><td>未找到一手文档</td><td>小米钱包文档（须登录）；CCC 认证清单</td></tr><tr><td>14</td><td>小米</td><td>「人车家」跨设备授权</td><td><code>iot.mi.com</code> 文档</td><td>面向模组厂商，无车云授权细节</td><td>检索 HyperOS Connect 权限模型；专利检索</td></tr><tr><td>15</td><td>零跑</td><td>开放平台存在性</td><td><code>developer.</code> / <code>dev.</code> / <code>open.leapmotor.com</code></td><td><strong>三域名均无 DNS</strong></td><td>ICP 备案检索；App 登录流程静态分析；RFI</td></tr><tr><td>16</td><td>零跑</td><td>国密 / mTLS / HSM</td><td>官网</td><td>未找到公开来源</td><td>RFI；专利检索；T-BOX 拆解</td></tr><tr><td>17</td><td>华为鸿蒙智行</td><td>数字车钥匙文档正文</td><td>Wallet Kit 文档（<code>/doc/harmonyos-guides/wallet-kit-*</code>）</td><td><strong>JS 空壳（约 1749 字节）</strong></td><td>带 JS 渲染 + 登录态抓取</td></tr><tr><td>18</td><td>华为鸿蒙智行</td><td>车云授权架构与信任边界</td><td><code>developer.huawei.com/consumer/cn/</code></td><td>无车云授权文档</td><td>RFI（车 BU / 合作整车厂）；合作车型隐私政策主体划分</td></tr><tr><td>19</td><td>华为鸿蒙智行</td><td>国密 / TEE / 安全芯片</td><td>开发者站</td><td>未找到公开来源</td><td>专利检索；器件选型逆向（须授权）</td></tr><tr><td>20</td><td>极氪</td><td>开放平台内容</td><td><code>open.zeekrlife.com</code></td><td><strong>HTTP 500 空页</strong></td><td>多时间窗口重复探测（判瞬态）；ICP 备案；RFI</td></tr><tr><td>21</td><td>极氪</td><td>授权机制 / appKey 形态</td><td>官网</td><td>无开发者入口</td><td>App 令牌流程静态分析；商务沙箱</td></tr><tr><td>22</td><td>比亚迪</td><td>appKey 生命周期（有效期/轮换/吊销）</td><td>i迪桥接口文档</td><td>文档仅说明鉴权头，未说明生命周期</td><td>商务渠道申请沙箱（<code>openapi@byd.com</code>）实测</td></tr><tr><td>23</td><td>比亚迪</td><td>车控/车主开放平台是否存在</td><td><code>open.byd.com</code></td><td>仅企业级 ESB（七大领域），无车控</td><td>探测 <code>.well-known</code>；RFI；ICP 备案；招投标检索</td></tr><tr><td>24</td><td>比亚迪</td><td>国密 / mTLS / 数字钥匙</td><td>i迪桥文档</td><td>文档未见相关章节</td><td>RFI；专利检索；T-BOX 拆解</td></tr><tr><td>25</td><td>奇瑞</td><td>漏洞披露政策细节</td><td><code>www.chery.cn/others/networksecurity/</code></td><td>页面可达，正文未取到</td><td>取专栏正文；核查 SRC 规则与响应时限</td></tr><tr><td>26</td><td>奇瑞</td><td>开放平台 / 车云授权</td><td><code>developer.chery.cn</code>、<code>open.chery.cn</code></td><td><strong>均无 DNS</strong></td><td>ICP 备案；命名探测；RFI；App 静态分析</td></tr></tbody></table></div>
+<p><strong>全九家共有的三条横向缺口（不属于单家，单列）</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>范围</th><th>缺口方向</th><th>已检索对象</th><th>结果</th><th>补证动作</th></tr></thead><tbody><tr><td>27</td><td>全九家</td><td>国密 SM2/SM3/SM4 实际使用</td><td>官网 / 开发者门户 / 隐私政策 / SRC 页</td><td><strong>全部未找到公开一手来源</strong>（§7.10 第 5 条）</td><td>RFI；采购安全白皮书；专利与招标文件检索</td></tr><tr><td>28</td><td>全九家</td><td>TEE / SE / HSM 实现</td><td>开发者门户 / 安全页</td><td><strong>全部未找到公开一手来源</strong>（§8）</td><td>器件选型逆向；T-BOX 拆解；芯片厂 Design Win 公告</td></tr><tr><td>29</td><td>全九家</td><td>mTLS 双向证书与证书轮换</td><td>各开放平台文档</td><td><strong>全部未找到公开一手来源</strong>（§7.10 第 5 条）</td><td>商务沙箱抓包（须授权）；RFI</td></tr><tr><td>30</td><td>全九家</td><td>scope 粒度与逐车主同意界面</td><td>各开放平台文档 / App</td><td><strong>全部未取得</strong></td><td>商务沙箱；App 隐私设置静态分析；RFI</td></tr></tbody></table></div>
+<blockquote><p>说明：表格编号 1–26 为车企级条目，27–30 为全行业横向条目；合计 30 条，满足「≥20 条」要求。<strong>推进优先级建议</strong>：先取「合规承诺文件」（隐私政策、信任中心、漏洞专栏——公开易得），再申请「商务沙箱」（需签署协议，但可得鉴权与令牌实测），最后做「专利检索与 T-BOX 拆解」（成本最高，仅用于确认硬件根与密码栈）。</p></blockquote>
+<p><strong>补充：与 <code>source-dossier.md</code> §8 方法论缺口的对接</strong>——§8 的 10 类缺口（Tesla TTL、BMW CarData、Rivian、R155/R156、ISO 21434/24089/15118、UMA 2.0/AUTOSAR/TPM 2.0/SHE/IEEE 802.15.4z 等）主要为国际侧与企业侧之外的规范侧缺口，其补证动作（换出口 IP、会员渠道、标准购买）已在 §8 列明，本章不重复。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-42">
+  <div class="sec-head"><span class="sec-badge">08</span><h2>16.7 本章小结</h2></div>
+<p>本章用「已取证事实 + 明确披露缺口 + 基于国标的设计空间分析」三层结构，对国内九家新能源车企的授权与访问控制实践做了尽可能诚实的记录。小结分四部分：<strong>已确证的三条事实 / 未确证的四个方向 / 对企业选型的启示 / 本章的自我限制</strong>。全部区分事实与推测。</p>
+<h3 id="sec-43">16.7.1 已确证的三条事实</h3>
+<p><strong>事实一：国内车企在「授权与访问控制」切面上的公开一手证据极为稀薄，45 格中仅 9 格取到 [A]，核心授权切面仅 2 格。</strong></p>
+<p>依据：§16.0.4 的 45 格矩阵。九家中只有比亚迪（i迪桥）、蔚来（Open NSC）、小米（IoT 平台/信任中心）、理想（隐私政策）、奇瑞（漏洞专栏）取到了 [A] 级的公开页面；而落在<strong>授权与访问控制（C3）</strong>切面核心的，只有<strong>比亚迪的 APIKey</strong> 与<strong>蔚来的 app-id+secret</strong> 两格 [A]。<strong>这是本次取证横截面的最硬结论，也是本章全部后续分析的事实起点。</strong></p>
+<p><strong>事实二：有取证的两家国内开放平台，其鉴权形态均为「非 OAuth」的应用身份型（APIKey / app-id+secret），且均非车控开放。</strong></p>
+<p>依据：<code>source-dossier.md</code> §7.6（比亚迪：appKey + <code>x-Gateway-APIKey</code> Header，企业级 ESB，覆盖供应链/研发/智造/营销/物流/品质/财务七大领域 [A]）；§7.7（蔚来：app-id+secret 双凭证，服务云业务，不含车控/数字钥匙 API [A]）。<strong>对照国际样本</strong>（§7.1 Tesla、§7.2 Mercedes-Benz 均为 OAuth 授权码流 [A]），国内有取证路径呈现「应用身份型 / 服务层」的结构特征。<strong>此结论仅覆盖被取证的两家，不得外推为行业事实。</strong></p>
+<p><strong>事实三：中国已建立覆盖「车云授权与接口」的国标与法规底座，且强制性国标于 2026-01-01 强制适用。</strong></p>
+<p>依据：§16.1。强制性国标 GB 44495-2024 / GB 44496-2024（2026-01-01 实施）[A]；与授权/接口直接相关的推荐性国标 GB/T 47324-2026（车联网平台网络安全防护要求）、GB/T 47467-2026（车联网安全管理接口规范）、GB/T 45112-2024（C-V2X 证书管理体系）、GB/T 44402.1-2024（数字钥匙参考架构）[A]；行政法规《汽车数据安全管理若干规定（试行）》（重要数据目录/境内存储/年度报送/出境评估）[A]；国密算法族 GB/T 32918/32905/32907/35275/35276 与 RFC 8998（SM 套件 TLS 1.3）[A]。<strong>这构成了国内车企授权架构的「必须做什么」的约束集。</strong></p>
+<h3 id="sec-44">16.7.2 未确证的四个方向</h3>
+<p><strong>方向一：国内车企的车云授权协议细节（是否 OAuth、scope 粒度、令牌生命周期、逐车主同意）。</strong></p>
+<p>状态：<strong>未取证</strong>。九家中两家（蔚来、比亚迪）的取证均落在<strong>非 OAuth 的服务层</strong>；<strong>其余七家全部未取得任何鉴权机制文档</strong>。<strong>因此「国内车企是否采用 OAuth 授权码流」是一个未确证命题。</strong> 补证：16.6 序号 1、4、5、8、11、21。</p>
+<p><strong>方向二：国内车企的密码学与硬件根实现（国密 / mTLS / HSM / SE / TEE）。</strong></p>
+<p>状态：<strong>全部未取证</strong>。<code>source-dossier.md</code> §7.10 第 5 条明确：<strong>九家国内车企本次全部未取得关于国密 SM2/SM3/SM4、mTLS 双向证书、证书轮换、HSM/SE/TEE 的任何官方一手来源</strong>。<strong>本章据此把「国内车企使用国密/专用安全硬件」严格标注为未取证，绝不写成事实。</strong> 补证：16.6 序号 27、28、29。</p>
+<p><strong>方向三：国内车企的数字钥匙实现（是否 CCC 3.0、是否 UWB、是否 SE）。</strong></p>
+<p>状态：<strong>未取证</strong>。仅存在二手材料（蔚来 [C]、小鹏 [C]，§7.10 第 1、2 条），<strong>不得作为事实</strong>。国际规范侧（CCC 3.0 = BLE+UWB+NFC、密钥存 SE）[A] 与国标侧（GB/T 44402.1-2024 参考架构）[A] 均已确证，但<strong>车企侧落点未取证</strong>。补证：16.6 序号 2、7、13、17、24。</p>
+<p><strong>方向四：国内车企的授权治理组织结构（集团统一 / 事业群各自 / 供应商代运营）。</strong></p>
+<p>状态：<strong>未取证（本节为推演）</strong>。§16.3.3 的三类结构是<strong>组织假设</strong>，用于指导补证，<strong>不构成对任何车企的事实断言</strong>。补证：16.6 各家的 ICP 备案与 RFI 条目。</p>
+<h3 id="sec-45">16.7.3 对企业选型的启示</h3>
+<blockquote><p><strong>本节是面向读者的中性建议</strong>，不构成对任何车企的评价。<strong>每条建议均建立在「本章已确证事实」或「显式标注的推测」之上。</strong> 凡涉及具体车企的能力判断，一律提示「须先完成 16.6 的补证」。</p></blockquote>
+<p><strong>启示一：评估任何车企的车云授权能力，必须先索取「授权三件套」。</strong> 依据本章的取证实践，判断一个车云开放平台的授权成熟度，最有效的三个索取对象是：</p>
+<ol><li><strong>鉴权与令牌文档</strong>（凭证类型、令牌模型、TTL、轮换、吊销）；</li><li><strong>scope / 授权粒度清单</strong>（是否有资源级策略，对应 RFC 9396 / RFC 8705 思路）；</li><li><strong>逐车主同意与撤销流程</strong>（对应 §16.1.3 数据合规的可追溯要求）。</li></ol>
+<p><strong>本章的 45 格矩阵说明：这三个对象在国内车企的公开渠道上几乎全军覆没（§16.0.4），因此必须通过 RFI/商务渠道主动索取，而非依赖公开检索。</strong></p>
+<p><strong>启示二：合规时间点是 2026-01-01，评估窗口应以该节点为界。</strong> GB 44495-2024 / GB 44496-2024 于 <strong>2026-01-01 强制适用</strong> [A]。<strong>本报告判断（推测，非事实）</strong>：2026-01-01 之后上市的新车型，其车云授权控制将成为<strong>合规要求</strong>而非可选优化。采购或合作评估时，可将「是否提供符合 GB 44495/44496 的授权控制说明」作为一项明确的准入问题。</p>
+<p><strong>启示三：区分「服务云开放」与「车控开放」，不要把前者当作后者的能力证明。</strong> 本章 16.2.8 用整整一节说明了这个陷阱：<strong>比亚迪 i迪桥是服务层 ESB [A]，不能用来证明其车控授权能力</strong>（§7.10 第 3 条）。同理，<strong>小米 IoT 平台面向模组厂商 [A]，不能用来证明其车云授权能力</strong>（§7.10 第 6 条）。<strong>评估时应明确询问「该平台是否包含车辆控制类接口、其授权是否代表车主」。</strong></p>
+<p><strong>启示四：为「国密栈 vs 国际 PKI 栈」的双栈现实预留工程与合规预算。</strong> 依据 §16.1.4，国内合规路径使国密栈（SM2/SM3/SM4 + RFC 8998）可能与国际 PKI 栈并行。<strong>本报告判断（推测，非事实）</strong>：涉及国内销售车型的车云链路，其证书体系、消息语法、TLS 套件可能需要在两套栈之间做适配（无论最终选择哪一套）。<strong>但需强调：本次未取得任何国内车企实际使用国密栈的一手证据</strong>（§7.10 第 5 条），因此这是「预算预留」建议，不是「现状断言」。</p>
+<p><strong>启示五：把「取证缺口」当作评估的一等对象。</strong> 本章的写作实践本身说明：<strong>在授权安全评估中，「拿不到证据」与「证据显示不安全」是两种不同的风险</strong>。前者需要补证动作（16.6 的 30 条），后者需要控制建议。<strong>混淆二者——把「未取到」读成「没有」或「不安全」——是评估中最常见的系统性错误。</strong> 本报告的中立性红线（§3.2 第 4 条）正是为此设立。</p>
+<h3 id="sec-46">16.7.4 本章的自我限制（读者须知）</h3>
+<ol><li><strong>证据覆盖度限制</strong>：本章的 45 格矩阵显示 39 格为「未取证」。<strong>任何基于本章的「国内车企授权能力」结论，其置信度上限受此限制。</strong></li><li><strong>时间限制</strong>：采集日期 2026-09-28；蔚来 Open NSC 文档停留在 2019-08-13 [A]、比亚迪 i迪桥文档发布于 2024-01-23 [A]。<strong>引用时务必带上这些时间戳。</strong></li><li><strong>方法论限制</strong>：本次无开放检索能力（检索工具额度耗尽），只能「直取已知权威 URL」[A]。<strong>因此本章的「未找到公开来源」，其含义是「在受限取证条件下未触达」，不等于「公开网络上不存在」。</strong></li><li><strong>推测标注限制</strong>：本章 16.2 各家的第 (4) 小节、16.3.2 的阶段模型、16.3.3 的三类结构、16.5 的数字钥匙推演，<strong>全部为 [合理推测]</strong>，已逐条标注「本报告判断（推测，非事实）」并附前置条件与检验方法。<strong>读者不得将这些段落当作事实使用。</strong></li><li><strong>中立性限制</strong>：本章未对任何车企给出「能力排名」或贬损性比较。<strong>凡「未取证」处，皆已显式声明「不等同于能力缺失」。</strong></li></ol>
+<h3 id="sec-47">16.7.5 本章对下游章节的移交</h3>
+<div class="table-wrap"><table><thead><tr><th>下游章节</th><th>本章移交的内容</th><th>移交时的标注要求</th></tr></thead><tbody><tr><td><code>17-authz-70-global-oem.md</code></td><td>国内视角的对照锚点（§16.4 六维度）</td><td>携带证据等级；维度 4 注明「规范差异明确、车企实证缺失」</td></tr><tr><td><code>20-cn-oem-security.md</code></td><td>九家车企的取证事实与缺口（§16.2）</td><td>保留 [A]/[未取证] 标注；不得把服务层开放外推为车控能力</td></tr><tr><td><code>30-comparison.md</code></td><td>§16.4 六维度差异矩阵</td><td>差异描述即差异描述，不作优劣归因</td></tr><tr><td><code>31-summary-trends.md</code></td><td>§16.3.2 四阶段模型、2026-01-01 合规节点</td><td>阶段归属仅对已取证者成立；合规节点为 [A] 事实</td></tr><tr><td><code>18-authz-80-compliance-audit.md</code></td><td>§16.1 合规底座（GB 44495/44496、GB/T 47324/47467/44402.1、数据法规、国密族）</td><td>只移交标准编号/名称/日期（[A]），不给出条款号</td></tr><tr><td><code>19-authz-90-reference-tables.md</code></td><td>§16.6 的 30 条补证清单、§16.0.4 的 45 格矩阵</td><td>作为参考表的缺口维度来源</td></tr></tbody></table></div>
+<hr>
+<blockquote><p><strong>本章结束。</strong> 本章的目标不是「写出一份国内车企授权架构综述」——在本次取证条件下，那样的综述只能是编造。本章的目标是<strong>如实记录取到了什么、没取到什么、以及在国标约束下合理的设计空间可能是什么</strong>，并把这三层物理分开，让读者能一眼看清每条结论的证据强度。<strong>「未找到公开来源，不等同于能力缺失」</strong>——这句话在本章出现了多次，因为它是本章唯一的、也是最重要的方法论立场。</p></blockquote>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 80,106 字符</div>
+  </div>
+</footer>
+</body>
+</html>

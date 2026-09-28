@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRA-1 车云安全技术方案调研 — 审计计划与方法论 · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="TRA-1 车云安全技术方案调研 — 审计计划与方法论 — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>TRA-1 车云安全技术方案调研 — 审计计划与方法论</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  <section class="meta-card"><dl><dt>编制</dt><dd>Trail of Bits Security · 首席安全官（CSO）</dd><dt>生效日期</dt><dd>2026-09-28</dd><dt>版本</dt><dd>v1.0（唯一现行版本；后续修订就地覆盖本文件，不新建版本）</dd><dt>委托方议题</dt><dd>TRA-1《车云安全技术方案调研》</dd></dl></section>
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">1. 委托范围与验收标准冻结</a></li>
+<li class="lvl2"><a href="#sec-1">2. 工作流分解与团队派工</a></li>
+<li class="lvl2"><a href="#sec-2">3. 证据分级与严重度分类标准（本委托的统一口径）</a></li>
+<li class="lvl2"><a href="#sec-6">4. 分析方法论（本委托采用）</a></li>
+<li class="lvl2"><a href="#sec-7">5. 质量门（每个交付物必须通过）</a></li>
+<li class="lvl2"><a href="#sec-8">6. 交付物规范</a></li>
+<li class="lvl2"><a href="#sec-13">7. 里程碑与终审</a></li>
+<li class="lvl2"><a href="#sec-14">8. 已知风险与缓解</a></li>
+<li class="lvl2"><a href="#sec-15">9. 派工单索引</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>1. 委托范围与验收标准冻结</h2></div>
+<p>本计划把委托方需求固化为可判定的验收标准（AC）。<strong>AC 编号在全部工作流中通用</strong>，任何交付物必须注明其覆盖的 AC 编号。</p>
+<div class="table-wrap"><table><thead><tr><th>AC</th><th>验收标准（可判定）</th><th>判定方式</th></tr></thead><tbody><tr><td>AC-1</td><td>报告含 6 个规定结构：概述 / 通用车云安全技术方案分析 / 国内新势力车企实践分析 / 国际新能源车企实践分析 / 对比与差异分析 / 总结与趋势</td><td>章节标题逐一核对</td></tr><tr><td>AC-2</td><td><strong>「授权与访问控制」章节 ≥ 300K 字符</strong>（委托方原文"不得少于 300K"）</td><td><code>wc -m</code> 统计该章节合并后字符数；同时记录字节数</td></tr><tr><td>AC-3</td><td>覆盖 5 层分析框架：硬件安全 / 通信安全 / 授权与访问控制 / 应用与平台安全 / 其他（OTA、数据隐私、合规、供应链）</td><td>每层至少 1 个专章，且授权层占比最大</td></tr><tr><td>AC-4</td><td>国内 ≥ 9 家（蔚来、小鹏、理想、小米、零跑、华为鸿蒙智行、极氪、比亚迪、奇瑞）逐家拆解</td><td>每家有独立小节，含"方案 / 与通用方案的异同 / 证据等级"</td></tr><tr><td>AC-5</td><td>国际 ≥ 5 家（特斯拉、Rivian、大众、宝马、奔驰）逐家拆解</td><td>同上</td></tr><tr><td>AC-6</td><td>国内外技术路线差异对比</td><td>至少 5 个维度的对比矩阵 + 差异归因</td></tr><tr><td>AC-7</td><td>信源可靠、优先官方白皮书/专利/标准/公开演讲/权威媒体，并标注参考资料</td><td>每条事实带 <code>[A]/[B]/[C]</code> 等级 + URL（见 §3）</td></tr><tr><td>AC-8</td><td>区分公开信息与合理推测，不确定内容明确标注</td><td>存在「待补证清单」章节，且正文无未标注的推测</td></tr><tr><td>AC-9</td><td>输出 Markdown 与 HTML 两种格式，<strong>每一部分</strong>均需两种格式</td><td>每个 <code>docs/*.md</code> 有对应 <code>docs/html/*.html</code></td></tr><tr><td>AC-10</td><td>HTML 为 <strong>CARIAD 风格</strong>（简洁、现代、科技感、清晰信息层级、适合技术报告阅读）</td><td>使用确定性转换脚本 <code>md2cariad.py</code>；渲染断言见 §6</td></tr><tr><td>AC-11</td><td>客观中立，不夸大或贬低任何车企</td><td>每家企业结论句不得含比较级贬损；缺证据一律写"未找到公开来源"</td></tr><tr><td>AC-12</td><td>技术深度与可读性并重</td><td>每章含架构图（ASCII/SVG）、表格、工程实现片段</td></tr></tbody></table></div>
+<p><strong>范围外（明确不做）</strong>：</p>
+<ul><li>不做针对任何在售车型的漏洞测试、渗透、逆向或实车攻击。本委托为<strong>公开信息调研</strong>，不含主动测试。</li><li>不披露任何未修复漏洞（对齐行业披露伦理与各厂 SRC 规则，如 Tesla Bugcrowd 规则第 3 条）。</li><li>不臆造国内车企的密码算法/硬件实现细节。<strong>缺证据即写缺证据。</strong></li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-1">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>2. 工作流分解与团队派工</h2></div>
+<p>本委托拆为 7 条工作流。每条工作流有唯一负责人、唯一文件所有权、明确的字符配额。<strong>文件所有权互斥</strong>：任何工作流不得修改他人拥有的文件（避免并行写冲突）。</p>
+<div class="table-wrap"><table><thead><tr><th>WF</th><th>工作流</th><th>领导者</th><th>拥有文件（唯一写入者）</th><th>字符配额</th><th>覆盖 AC</th></tr></thead><tbody><tr><td>WF-0</td><td>方法论、总体框架与终审</td><td><strong>CSO（本 Agent）</strong></td><td><code>docs/00-engagement-plan.md</code>、<code>docs/01-overview.md</code>、<code>docs/30-comparison.md</code>、<code>docs/31-summary-trends.md</code>、<code>docs/90-references.md</code></td><td>40K</td><td>AC-1,6,8,11</td></tr><tr><td>WF-1</td><td>通用分层技术方案（硬件/通信/平台/OTA/隐私）</td><td>CSO（v1）→ <strong>Engineering Lead</strong> 扩写</td><td><code>docs/02-general-layered-security.md</code></td><td>45K</td><td>AC-3,7,12</td></tr><tr><td>WF-2</td><td>授权与访问控制 · 协议与机制（总论+协议族+令牌+资源级）</td><td>CSO（总论/协议族）→ <strong>Verification Lead</strong> 扩写</td><td><code>docs/10-authz-00-intro.md</code>、<code>docs/11-authz-10-protocols.md</code>、<code>docs/12-authz-20-tokens-keys.md</code>、<code>docs/13-authz-30-resource-authz.md</code></td><td><strong>120K</strong></td><td>AC-2,3,7,12</td></tr><tr><td>WF-3</td><td>授权与访问控制 · 威胁模型与工程实现</td><td><strong>Reverse Engineering Lead</strong></td><td><code>docs/14-authz-40-threat-model.md</code>、<code>docs/15-authz-50-engineering.md</code></td><td>80K</td><td>AC-2,7,12</td></tr><tr><td>WF-4</td><td>授权与访问控制 · 国内车企实践（9 家）</td><td><strong>Audit Lead</strong></td><td><code>docs/16-authz-60-cn-oem.md</code>、<code>docs/20-cn-oem-security.md</code></td><td><strong>130K</strong></td><td>AC-2,4,7,11</td></tr><tr><td>WF-5</td><td>授权与访问控制 · 国际车企实践（5 家）</td><td><strong>Reverse Engineering Lead</strong></td><td><code>docs/17-authz-70-global-oem.md</code>、<code>docs/21-global-oem-security.md</code></td><td>110K</td><td>AC-2,5,7,11</td></tr><tr><td>WF-6</td><td>合规映射、审计与参考表</td><td><strong>Verification Lead</strong></td><td><code>docs/18-authz-80-compliance-audit.md</code>、<code>docs/19-authz-90-reference-tables.md</code></td><td>70K</td><td>AC-2,7,8</td></tr></tbody></table></div>
+<p><strong>授权章节字符预算对账</strong>（AC-2 的 300K 必须能被加总验证）：</p>
+<div class="table-wrap"><table><thead><tr><th>文件</th><th>预算（字符）</th><th>归属工作流</th></tr></thead><tbody><tr><td><code>10-authz-00-intro.md</code></td><td>15K</td><td>WF-2</td></tr><tr><td><code>11-authz-10-protocols.md</code></td><td>40K</td><td>WF-2</td></tr><tr><td><code>12-authz-20-tokens-keys.md</code></td><td>35K</td><td>WF-2</td></tr><tr><td><code>13-authz-30-resource-authz.md</code></td><td>30K</td><td>WF-2</td></tr><tr><td><code>14-authz-40-threat-model.md</code></td><td>40K</td><td>WF-3</td></tr><tr><td><code>15-authz-50-engineering.md</code></td><td>40K</td><td>WF-3</td></tr><tr><td><code>16-authz-60-cn-oem.md</code></td><td>90K</td><td>WF-4</td></tr><tr><td><code>17-authz-70-global-oem.md</code></td><td>75K</td><td>WF-5</td></tr><tr><td><code>18-authz-80-compliance-audit.md</code></td><td>35K</td><td>WF-6</td></tr><tr><td><code>19-authz-90-reference-tables.md</code></td><td>35K</td><td>WF-6</td></tr><tr><td><strong>合计</strong></td><td><strong>435K</strong></td><td>≥ 300K（留 45% 余量，防止单条工作流欠交付导致 AC-2 失守）</td></tr></tbody></table></div>
+<p><strong>派工原则说明</strong>：本委托不含智能合约、不含密码学原语实现的代码审计、不含固件的二进制逆向——因此<strong>不派 Blockchain Security Lead</strong>（无链上组件）；<strong>Verification Lead</strong> 承担规范/协议/形式化与合规映射类核对；<strong>Reverse Engineering Lead</strong> 承担"公开研究成果与车辆侧实现"的解释性分析（非主动逆向）；<strong>Audit Lead</strong> 承担应用与平台侧、开放平台实践类分析；<strong>Engineering Lead</strong> 承担工程实现与分层方案的工程化拆解。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-2">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>3. 证据分级与严重度分类标准（本委托的统一口径）</h2></div>
+<h3 id="sec-3">3.1 证据分级（每条事实必须带等级）</h3>
+<div class="table-wrap"><table><thead><tr><th>等级</th><th>定义</th><th>允许的表述措辞</th></tr></thead><tbody><tr><td><strong>[A] 一手</strong></td><td>标准正文（openstd.samr.gov.cn / RFC Editor / 官方规范库）、OEM 官方开发者文档、官方白皮书、官方漏洞政策、官方年报</td><td>"<strong>文档明载</strong>…"</td></tr><tr><td><strong>[B] 权威第三方</strong></td><td>学术论文、检测认证机构、权威媒体、官方 SDK 仓库、行业联盟规范页</td><td>"<strong>据 …（第三方）</strong>…"</td></tr><tr><td><strong>[C] 二手</strong></td><td>自媒体、博客、论坛、聚合站</td><td>"<strong>有报道称</strong>…（未经一手核实）"</td></tr><tr><td><strong>[未验证]</strong></td><td>站点可达性已确认但正文未取到</td><td>"<strong>尚未取证</strong>，URL 结构待复核"</td></tr><tr><td><strong>[合理推测]</strong></td><td>由已知架构/规范推导</td><td>"<strong>本报告判断</strong>…（推测，非事实）"</td></tr><tr><td><strong>未找到公开来源</strong></td><td>已检索指定对象无果</td><td>"该方向<strong>未找到公开来源</strong>，不等同于能力缺失"</td></tr></tbody></table></div>
+<h3 id="sec-4">3.2 写作红线（违反即退回重写）</h3>
+<ol><li><strong>禁止</strong>把 [合理推测] 写成陈述句事实。</li><li><strong>禁止</strong>为凑字数引入无关内容、重复段落、无信息量的填充。所有体量来自真实的对照表、机制剖析、工程片段、逐家拆解。</li><li><strong>禁止</strong>编造 URL、标准编号、条款号、数字、时间。本委托已有一次因工具额度导致的取证受限（见信源档案 §0），<strong>不得用记忆填补缺口</strong>。</li><li><strong>禁止</strong>把"未找到公开来源"反向表述为"该企业不具备"。这是中立性红线（AC-11）。</li><li>引用单篇原文不得超过该节篇幅的 5%（避免搬运替代分析）。</li></ol>
+<h3 id="sec-5">3.3 发现严重度分类（沿用本次审计口径，用于"风险"类结论）</h3>
+<div class="table-wrap"><table><thead><tr><th>等级</th><th>判据（满足其一）</th><th>报告中的处理</th></tr></thead><tbody><tr><td><strong>Critical</strong></td><td>授权链可被绕过，导致任意车辆车控/位置被未授权访问；或根密钥可被远程提取</td><td>必须在"对比与差异"中作为行业级风险单列，并给出缓解控制</td></tr><tr><td><strong>High</strong></td><td>单一应用/单一凭证被攻破可横向影响同账号其他车辆或平台其他租户</td><td>单列控制建议（最小权限、令牌绑定）</td></tr><tr><td><strong>Medium</strong></td><td>令牌生命周期管理不当（长效令牌、无轮换、无吊销联动）导致影响范围扩大</td><td>归入"工程实现参考"的控制清单</td></tr><tr><td><strong>Low</strong></td><td>文档与可观测性缺失、日志不含授权决策依据</td><td>归入合规映射章节</td></tr><tr><td><strong>Informational</strong></td><td>架构观察、行业趋势判断</td><td>归入"总结与趋势"</td></tr></tbody></table></div>
+<p><strong>CSO 判定示例（本次已判定，写入报告）</strong>：</p>
+<ul><li>特斯拉 Fleet API 中 <code>vehicle_specs</code> / <code>vehicle_pricing_info</code> <strong>仅 Partner Token 可用且对任意车辆无需车主授权</strong> → 归为 <strong>High</strong>（授权控制例外，需在报告中显式标注为"退出逐车主同意模型"的路径，并建议以契约与审计补偿）。</li><li><code>granular_access.hide_private</code> 在已授予 <code>vehicle_location</code> 的前提下仍拒绝位置字段（403） → 归为 <strong>Informational→正面控制案例</strong>（<strong>双层授权控制</strong>的良好实践，建议其他车企对标）。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-6">
+  <div class="sec-head"><span class="sec-badge">04</span><h2>4. 分析方法论（本委托采用）</h2></div>
+<ol><li><strong>分层解构法</strong>：把"车云安全"解构为 5 层（硬件根信任 → 通信 → 授权 → 应用与平台 → 生命周期/合规），逐层定义"可信基、威胁面、控制点、可验证证据"。</li><li><strong>授权优先权重法</strong>：因委托方明确要求授权章节 ≥300K，授权层按"机制 → 令牌 → 资源级 → 威胁 → 工程 → 逐家实践 → 合规 → 参考表"8 个切面展开，其余层用总纲厚度。</li><li><strong>控制-威胁映射法</strong>：每条控制点反向标记其缓解的威胁（STRIDE / OWASP API Security Top 10 / GB 44495 要求域），确保不出现"无威胁来源的控制"与"无控制的威胁"。</li><li><strong>证据分层写作法</strong>：先写"文档明载"部分，再写"合理推测"部分，两者物理分段。读者可一眼区分。</li><li><strong>对标基准法</strong>：以 <strong>Tesla Fleet API</strong>（公开文档最完整）与 <strong>Mercedes-Benz Developer Platform</strong> 为"已公开实现的标尺"，其他车企与通用方案均与此对标，量化差异（scope 命名空间、令牌 TTL、轮换策略、同意模型、密钥模型）。</li><li><strong>缺口显式化</strong>：所有"未找到公开来源"汇总为待补证清单，并给出补证动作（RFI / 沙箱申请 / 代理重跑 / 采购白皮书）。</li></ol>
+<hr>
+</section>
+<section class="rep-section" id="sec-7">
+  <div class="sec-head"><span class="sec-badge">05</span><h2>5. 质量门（每个交付物必须通过）</h2></div>
+<div class="table-wrap"><table><thead><tr><th>门</th><th>检查项</th><th>工具</th></tr></thead><tbody><tr><td>G1</td><td>每条事实带证据等级 + URL；无 URL 的断言必须标 [合理推测]</td><td>抽样 20 条，与 <code>sources/source-dossier.md</code> 逐条比对</td></tr><tr><td>G2</td><td>无编造：抽查 10 个 URL 的 HTTP 可达性</td><td><code>curl -s -o /dev/null -w "%{http_code}"</code></td></tr><tr><td>G3</td><td>中立性：无贬损措辞；"未找到公开来源"表述未被反向使用</td><td>关键词扫描</td></tr><tr><td>G4</td><td>篇幅：各文件实测字符数 ≥ 配额的 90%（±10% 容差）</td><td><code>wc -m</code></td></tr><tr><td>G5</td><td>AC-2 对账：授权章节 10 个文件字符数之和 ≥ 300K</td><td>汇总表</td></tr><tr><td>G6</td><td>双格式齐备：每个 <code>docs/*.md</code> 有 <code>docs/html/*.html</code></td><td>目录比对</td></tr><tr><td>G7</td><td>HTML 结构完好：<code>&lt;section&gt;</code>/<code>&lt;/section&gt;</code> 配对、<code>&lt;div&gt;</code> 配对、无横向溢出</td><td><code>python3</code> 计数 + <code>browser_console</code> 断言</td></tr><tr><td>G8</td><td>每章含架构图或对照表（非纯文字）</td><td>人工/脚本检查 `</td><td><code> 表与 </code>`` 块</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-8">
+  <div class="sec-head"><span class="sec-badge">06</span><h2>6. 交付物规范</h2></div>
+<h3 id="sec-9">6.1 目录结构（唯一现行版本，禁止 V1/V2 副本）</h3>
+<pre><code>security-investigation/
+├── README.md                       # 索引：章节、AC 对照、证据分级、覆盖度
+├── docs/
+│   ├── 00-engagement-plan.md       # 本文件
+│   ├── 01-overview.md
+│   ├── 02-general-layered-security.md
+│   ├── 10-authz-00-intro.md
+│   ├── 11-authz-10-protocols.md
+│   ├── 12-authz-20-tokens-keys.md
+│   ├── 13-authz-30-resource-authz.md
+│   ├── 14-authz-40-threat-model.md
+│   ├── 15-authz-50-engineering.md
+│   ├── 16-authz-60-cn-oem.md
+│   ├── 17-authz-70-global-oem.md
+│   ├── 18-authz-80-compliance-audit.md
+│   ├── 19-authz-90-reference-tables.md
+│   ├── 20-cn-oem-security.md
+│   ├── 21-global-oem-security.md
+│   ├── 30-comparison.md
+│   ├── 31-summary-trends.md
+│   ├── 90-references.md
+│   ├── sources/source-dossier.md   # 唯一事实底座
+│   └── html/*.html                 # 每个 md 的 CARIAD 风格 HTML
+└── scripts/md2cariad.py            # 确定性 MD→CARIAD HTML 转换器</code></pre>
+<h3 id="sec-10">6.2 单一内容源原则</h3>
+<p><strong>只有 Markdown 是内容源。HTML 一律由 <code>scripts/md2cariad.py</code> 确定性生成，禁止手写 HTML。</strong> 每次改动 MD 后必须重新生成对应 HTML，并在 <code>docs/html/</code> 内<strong>就地覆盖</strong>同名文件。</p>
+<pre><code class="language-bash">python3 scripts/md2cariad.py docs/16-authz-60-cn-oem.md docs/html/16-authz-60-cn-oem.html</code></pre>
+<h3 id="sec-11">6.3 提交纪律</h3>
+<ul><li>分支 <code>main</code> 为共享分支，<strong>多 Agent 并行提交</strong>。提交前先 <code>git log --oneline -3</code> 观察他人进度；<strong>只 <code>git add</code> 自己拥有的文件</strong>。</li><li>推送：<code>timeout 240 git push origin main</code>。失败不阻塞交付：把内容作为 issue 评论投递（见 §6.4）。</li><li>提交信息格式：<code>docs(&lt;WF&gt;): &lt;文件&gt; — &lt;字符数&gt;</code>。</li></ul>
+<h3 id="sec-12">6.4 兜底投递</h3>
+<p>若 git 推送失败（网络/权限），必须在所属子 issue 上以评论形式投递完整正文（评论上限 200000 字符，超长分条），并注明文件路径与实测字符数。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-13">
+  <div class="sec-head"><span class="sec-badge">07</span><h2>7. 里程碑与终审</h2></div>
+<div class="table-wrap"><table><thead><tr><th>里程碑</th><th>内容</th><th>终审人</th><th>判据</th></tr></thead><tbody><tr><td>M1</td><td>框架 v1：方法论 + 概述 + 通用分层 + 授权总论/协议族</td><td>CSO</td><td>G1–G4 通过</td></tr><tr><td>M2</td><td>授权章节 8 切面齐备（10–19 号文件）</td><td>CSO</td><td><strong>AC-2 ≥300K 达成</strong></td></tr><tr><td>M3</td><td>车企实践齐备（16/17/20/21）</td><td>CSO</td><td>AC-4/AC-5 通过</td></tr><tr><td>M4</td><td>对比/总结/参考表/合规章节</td><td>CSO</td><td>AC-6/AC-8 通过</td></tr><tr><td>M5</td><td>全量双格式生成 + 渲染校验 + 发布</td><td><strong>CSO 终审签署</strong></td><td>AC-9/AC-10 通过</td></tr></tbody></table></div>
+<p><strong>终审签署规则（CSO 职权）</strong>：M5 之前任何交付物不得对外发布。终审检查 G1–G8 全绿后，在 TRA-1 上签署"终审通过"评论，并将议题置为 <code>done</code>。若某项 AC 未达成，<strong>不得签署</strong>，须列明缺口与责任工作流。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-14">
+  <div class="sec-head"><span class="sec-badge">08</span><h2>8. 已知风险与缓解</h2></div>
+<div class="table-wrap"><table><thead><tr><th>风险</th><th>影响</th><th>缓解</th></tr></thead><tbody><tr><td>检索工具额度耗尽（已发生）</td><td>无法做开放网络发现，国内车企证据稀薄</td><td>已改用权威 URL 直取 + 证据分级；缺口显式化为待补证清单（AC-8 兜底），在报告中主动声明局限</td></tr><tr><td>部分站点区域封锁（bmw.com / rivian.com / unece.org / iso.org）</td><td>国际车企与标准正文缺失</td><td>待补证清单 + 换出口 IP 重跑；正文引用时标 [未验证]</td></tr><tr><td>并行写入同一共享分支冲突</td><td>丢文件</td><td>文件所有权互斥（§2）；只 add 自己文件</td></tr><tr><td>AC-2 体量目标过高导致注水</td><td>质量下降、违反红线</td><td>配额按 435K 下达（45% 余量）；体量只允许来自对照表/机制剖析/工程片段/逐家拆解</td></tr><tr><td>子 Agent 无上下文导致跑偏</td><td>交付物偏离格式</td><td>每个派工单自包含：文件路径、字符配额、证据等级、写作红线、脚本用法、AC 编号</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-15">
+  <div class="sec-head"><span class="sec-badge">09</span><h2>9. 派工单索引</h2></div>
+<p>每个工作流的派工单以子 issue 形式下发，派工单必须自包含：<strong>拥有的文件路径 / 字符配额 / 覆盖 AC / 证据分级表 / 写作红线 / 转换脚本用法 / 提交纪律 / 兜底投递</strong>。子 issue 与本文档 §2 的 WF 编号一一对应。</p>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 8,725 字符</div>
+  </div>
+</footer>
+</body>
+</html>

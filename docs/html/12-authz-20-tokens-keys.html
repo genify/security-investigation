@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>授权与访问控制 · 令牌与密钥治理 · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="授权与访问控制 · 令牌与密钥治理 — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>授权与访问控制 · 令牌与密钥治理</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">12.0 本章方法与覆盖度声明</a></li>
+<li class="lvl2"><a href="#sec-4">12.1 令牌谱系总览</a></li>
+<li class="lvl2"><a href="#sec-8">12.2 令牌生命周期治理</a></li>
+<li class="lvl2"><a href="#sec-13">12.3 发送方约束令牌（Sender-Constrained Tokens）</a></li>
+<li class="lvl2"><a href="#sec-18">12.4 JWT 与不透明令牌的工程取舍</a></li>
+<li class="lvl2"><a href="#sec-22">12.5 客户端认证与授权链</a></li>
+<li class="lvl2"><a href="#sec-27">12.6 设备授权与受限 UI：RFC 8628</a></li>
+<li class="lvl2"><a href="#sec-28">12.7 密钥生命周期管理（面向车云）</a></li>
+<li class="lvl2"><a href="#sec-33">12.8 工程实现片段</a></li>
+<li class="lvl2"><a href="#sec-37">12.9 失败模式与严重度</a></li>
+<li class="lvl2"><a href="#sec-38">12.10 本章待补证清单</a></li>
+<li class="lvl2"><a href="#sec-39">12.11 本章小结</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<blockquote><p>本文件为 TRA-1《车云安全技术方案调研》第 3 部分「授权与访问控制」的第 3 个切面。 前序：<code>10-authz-00-intro.md</code>（总论）、<code>11-authz-10-protocols.md</code>（协议族）；后续：<code>13-authz-30-resource-authz.md</code>（资源级授权）。 覆盖验收标准：AC-2、AC-3、AC-7、AC-12。</p></blockquote>
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>12.0 本章方法与覆盖度声明</h2></div>
+<h3 id="sec-1">12.0.1 本章的唯一事实底座</h3>
+<p>本章全部事实性断言，均取自本仓库的 <code>docs/sources/source-dossier.md</code>（下称"信源档案"）。信源档案 §0 已声明本次调研的采集方法：<strong>检索工具不可用</strong>（<code>web_search</code>/<code>web_extract</code> 全程返回额度耗尽），采集方式退化为"直取已知权威 URL"（<code>terminal + curl</code> 与浏览器直连）。因此本章不引入任何信源档案之外的 URL、标准编号、条款号、数字或日期。</p>
+<p><strong>证据等级沿用 <code>00-engagement-plan.md</code> §3.1 的统一口径</strong>，本章正文中一律以方括号标注：</p>
+<div class="table-wrap"><table><thead><tr><th>标记</th><th>含义</th><th>本章允许的措辞</th></tr></thead><tbody><tr><td><code>[A]</code></td><td>一手：RFC Editor / openid.net 规范正文、OEM 官方开发者文档、官方规范库</td><td>"文档明载……"</td></tr><tr><td><code>[B]</code></td><td>权威第三方：行业联盟规范页、官方 SDK 仓库</td><td>"据……（第三方）……"</td></tr><tr><td><code>[C]</code></td><td>二手：自媒体、论坛、聚合站</td><td>"有报道称……（未经一手核实）"</td></tr><tr><td><code>[未验证]</code></td><td>站点可达性确认但正文未取到</td><td>"尚未取证，URL 结构待复核"</td></tr><tr><td><code>[推测]</code></td><td>由已知规范/架构推导，档案无直接来源</td><td>"<strong>本报告判断</strong>……（推测，非事实）"</td></tr><tr><td><code>未找到公开来源</code></td><td>已检索指定对象无果</td><td>"本次未找到公开来源，不等同于能力缺失"</td></tr></tbody></table></div>
+<h3 id="sec-2">12.0.2 本章的证据构成</h3>
+<p>本章直接使用的 <code>[A]</code> 一手条目分布如下（来源分类见信源档案 §2、§3、§4、§7）：</p>
+<ul><li><strong>规范条目（信源档案 §2，全部经 RFC Editor / openid.net 取证 HTTP 200）</strong>：RFC 6749、RFC 6750、RFC 7009、RFC 7523、RFC 7636、RFC 7662、RFC 8252、RFC 8414、RFC 8628、RFC 8693、RFC 8705、RFC 9068、RFC 9396、RFC 9470、RFC 9449、RFC 9635、OIDC Core 1.0、OIDC Discovery 1.0、OAuth 2.1 草案 <code>draft-ietf-oauth-v2-1-16</code>。—— 这是本章"机制剖析"部分的骨架。</li><li><strong>通信与 PKI 条目（信源档案 §3）</strong>：RFC 8446、RFC 5280、RFC 6960、RFC 3161、RFC 8555、RFC 5480、RFC 8017、RFC 6090、RFC 8998。</li><li><strong>硬件根信任与密钥管理条目（信源档案 §4）</strong>：FIPS 140-3、FIPS 186-5、FIPS 197、NIST SP 800-57 Part 1 Rev.5、SP 800-38D、SP 800-90A Rev.1、SP 800-133、GlobalPlatform TEE System Architecture v1.3（规范号 GPD_SPE_009）、GlobalPlatform Secure Element 分类。EVITA 分级为 <code>[B]</code>。</li><li><strong>车企一手证据（信源档案 §7）</strong>：Tesla（<code>developer.tesla.com</code>，本章引用最密）、Mercedes-Benz（<code>developer.mercedes-benz.com</code>）、Volkswagen Group / CARIAD（自述营销口径）、比亚迪 i迪桥、蔚来 Open NSC、小米 IoT 平台。BMW / Rivian 为本次网络封锁未取到（信源档案 §7.4 / §7.5），本章仅将其列为"未找到公开来源"的补证对象，<strong>不作能力判断</strong>。</li></ul>
+<h3 id="sec-3">12.0.3 本章的判断边界</h3>
+<p>以下三类内容在本章被<strong>显式标记为推测</strong>，不进入事实层：</p>
+<ol><li>由 RFC 规范语义推导、但档案无对应企业实现证据的工程建议（例如"为高危车控命令引入步进认证"）。</li><li>由两处 <code>[A]</code> 事实（如 Tesla 的刷新令牌一次性 + 24 小时宽限）组合出的、档案未直接陈述的行为推理。</li><li>面向车云场景的分级、配额、阈值建议——本章给出的具体数值（若有）一律标注为"设计建议值"，与"文档明载值"物理分隔。</li></ol>
+<p><strong>中立性声明（对齐 AC-11 与信源档案 §0）</strong>：信源档案 §0 明确记录"覆盖度偏置"——证据密度向"文档公开可达"的企业倾斜，Tesla 与 Mercedes-Benz 证据最厚，BMW / Rivian / 小鹏 / 极氪 / 零跑 / 理想 / 华为 / 奇瑞证据薄弱。本章凡是写"本次未找到公开来源"之处，<strong>一律是本次披露缺口的陈述，绝不等同于该企业不具备相应能力</strong>。信源档案 §7.10 第 5 条特别指出：本次 9 家国内车企全部未取得关于"国密 SM2/SM3/SM4""mTLS 双向证书""证书轮换""HSM/SE/TEE"的任何官方一手来源，本章相关小节据此只写"未找到公开来源 / 待补证"。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-4">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>12.1 令牌谱系总览</h2></div>
+<h3 id="sec-5">12.1.1 为什么先做"谱系"而不是先做"协议"</h3>
+<p>授权与访问控制在工程上最终收敛为一件事：<strong>一个字符串（或一个签名结构）被随请求携带，由资源服务器判定"这个请求代表谁、可以做什么"</strong>。这个字符串就是令牌。车云场景的特殊性在于，这个字符串的持有方链条异常长——车主手机 → 第三方应用 → 车企云 → 车端网关 → 车辆内 ECU——且链条上每一跳的可信度不同。因此本章不从协议流（<code>10</code>/<code>11</code> 号文件已覆盖）入手，而从<strong>令牌类型本身的属性</strong>入手：一种令牌能活多久、会不会被复制、被绑定到谁、失效后代码会发生什么。</p>
+<h3 id="sec-6">12.1.2 令牌类型 × 生命周期 × 可复制性 × 绑定对象 × 失败后果（大对照表）</h3>
+<p>下表是本节的骨架。<strong>"生命周期"列的数值仅当信源档案中有明载值时才给出数值，否则写"规范未规定具体时长"</strong>——这是本章反复强调的一个纪律：OAuth 规范族几乎不规定令牌时长，时长是部署决策；而车企文档中出现的具体秒数/月数才是 <code>[A]</code> 事实。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>令牌/凭证类型（规范依据）</th><th>生命周期</th><th>可复制性</th><th>绑定对象</th><th>失败后果</th></tr></thead><tbody><tr><td>1</td><td>授权码 authorization code（RFC 6749）</td><td>极短，一次性</td><td>可被拦截（公共客户端）</td><td>绑定 <code>client_id</code> + <code>redirect_uri</code></td><td>重放换码即失窃；PKCE 与 <code>state</code> 是对策</td></tr><tr><td>2</td><td>访问令牌 access token（RFC 6749 / RFC 6750）</td><td>部署决定；Mercedes 默认 <code>expires_in=3599</code> 秒 <code>[A]</code></td><td>若为 Bearer，<strong>默认可复制</strong></td><td>Bearer 无绑定；mTLS/DPoP 引入绑定</td><td>被盗即被用；缓解靠短 TTL + 绑定</td></tr><tr><td>3</td><td>刷新令牌 refresh token（RFC 6749）</td><td>长于访问令牌；Tesla 3 个月 <code>[A]</code></td><td>可复制，但一次性使用削弱重放价值</td><td>绑定 <code>client_id</code>；Tesla 另受 scope 影响 <code>[A]</code></td><td>泄露后攻击者可长期续命；轮换是主控制</td></tr><tr><td>4</td><td>id_token（OIDC Core 1.0）</td><td>短；仅用于认证时刻</td><td>可复制</td><td><code>aud</code> 绑定客户端</td><td>被误当 access token 用（见 12.4.3）</td></tr><tr><td>5</td><td>客户端断言 client assertion（RFC 7523）</td><td>极短（防止重放）</td><td>可复制但有短时窗</td><td>绑定 <code>client_id</code> + JWT <code>aud</code>/<code>jti</code></td><td>重放窗口；<code>jti</code> 去重是对策</td></tr><tr><td>6</td><td>设备码 device_code / user_code（RFC 8628）</td><td>短；<code>expires_in</code> + 轮询 <code>interval</code></td><td>user_code 对人可见、可被社工</td><td>绑定设备授权请求会话</td><td>轮询过密触发 <code>slow_down</code>；见 12.6</td></tr><tr><td>7</td><td>mTLS 证书绑定访问令牌（RFC 8705）</td><td>同访问令牌</td><td><strong>不可直接复制</strong>（复制后无对应私钥）</td><td>绑定客户端证书指纹 <code>x5t#S256</code>（<code>cnf</code>）</td><td>指纹不匹配即拒；见 12.3.2</td></tr><tr><td>8</td><td>DPoP 绑定访问令牌（RFC 9449）</td><td>同访问令牌</td><td><strong>不可直接复制</strong></td><td>绑定客户端持有的 JWK 指纹 + <code>DPoP</code> 头</td><td><code>DPoP</code> 头缺失/<code>jti</code> 重放即拒；见 12.3.3</td></tr><tr><td>9</td><td>令牌交换 subject_token（RFC 8693）</td><td>随新签发令牌</td><td>同其所代表的令牌</td><td>代表"主体"</td><td>主体混淆导致越权；见 12.5.3</td></tr><tr><td>10</td><td>令牌交换 actor_token（RFC 8693）</td><td>随新签发令牌</td><td>同其所代表的令牌</td><td>代表"代理方"</td><td><code>act</code> 链断裂则审计不可归因</td></tr><tr><td>11</td><td>内省响应 introspection response（RFC 7662）</td><td>实时查询、不缓存或短缓存</td><td>不适用（服务器侧）</td><td>查询方需自身已认证</td><td>内省端点成为信任瓶颈；见 12.4.2</td></tr><tr><td>12</td><td>富授权请求 authorization_details（RFC 9396）</td><td>随授权请求/令牌</td><td>随令牌</td><td>结构化资源描述</td><td>粒度不足退化为裸 scope；见 13 号文件</td></tr><tr><td>13</td><td>Tesla third-party token（代表车主）<code>[A]</code></td><td>访问令牌 TTL 本次<strong>未证实</strong></td><td>Bearer，可复制</td><td>车主 consent + scope</td><td>撤销 consent 即失效 <code>[A]</code></td></tr><tr><td>14</td><td>Tesla partner token <code>[A]</code></td><td>文档未明载时长</td><td>Bearer，可复制</td><td>合作伙伴身份（非车主）</td><td>可访问 <code>vehicle_specs</code> 任意车辆 <code>[A]</code></td></tr><tr><td>15</td><td>Tesla third-party-for-business token <code>[A]</code></td><td>文档未明载时长</td><td>Bearer，可复制</td><td>企业主体</td><td>与 partner token 同族，语义面向企业</td></tr><tr><td>16</td><td>Tesla 虚拟密钥（P-256 公私钥对）<code>[A]</code></td><td>长期（用户显式删除前）</td><td>私钥不可复制（留应用服务器）</td><td>绑定车辆 + 开发者域名</td><td>车辆拒绝未签名载荷 <code>[A]</code>；见 12.3.4</td></tr><tr><td>17</td><td>BYD i迪桥 <code>x-Gateway-APIKey</code>（appKey）<code>[A]</code></td><td>文档未明载</td><td>静态密钥，<strong>可复制</strong></td><td>绑定应用身份</td><td>泄露即裸调用；见 12.5.2 讨论</td></tr><tr><td>18</td><td>NIO app-id + secret 双凭证 <code>[A]</code></td><td>文档未明载</td><td>静态密钥，可复制</td><td>绑定应用身份</td><td>同上；文档本身亦受 token 保护 <code>[A]</code></td></tr><tr><td>19</td><td>GNAP grant（RFC 9635）</td><td>协商决定</td><td>取决于访问令牌形态</td><td>协商的客户端实例</td><td>演进方向；见 12.0.3 边界声明</td></tr></tbody></table></div>
+<blockquote><p>表注：第 13–16 行的"文档未明载"是<strong>如实标注</strong>，不是"不存在"——见信源档案 §7.1「Tesla 未能证实项」：访问令牌有效期约 8 小时的说法在该档案已读页面中<strong>未获证实</strong>，因此本章不写 8 小时。</p></blockquote>
+<h3 id="sec-7">12.1.3 从谱系读出的三条结构性结论</h3>
+<p><strong>结论一：车云场景的令牌必须从"第 2 行"向"第 7/8/16 行"迁移。</strong> 表中第 2 行（Bearer 访问令牌）的"可复制性"标注为"默认可复制"，这是 RFC 6750 语义的固有属性：Bearer 令牌的持有即证明。信源档案 §2 将 RFC 8705 标注为"<strong>车云链路最关键的授权规范</strong>"，其理由正在于此——车云链路的承载介质（手机 App、车机车机、TSP 服务器）比传统 Web 浏览器更难保证"令牌不离域"。这是一个规范层面的结构性判断，不是对任何单一企业的评价。</p>
+<p><strong>结论二：车控命令的最后一道闸门在车端，不在云端。</strong> 表第 16 行来自 Tesla 的文档明载：<strong>车辆在执行命令前或接受 Fleet Telemetry 配置前验证载荷签名</strong> <code>[A]</code>（信源档案 §7.1）。这意味着即使云端令牌完全泄露，攻击者仍缺少应用私钥，无法构造通过车端验签的载荷。档案同处引述 Tesla 文档称虚拟密钥"甚至能阻止 Tesla 自己的后端访问这些能力" <code>[A]</code>——这是一个<strong>去中心化的信任锚点</strong>，其意义在 12.3.4 展开。</p>
+<p><strong>结论三：静态密钥（第 17/18 行）与令牌体系不是同一代际的设计。</strong> 比亚迪 i迪桥文档明载鉴权为 <code>x-Gateway-APIKey</code>（应用 appKey）置于请求头 <code>[A]</code>；蔚来 Open NSC 文档明载 <code>app-id</code> 和 <code>secret</code> 是系统对接调用的唯一凭证 <code>[A]</code>。<strong>但必须严格区分</strong>：信源档案 §7.10 第 3 条明确警告，i迪桥是<strong>企业级 ESB 网关</strong>（覆盖供应链/研发/智造/营销/物流/品质/财务七大领域），与"车控开放平台 / 车主 API"不是同一事物，报告必须区分，避免误导向"比亚迪车云授权 = APIKey"的过度归纳。同理，§7.10 第 4 条指出蔚来 Open NSC 文档停留在 2019-08-13、站点自述"正在建设中"，<strong>不能代表蔚来当前车云安全架构</strong>。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-8">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>12.2 令牌生命周期治理</h2></div>
+<h3 id="sec-9">12.2.1 令牌 TTL 设计与"过期"的真实语义</h3>
+<h4>12.2.1.1 一个必须先讲清的概念区分</h4>
+<p>工程上常说"令牌过期了"，但这句话在 OAuth 语义里至少含三个不同的失效原因，它们的处置动作完全不同：</p>
+<ul><li><strong>时间到期（<code>exp</code>）</strong>：令牌的绝对过期时刻到达。处置：用刷新令牌换新，不打扰用户。</li><li><strong>被替代（superseded / squeezed out）</strong>：刷新令牌轮换后，旧刷新令牌被新令牌挤出。处置：若应用正确持久化了新令牌则无感；否则触发重新登录。</li><li><strong>授权变更（consent revoked / password reset）</strong>：用户侧动作导致授权基础消失。处置：<strong>无法通过刷新恢复</strong>，必须重新走授权码流程。</li></ul>
+<p>信源档案 §7.1 有这一区分的<strong>直接一手证据</strong>：Tesla 文档明载，刷新失败返回 <code>401 login_required</code> 有两种触发场景——"刷新令牌过期/被更新令牌挤出"或"用户已重置密码" <code>[A]</code>。这两个场景被文档明确并列为同一错误码的两个触发条件，说明<strong>厂商自身也在客户端侧把它们收敛为同一处置动作（重新登录）</strong>，但在服务端审计上它们代表完全不同的因果链。</p>
+<h4>12.2.1.2 两个真实数值的基准对照</h4>
+<p>下表把信源档案中<strong>有明载数值</strong>的两家放在一起。请特别注意：表中每一个数值都可回溯到信源档案条目；空着的格子就是"文档未明载"，不得凭经验填充。</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>Tesla Fleet API（信源档案 §7.1，[A]）</th><th>Mercedes-Benz Developer Platform（信源档案 §7.2，[A]）</th></tr></thead><tbody><tr><td>访问令牌有效期</td><td><strong>未证实</strong>（档案已读页面未见 TTL；"约 8 小时"一说被档案显式列为未能证实项）</td><td>响应 <code>expires_in</code> 为秒数，"<strong>默认 3599 秒</strong>"（≈1 小时）</td></tr><tr><td>刷新令牌有效期</td><td><strong>3 个月</strong>（文档明载）</td><td>文档未明载绝对时长</td></tr><tr><td>刷新令牌使用次数</td><td><strong>一次性（single use only）</strong></td><td><strong>一次性使用</strong>；已用/无效报错 "The given refresh token is not valid or was already used"</td></tr><tr><td>刷新宽限期</td><td><strong>最近一次使用的刷新令牌在 24 小时内仍有效</strong></td><td>文档未明载宽限期</td></tr><tr><td>刷新返回值</td><td>文档未明载是否返回新刷新令牌</td><td><strong>返回新的访问令牌与新的刷新令牌</strong>（成对返回）</td></tr><tr><td>令牌端点</td><td><code>POST https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/token</code></td><td><code>https://ssoalpha.dvb.corpinter.net/v1/token</code></td></tr><tr><td>客户端认证到令牌端点</td><td>请求体含 <code>client_id</code>、<code>client_secret</code></td><td><strong>HTTP Basic</strong>（<code>clientId:clientSecret</code> BASE64 置于 <code>Authorization</code> 头）</td></tr><tr><td>授权端点</td><td><code>https://auth.tesla.com/oauth2/v3/authorize</code></td><td><code>https://ssoalpha.dvb.corpinter.net/v1/auth</code></td></tr><tr><td>授权服务器发现</td><td><code>https://fleet-auth.prd.vn.cloud.tesla.com/oauth2/v3/thirdparty/.well-known/openid-configuration</code></td><td>文档未明载 discovery 端点</td></tr></tbody></table></div>
+<p><strong>读表的三个要点：</strong></p>
+<ol><li><strong>两家都实现了一次性刷新令牌轮换。</strong> 这不是巧合——它是 OAuth 2.0 生态里对抗"刷新令牌泄露后长期有效"的主流工程手段。它对客户端的额外要求是<strong>必须原子地持久化轮换后的新令牌</strong>，否则下一次刷新会因使用旧令牌而失败。这正是 Tesla 需要"24 小时宽限"的原因（见 12.2.2）。</li><li><strong>Mercedes 的 <code>expires_in=3599</code> 秒是一个"偏向保守"的默认值</strong>。3599 而非 3600 是一个常见的实现约定（留给时钟偏差与网络往返余量）。<strong>本报告判断</strong>（推测，非事实）：短访问令牌 + 长刷新令牌的组合，把"令牌泄露的暴露窗口"压缩到小时级，同时把用户体验的登录频次降到 3 个月级。这是规范推导出的通用权衡，档案并未就 Mercedes 的具体设计意图作出陈述。</li><li><strong>Tesla 的访问令牌 TTL 缺失是一个必须显式保留的缺口。</strong> 信源档案 §8 覆盖度局限表将其列为待补证项，建议补证方式为"实机走一遍 token 响应读取 <code>expires_in</code>"。本章不补这个洞——任何填进这个空格的数字都会违反红线第 1 条。</li></ol>
+<h4>12.2.1.3 "过期"在车云链路上的多层语义</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：车云链路的"令牌过期"会同时发生在多个独立层，各层的过期时间尺度相差数个数量级，且<strong>没有统一的协调机制</strong>。层与层的对应关系如下：</p>
+<div class="table-wrap"><table><thead><tr><th>层级</th><th>令牌/凭证</th><th>时间尺度（依据）</th></tr></thead><tbody><tr><td>应用业务层</td><td>OAuth 访问令牌</td><td>小时级（Mercedes 3599 秒 <code>[A]</code>）</td></tr><tr><td>应用业务层</td><td>OAuth 刷新令牌</td><td>月级（Tesla 3 个月 <code>[A]</code>）</td></tr><tr><td>传输层</td><td>TLS 会话票据 / 会话会话</td><td>握手时协商（RFC 8446 <code>[A]</code>）</td></tr><tr><td>传输层</td><td>客户端证书</td><td>年级（受 CA 策略与 RFC 5280 约束 <code>[A]</code>）</td></tr><tr><td>设备身份层</td><td>车端设备证书</td><td>年级（RFC 5280 / RFC 8555 <code>[A]</code>）</td></tr><tr><td>命令授权层</td><td>Tesla 虚拟密钥</td><td><strong>无自动过期</strong>，直到用户在车辆 Locks 界面删除 <code>[A]</code></td></tr></tbody></table></div>
+<p>这个表的工程含义是：<strong>TLS 层和虚拟密钥层不会自动跟随 OAuth 层的缩短而缩短</strong>。当业务层把访问令牌压到小时级以求最小暴露面时，若命令授权层的虚拟密钥仍是"永久有效直到手动删除"，则整个系统的有效暴露面由<strong>最长的那个</strong>决定。<strong>本报告判断</strong>（推测，非事实）：这是令牌治理中最容易被忽视的不一致，缓解手段是为虚拟密钥引入周期性重新配对流程（Tesla 文档未描述此类流程，见 12.10）。</p>
+<h3 id="sec-10">12.2.2 刷新令牌轮换（rotation）</h3>
+<h4>12.2.2.1 轮换机制的形式化</h4>
+<p>刷新令牌轮换的基本断言是：<strong>每次使用刷新令牌换取新访问令牌时，刷新令牌自身也被替换</strong>。信源档案中有两处 <code>[A]</code> 直接支持：</p>
+<ul><li>Mercedes：<code>grant_type=refresh_token</code>，刷新令牌一次性使用，授权服务器返回<strong>新的访问令牌与新的刷新令牌</strong> <code>[A]</code>。</li><li>Tesla：刷新令牌<strong>一次性使用（single use only）</strong>，且<strong>最近一次使用的刷新令牌在 24 小时内仍有效</strong> <code>[A]</code>。</li></ul>
+<p>这两条合起来给出轮换的完整状态机。<strong>本报告判断</strong>（推测，非事实）：按规范语义推导，服务端需要维护的刷新令牌状态至少包含四个：<code>当前有效</code>、<code>刚被轮换（宽限窗口中）</code>、<code>已过期</code>、<code>已吊销</code>。客户端侧对应需要维护的持久化状态是"我手里这把是不是最新的"。</p>
+<h4>12.2.2.2 并发竞态：轮换的真正难点</h4>
+<p>轮换的<strong>工程难点不在轮换本身，而在并发</strong>。考虑一个典型的车云第三方应用：它是多副本部署的（负载均衡后 3 个实例），令牌存储在一个共享数据库里。</p>
+<p>故障序列（<strong>本报告判断</strong>，推测，非事实——基于轮换机制语义推导）：</p>
+<ol><li>实例 A 与实例 B 同时收到请求，两者读到的刷新令牌都是 <code>RT_n</code>。</li><li>实例 A 先发出刷新请求，服务端把 <code>RT_n</code> 标记为"刚被轮换"，签发 <code>AT_{n+1}</code> + <code>RT_{n+1}</code>，并在 24 小时宽限窗口内保留 <code>RT_n</code> 可用（Tesla 模型 <code>[A]</code>）。</li><li>实例 A 写入 <code>RT_{n+1}</code>。</li><li>实例 B 稍后发出刷新请求，携带的仍是 <code>RT_n</code>。在 Tesla 模型下，因为落在 24 小时宽窗内，服务端<strong>接受</strong>，并再签发一对新令牌——但这可能是 <code>AT_{n+2}</code> + <code>RT_{n+2}</code>。</li><li>若实例 B 写入的 <code>RT_{n+2}</code> 晚于实例 A 的写入，则 <code>RT_{n+1}</code> 被覆盖且从未被使用；反之 <code>RT_{n+2}</code> 被覆盖。<strong>两者都不会立刻报错</strong>，但下一次刷新使用的令牌可能已在服务端被挤出，触发 <code>401 login_required</code> <code>[A]</code>。</li></ol>
+<p><strong>这就是"宽限期"在工程上的双刃性</strong>：它覆盖了"应用未能持久化轮换后令牌"的失败场景（信源档案 §7.1 明确记录了宽限期的这一用途 <code>[A]</code>），但它同时<strong>把单次错误变成可容忍的重复</strong>，从而给了并发场景一个"看起来能跑、偶发掉线"的窗口。</p>
+<h4>12.2.2.3 宽限期设计的两个参数</h4>
+<p>宽限期这个机制出厂只有两个可调参数：<strong>窗口长度</strong>与<strong>窗口内是否允许重复签发</strong>。</p>
+<div class="table-wrap"><table><thead><tr><th>策略</th><th>行为</th><th>代价</th></tr></thead><tbody><tr><td>窗口内可重复签发</td><td>并发刷新都能成功</td><td>出现"多把有效刷新令牌"，轮换的检测价值下降</td></tr><tr><td>窗口内返回同一对令牌（幂等）</td><td>并发刷新结果一致</td><td>需要服务端按 <code>RT_n</code> 做幂等映射，状态存储增大</td></tr><tr><td>无宽限期（严格一次性）</td><td>轮换的强检测（重放即拒）</td><td>任何客户端持久化失败 = 强制用户重新登录</td></tr></tbody></table></div>
+<p>Tesla 的文档明载了窗口长度（24 小时）<code>[A]</code>，但<strong>未明载窗口内的行为是"可重复签发"还是"幂等返回"</strong>。这是一个必须保留的空白——本章在 12.8.3 给出的实现示意中，采用"幂等键 + 加锁"的客户端方案来规避该不确定性，并明确标注为<strong>设计建议，非对 Tesla 行为的断言</strong>。</p>
+<h4>12.2.2.4 失败恢复语义</h4>
+<p>轮换失败后的恢复路径按原因分三类：</p>
+<div class="table-wrap"><table><thead><tr><th>失败原因</th><th>服务端返回</th><th>客户端应做什么</th><th>依据</th></tr></thead><tbody><tr><td>令牌时间到期</td><td>Tesla：<code>401 login_required</code>；Mercedes：文档列"Invalid grant"用于授权码无效或已被使用</td><td>走完整授权码流程</td><td>Tesla <code>[A]</code>；Mercedes <code>[A]</code></td></tr><tr><td>令牌被挤出（已过期或被更新令牌挤出）</td><td>Tesla：<code>401 login_required</code></td><td>走完整授权码流程</td><td>Tesla <code>[A]</code></td></tr><tr><td>用户已重置密码</td><td>Tesla：<code>401 login_required</code></td><td>走完整授权码流程</td><td>Tesla <code>[A]</code></td></tr><tr><td>已用过的刷新令牌</td><td>Mercedes：<strong>"The given refresh token is not valid or was already used"</strong></td><td>判定是否需要重新授权</td><td>Mercedes <code>[A]</code></td></tr><tr><td>请求了未注册的 scope</td><td>Mercedes：<code>invalid_scope</code> → "No registered scope value for this client has been requested"</td><td>修正 scope 参数</td><td>Mercedes <code>[A]</code></td></tr><tr><td><code>redirect_uri</code> 不一致</td><td>Mercedes："Invalid redirect URL"</td><td>修正注册值</td><td>Mercedes <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>这里有一个重要的语义观察</strong>：Tesla 把"令牌过期""被挤出""密码重置"三种原因收敛到同一个 <code>401 login_required</code>。<strong>本报告判断</strong>（推测，非事实）：这种收敛对客户端实现友好（一个错误码一种处置），但<strong>牺牲了客户端的可观测性</strong>——客户端无法区分"用户改密码了，应该提示用户'因安全原因需重新登录'"与"我们的令牌存储出了并发 bug，应该告警"。缓解手段是客户端侧为每次刷新尝试打独立的关联标识，把 <code>login_required</code> 的发生频率与自身令牌存储的健康指标关联分析。</p>
+<h3 id="sec-11">12.2.3 吊销与传播</h3>
+<h4>12.2.3.1 规范层：吊销端点与内省端点</h4>
+<p>信源档案 §2 收录了两个直接相关的规范，均为 <code>[A]</code>：</p>
+<ul><li><strong>RFC 7009（2013）OAuth 2.0 Token Revocation</strong>：定义令牌吊销端点。它的关键语义边界是——<strong>吊销的传播是"尽力而为"的</strong>。规范层面，资源服务器并不保证立刻感知。</li><li><strong>RFC 7662（2015）OAuth 2.0 Token Introspection</strong>：定义内省端点，让资源服务器在每次使用时向授权服务器查询令牌状态。</li></ul>
+<p>这两个规范合起来描述了一个<strong>基本矛盾</strong>：吊销需要"实时传播"才有效，而内省是"有成本的实时查询"。</p>
+<h4>12.2.3.2 车企实现层：Tesla 的三条吊销传播路径</h4>
+<p>信源档案 §7.1 提供了三条 <strong><code>[A]</code></strong> 的、彼此独立的吊销传播路径，它们分别作用于不同层级：</p>
+<p><strong>路径一：授权范围/授权的撤销（车主侧入口）</strong> 文档明载车主可通过 <code>https://auth.tesla.com/user/revoke/consent?revoke_client_id=$CLIENT_ID&amp;back_url=$RETURN_URL</code> <strong>管理授权范围或撤销授权</strong> <code>[A]</code>。这是"授权基础"层的撤销，作用点是 OAuth consent。</p>
+<p><strong>路径二：scope 缩减对既有令牌的生效规则</strong> 文档明载：<strong>scope 缩减与既有刷新令牌兼容，仅对新签发的访问令牌生效</strong> <code>[A]</code>。这条规则的工程含义极其重要：</p>
+<ul><li>撤销一个 scope 后，<strong>已有的访问令牌在到期前仍然带着那个 scope 有效</strong>。这是一个"撤销不即时"的明确窗口。</li><li>只有重新签发访问令牌时，新的 scope 集合才生效。</li><li>反向操作（<strong>新增</strong> scope）需要以 <code>prompt_missing_scopes=true</code> <strong>重新发起</strong> <code>/authorize</code> <code>[A]</code>——即新增权限必须重新经过车主同意界面。</li></ul>
+<p><strong>路径三：配置级的下游联动（Fleet Telemetry）</strong> 文档明载：Fleet Telemetry 配置由应用私钥<strong>签名</strong>且"Tesla 无法编辑"；<strong>若所需 scope 被撤销导致配置失效，配置会被从车辆移除</strong> <code>[A]</code>。这是一条<strong>非常值得对标的控制</strong>：撤销一个云端授权，触发了<strong>车端推流配置的自动回收</strong>。它不是"下次请求被拒"，而是"主动清理既有状态"。</p>
+<p><strong>路径四（命令级）：虚拟密钥的删除</strong> 文档明载，虚拟密钥的吊销由<strong>用户在车辆 Locks 界面删除密钥</strong>完成 <code>[A]</code>。注意这条路径的作用域：它关闭的是<strong>车端命令执行能力</strong>，而不是云端 API 访问能力——两者独立。</p>
+<h4>12.2.3.3 吊销传播的时间线（本报告判断，推测）</h4>
+<p>把上面四条路径合起来，可以画出一条<strong>多级、非同时</strong>的吊销传播时间线。<strong>本报告判断</strong>（推测，非事实）——这是对已知事实组合出的推理，档案未直接描述这条时间线：</p>
+<pre><code>t0  车主点击 revoke consent（路径一，[A] 入口）
+    │
+    ├─ t0 + ε   刷新令牌立即失效（推断依据：刷新需在线校验授权状态）
+    │            客户端下次刷新 → 401 login_required（[A] 错误语义）
+    │
+    ├─ t0 + T_at  当前访问令牌到期（T_at 见 12.2.1；Tesla 值未证实）
+    │            在此之前，被撤销 scope 对应的 API 调用【仍可能成功】
+    │            依据：文档明载 scope 缩减&quot;仅对新签发的访问令牌生效&quot;（[A]）
+    │
+    └─ 车端侧：
+         ├─ Fleet Telemetry 配置被从车辆移除（[A] 明载的自动联动）
+         └─ 虚拟密钥【仍存在】直至车主手动在 Locks 界面删除（[A]）</code></pre>
+<p><strong>这张图暴露的核心风险</strong>：在 <code>t0</code> 到 <code>t0 + T_at</code> 之间，存在一个<strong>"已撤销但未到期"的访问令牌窗口</strong>。攻击者若在此窗口内持有被撤销前泄露的访问令牌，仍可调用 API。这不是 Tesla 的缺陷陈述——文档明载的"scope 缩减仅对新签发访问令牌生效"是 OAuth 生态的通行语义；<strong>本报告判断</strong>（推测，非事实）：缩短访问令牌 TTL 是压缩该窗口最直接的手段，而 Tesla 的访问令牌 TTL 恰恰是本次未证实项（12.2.1.2），因此该窗口的<strong>实际长度无法从公开文档评估</strong>。</p>
+<h4>12.2.3.4 吊销事件的可观测性缺口</h4>
+<p>信源档案 §7.1 记录了 Tesla 的限流与计费模型，其中一个细节与吊销治理有关：<strong>超限会暂停 API 使用并移除 Fleet Telemetry 推流配置（且不恢复）</strong> <code>[A]</code>。这是一条"非安全性的吊销"——它由计费边界触发，但后果与安全吊销（配置被移除）<strong>在表现上无法区分</strong>。</p>
+<p><strong>本报告判断</strong>（推测，非事实）：这意味着一个第三方应用运维团队在收到"推流配置消失"的告警时，<strong>无法仅凭现象判定是"车主撤销了授权"还是"我们超额被暂停了"</strong>。缓解手段是为两种路径建立可区分的审计事件（例如授权服务器在撤销时发出一次带原因的信号）。这是 L 级（Low，文档与可观测性缺失）问题，按 <code>00-engagement-plan.md</code> §3.3 归入合规映射章节。</p>
+<h3 id="sec-12">12.2.4 令牌轮换与证书轮换的区别与协同</h3>
+<p>这两种"轮换"常被混为一谈，其实它们的作用层与失败后果完全不同。</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>令牌轮换</th><th>证书轮换</th></tr></thead><tbody><tr><td>轮换对象</td><td>OAuth 刷新令牌 / 访问令牌</td><td>X.509 证书与其私钥</td></tr><tr><td>规范依据</td><td>RFC 6749（刷新令牌）<code>[A]</code></td><td>RFC 5280（PKI）<code>[A]</code>、RFC 8555（ACME）<code>[A]</code>、RFC 6960（OCSP）<code>[A]</code></td></tr><tr><td>时间尺度</td><td>小时至月（Mercedes 3599 秒 <code>[A]</code>、Tesla 3 个月 <code>[A]</code>）</td><td>年级（受 CA 策略约束）</td></tr><tr><td>自动化程度</td><td>客户端协议内建（刷新即轮换）</td><td>需要独立的自动化（ACME 是工程前提）</td></tr><tr><td>失败的真实后果</td><td>强制用户重新登录（体验降级）</td><td><strong>链路中断</strong>（服务不可达）</td></tr><tr><td>撤销机制</td><td>RFC 7009 吊销端点 <code>[A]</code></td><td>RFC 5280 CRL <code>[A]</code> / RFC 6960 OCSP <code>[A]</code></td></tr><tr><td>与车云的关系</td><td>云端 API 访问控制</td><td>车云链路建立（mTLS）与车端身份</td></tr></tbody></table></div>
+<h4>12.2.4.1 RFC 8555 ACME 作为短周期证书的工程前提</h4>
+<p>信源档案 §3 收录 <strong>RFC 8555（2019）ACME</strong>，并标注其定位为"<strong>自动化证书签发/轮换，短周期证书的工程前提</strong>" <code>[A]</code>。</p>
+<p><strong>本报告判断</strong>（推测，非事实）：短周期证书（例如 90 天或更短）的安全性优势是"私钥暴露窗口小、吊销依赖弱"，但它的<strong>前提是轮换必须全自动</strong>——人工轮换与 90 天周期不兼容。因此对车云场景而言，"是否使用短周期证书"这个问题实际上等价于"是否具备全自动证书生命周期管理能力"。这是规范语义推导出的工程结论，档案未对任何车企的 ACME 使用情况作出陈述（信源档案 §7.10 第 5 条：9 家国内车企的"证书轮换"方向<strong>未找到公开来源</strong>）。</p>
+<h4>12.2.4.2 RFC 3161 时间戳作为防重放的时间基准</h4>
+<p>信源档案 §3 收录 <strong>RFC 3161（2001）Time-Stamp Protocol</strong>，标注为"<strong>防重放的时间基准</strong>" <code>[A]</code>。</p>
+<p><strong>协同点</strong>：令牌/签名的防重放依赖"接受方与签发方对时间的判断一致"。若车端时钟可被操纵（车辆长期停放在地库、断开网络、电瓶断电），则：</p>
+<ul><li>基于本地时钟的令牌过期判断可能被绕过（<strong>本报告判断</strong>，推测，非事实——前提是车端使用本地时钟做 <code>exp</code> 校验）。</li><li>基于本地时钟的随机数/nonce 新鲜度判断可能失效。</li><li>基于本地时钟的签名时间戳校验可能失效。</li></ul>
+<p>RFC 3161 提供的是<strong>由可信时间源签发的、可验证的时间戳</strong>，它把"时间"从本地状态变成"可验证的外部断言"。<strong>本报告判断</strong>（推测，非事实）：在车云场景中，凡是需要"证明某条命令在某个时间范围内首次出现"的控制点，都应考虑引入 RFC 3161 时间戳或等价的可信时间源，而不是依赖车端本地时钟。档案未记录任何车企在此方向的实现。</p>
+<h4>12.2.4.3 轮换的协同时序（本报告判断，推测）</h4>
+<p>一个协同完整的设计时序大致如下（<strong>全部为设计建议，非对任何企业实现的断言</strong>）：</p>
+<ol><li>车端设备证书临近到期 → ACME（RFC 8555）自动签发新证书；新旧证书在一段重叠窗口内并存。</li><li>车端用新证书重新建立与车云的 mTLS 链路（RFC 8446 / RFC 8705）。</li><li>mTLS 链路上，资源服务器依据证书指纹校验绑定令牌（<code>cnf</code> / <code>x5t#S256</code>）——<strong>注意：证书轮换会导致已绑定令牌的指纹失配</strong>。</li><li>因此在证书轮换的重叠窗口内，服务端必须<strong>同时接受</strong>旧证书指纹与新证书指纹各自绑定的令牌，直至旧令牌全部自然到期。</li><li>命令级载荷的防重放校验以 RFC 3161 时间戳为基准，而非车端本地时钟。</li></ol>
+<p><strong>第 3–4 步是一个必须显式设计的协同点</strong>，也是最容易被忽略的地方：<strong>令牌轮换与证书轮换若不同步，会在证书轮换瞬间造成"授权层拒绝合法请求"的批量故障</strong>。见 12.9 失败模式表对应行。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-13">
+  <div class="sec-head"><span class="sec-badge">04</span><h2>12.3 发送方约束令牌（Sender-Constrained Tokens）</h2></div>
+<h3 id="sec-14">12.3.1 为什么车云场景必须先解决"令牌可被复制"问题</h3>
+<h4>12.3.1.1 Bearer 令牌的固有缺陷</h4>
+<p>RFC 6750 定义的 Bearer 令牌的核心语义是：<strong>持有即授权</strong>。信源档案 §2 将其内容描述为"Bearer 令牌在 HTTP 中的使用、<code>WWW-Authenticate</code> 错误语义" <code>[A]</code>。这个语义的推论是：任何获得令牌字节串的实体，都在授权范围内拥有与原始客户端完全等同的权限，且<strong>服务端无法区分两者</strong>。</p>
+<p>在传统 Web 场景中，这个缺陷被三个条件部分抵消：浏览器同源策略限制了令牌的可获取路径；服务端渲染减少了令牌在客户端的停留；攻击者获取令牌的路径相对明确（XSS、日志泄露）。</p>
+<p>在车云场景中，这三个条件<strong>同时弱化</strong>：</p>
+<div class="table-wrap"><table><thead><tr><th>传统 Web 场景</th><th>车云场景</th><th>后果（本报告判断，推测）</th></tr></thead><tbody><tr><td>浏览器沙箱 + 同源策略</td><td>原生 App（RFC 8252 要求外部浏览器，见 12.5.1）、车机系统</td><td>令牌可能落在应用私有存储，也可能落在系统级存储、日志、崩溃报告</td></tr><tr><td>单一进程持有令牌</td><td>手机、车机、车企 TSP 服务器、第三方服务器多跳持有</td><td>每一跳都是潜在的令牌泄露点</td></tr><tr><td>令牌泄露通常因单一漏洞</td><td>令牌需在<strong>车企云 → 第三方 → 车</strong>链路上传递</td><td>每一跳的运维方都有令牌可见性</td></tr><tr><td>泄露影响一个用户会话</td><td>泄露影响<strong>一台或多台真实车辆的车控能力</strong></td><td>后果从数据泄露升级为物理安全</td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>（推测，非事实）：正是这张表的最后一行，使得车云场景对发送方约束令牌的需求强度<strong>高于一般的 API 场景</strong>。信源档案 §2 把 RFC 8705 标注为"车云链路最关键的授权规范"，正是同一判断的规范侧表述。</p>
+<h4>12.3.1.2 RFC 6750 的语义边界</h4>
+<p>需要注意，RFC 6750 并非"不安全规范"——它明确定义了传输要求（TLS 之上）、错误语义（<code>WWW-Authenticate</code> 响应头）与令牌不应用于 URL 查询参数等约束（信源档案 §2 将其内容概括为"Bearer 令牌在 HTTP 中的使用、<code>WWW-Authenticate</code> 错误语义" <code>[A]</code>）。</p>
+<p><strong>边界在于</strong>：这些要求约束的是"令牌如何传输"，而<strong>不改变"持有即授权"这一核心语义</strong>。因此 RFC 6750 与发送方约束令牌不是替代关系，而是"在无绑定能力时的下限"与"在有绑定能力时的增强"关系。OAuth 2.1 草案 <code>draft-ietf-oauth-v2-1-16</code> 明确包含"Bearer 令牌最小化"的方向（信源档案 §2 <code>[A]</code>），也印证了这一演进判断。</p>
+<h3 id="sec-15">12.3.2 mTLS 证书绑定令牌：RFC 8705</h3>
+<h4>12.3.2.1 机制概述</h4>
+<p>信源档案 §2 对 RFC 8705（2020）的描述是：<strong>"mTLS 客户端认证 + 证书绑定令牌，即'持有的令牌不可被复制盗用'"</strong> <code>[A]</code>。它同时解决两个问题：</p>
+<ol><li><strong>客户端认证</strong>：客户端用 mTLS 证书向授权服务器证明身份（取代或补充 <code>client_secret</code>）。</li><li><strong>令牌绑定</strong>：访问令牌被绑定到客户端证书，使得令牌在被转移到另一条 TLS 连接后无法使用。</li></ol>
+<h4>12.3.2.2 <code>cnf</code> / <code>x5t#S256</code> 绑定</h4>
+<p>RFC 8705 的绑定实现方式（信源档案条目给出的关键要素）：令牌中携带 <code>cnf</code>（confirmation）声明，其中包含证书指纹 <code>x5t#S256</code>——即客户端证书的 SHA-256 指纹。</p>
+<p>工作方式（<strong>本报告判断</strong>，推测，非事实——按规范语义推导的机制描述）：</p>
+<pre><code>授权服务器                             资源服务器
+    │                                      │
+    │  1. 客户端以 mTLS 建立连接，             │
+    │     出示客户端证书 C                     │
+    │                                      │
+    │  2. 授权服务器计算 SHA-256(C) = F       │
+    │     签发访问令牌 AT，其中                │
+    │     cnf: { &quot;x5t#S256&quot;: F }             │
+    │  ─────────── AT ────────────────────▶  │
+    │                                      │
+    │  3. 客户端以 mTLS 调用资源服务器，        │
+    │     出示同一个证书 C                     │
+    │  ──────────────────────────────────▶   │
+    │                                      │
+    │                          4. 资源服务器计算
+    │                             SHA-256(C) = F&#x27;
+    │                             断言 F&#x27; == AT.cnf.x5t#S256
+    │                             不等即拒</code></pre>
+<p><strong>关键点：绑定发生在 TLS 握手层提供的证书，而不是令牌内的任何自述字段。</strong> 这决定了它<strong>不可被复制</strong>——攻击者即使拿到了令牌字节串，也无法出示对应的客户端私钥来建立握手的证书（假设私钥不可导出）。</p>
+<h4>12.3.2.3 握手层与授权层的双层校验</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：RFC 8705 场景下存在两个独立且都必须通过的检查：</p>
+<div class="table-wrap"><table><thead><tr><th>层</th><th>检查内容</th><th>失败的典型原因</th></tr></thead><tbody><tr><td>握手层</td><td>证书链是否可信（RFC 5280 <code>[A]</code>）</td><td>CA 不受信、证书过期、链不完整</td></tr><tr><td>握手层</td><td>证书是否被吊销（CRL <code>[A]</code> / OCSP <code>[A]</code>）</td><td>证书已吊销但 OCSP 响应缓存过期</td></tr><tr><td>授权层</td><td>令牌是否有效（<code>exp</code>、签名、<code>aud</code>）</td><td>令牌过期</td></tr><tr><td>授权层</td><td><code>cnf.x5t#S256</code> 是否等于当前连接的证书指纹</td><td><strong>证书轮换窗口内指纹失配</strong></td></tr></tbody></table></div>
+<p><strong>第四行的失效模式值得单列</strong>：当客户端证书被轮换（RFC 8555 ACME 自动轮换，见 12.2.4）而令牌尚未过期时，<strong>新证书的指纹与令牌中的 <code>cnf</code> 不匹配</strong>。这不是安全缺陷，而是<strong>协同设计缺陷</strong>——缓解手段是轮换重叠窗口（见 12.2.4.3）。这个失效模式会在 12.9 表中以 High 等级出现。</p>
+<h4>12.3.2.4 车云场景的适用性讨论</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：mTLS 证书绑定令牌在车云链路上的最强适用点是<strong>服务器到服务器</strong>的链路（车企云 ↔ 第三方云、车企云 ↔ TSP），因为：</p>
+<ul><li>服务端持有证书私钥的边界清晰（有 KMS/HSM 管理，信源档案 §4 收录 FIPS 140-3 <code>[A]</code> 作为 HSMA 认证基线）。</li><li>服务端不需要面对"用户卸载应用后私钥残留"这类问题。</li><li>服务端证书轮换可完全自动化（RFC 8555 <code>[A]</code>）。</li></ul>
+<p>最弱适用点是<strong>手机端第三方应用</strong>，因为客户端证书在移动端的部署、更新、吊销都更复杂。<strong>这正给了 DPoP 一个位置</strong>（12.3.3）。档案未记录任何车企在这两个方向的具体实现——Tesla 与 Mercedes 的已读文档中，本次<strong>未取得</strong> mTLS 相关条目（Mercedes 明确列为未取到项，信源档案 §7.2）。</p>
+<h3 id="sec-16">12.3.3 DPoP：RFC 9449</h3>
+<h4>12.3.3.1 机制概述</h4>
+<p>信源档案 §2 对 RFC 9449（2023）的描述是：<strong>OAuth 2.0 Demonstrating Proof of Possession（DPoP），发送方约束令牌，<code>DPoP</code> 头 + JWK 指纹绑定</strong> <code>[A]</code>。</p>
+<p>与 mTLS 的核心区别：<strong>DPoP 在应用层（HTTP 头）而非传输层（TLS 握手）证明持有</strong>。它不要求客户端证书，代价是引入了自己的防重放机制。</p>
+<h4>12.3.3.2 三个构件</h4>
+<div class="table-wrap"><table><thead><tr><th>构件</th><th>作用</th><th>说明</th></tr></thead><tbody><tr><td><code>DPoP</code> 请求头</td><td>携带一个 <strong>DPoP proof JWT</strong></td><td>证明请求方持有某个私钥（信源档案 §2 <code>[A]</code>）</td></tr><tr><td>JWK 指纹绑定</td><td>令牌内绑定客户端公钥（JWK）的指纹</td><td>与 RFC 8705 的 <code>cnf</code> 思路一致，但绑定对象是 JWK 而非证书（信源档案 §2 <code>[A]</code>）</td></tr><tr><td>nonce 挑战</td><td>授权服务器/资源服务器下发 <code>nonce</code>，要求 proof 中包含</td><td>限制 proof 的可重放窗口（信源档案 §2 <code>[A]</code>）</td></tr></tbody></table></div>
+<h4>12.3.3.3 防重放机制剖析</h4>
+<p><strong>本报告判断</strong>（推测，非事实——按规范语义推导）：DPoP 的防重放依赖多层机制叠加，每一层解决不同的重放场景：</p>
+<div class="table-wrap"><table><thead><tr><th>重放场景</th><th>防御机制</th><th>说明</th></tr></thead><tbody><tr><td>攻击者抄走 access token，用自己的密钥发请求</td><td><strong>JWK 指纹不匹配</strong></td><td>令牌绑定的公钥指纹 ≠ 攻击者 proof 里公钥的指纹</td></tr><tr><td>攻击者抄走 access token <strong>和</strong> 一个完整的 DPoP proof</td><td><strong><code>jti</code> 去重 + <code>iat</code> 时间窗</strong></td><td>同一个 proof 不能被用两次；过旧的 proof 被拒</td></tr><tr><td>攻击者在长时间窗内反复使用被截获的 proof</td><td><strong>nonce 挑战</strong></td><td>服务器要求 proof 使用服务器指定的 nonce，旧 nonce 失效</td></tr><tr><td>攻击者伪造 proof 声称是自己的公钥</td><td><strong>令牌内的 JWK 指纹绑定</strong></td><td>令牌签发给谁的公钥是绑定的，攻击者改不了</td></tr></tbody></table></div>
+<p>这四层是<strong>叠加</strong>关系：去掉任何一层，对应的重放场景就打开。</p>
+<h4>12.3.3.4 与 mTLS 的取舍对照表</h4>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>RFC 8705 mTLS 绑定</th><th>RFC 9449 DPoP</th></tr></thead><tbody><tr><td>绑定载体</td><td>TLS 客户端证书（传输层）</td><td>JWK（应用层 HTTP 头）</td></tr><tr><td>客户端证书依赖</td><td><strong>需要</strong></td><td><strong>不需要</strong></td></tr><tr><td>密钥管理</td><td>需证书生命周期管理（签发/轮换/吊销）</td><td>仅需密钥对；公钥随 proof 走</td></tr><tr><td>轮换复杂度</td><td>高（涉及 CA、CRL/OCSP，见 12.2.4）</td><td>低（换密钥对即换绑定）</td></tr><tr><td>防重放机制</td><td>TLS 握手本身 + 令牌绑定</td><td>需要 <code>jti</code>/<code>iat</code>/nonce 三层（见上表）</td></tr><tr><td>中间设备友好度</td><td><strong>低</strong>（任何 TLS 终止/代理会破坏绑定）</td><td><strong>高</strong>（HTTP 层，代理可透传头）</td></tr><tr><td>对移动客户端的适配</td><td>较难</td><td>较易</td></tr><tr><td>规范依据</td><td>RFC 8705 <code>[A]</code></td><td>RFC 9449 <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>（推测，非事实）：在<strong>车云双层代理链</strong>（车企云 → 第三方 → 车，见 12.5.3）中，mTLS 的一个现实障碍是"链路上存在 TLS 终止点"——每个 TLS 终止点都会断开 mTLS 绑定的完整性，需要用 RFC 8705 定义的中间层机制或改用 DPoP。这是纯规范层面的工程推导，档案未对任何车企的 DPoP 采用情况作出陈述。</p>
+<h3 id="sec-17">12.3.4 车端特有的第三层：虚拟密钥</h3>
+<h4>12.3.4.1 事实清单（全部 <code>[A]</code>，信源档案 §7.1）</h4>
+<p>这是本章证据最厚的一节，全部来自 Tesla 虚拟密钥开发者指南：</p>
+<div class="table-wrap"><table><thead><tr><th>事实</th><th>文档明载内容</th></tr></thead><tbody><tr><td>密钥对性质</td><td>虚拟密钥 = <strong>公私钥对</strong></td></tr><tr><td>私钥位置</td><td><strong>留在应用服务器</strong></td></tr><tr><td>公钥位置</td><td>由<strong>可信用户</strong>添加到车辆</td></tr><tr><td>验签时机</td><td><strong>车辆在执行命令前或接受 Fleet Telemetry 配置前验证载荷签名</strong></td></tr><tr><td>信任边界</td><td>文档称虚拟密钥"<strong>甚至能阻止 Tesla 自己的后端访问这些能力</strong>"</td></tr><tr><td>吊销方式</td><td>用户在车辆 <strong>Locks 界面删除密钥</strong></td></tr><tr><td>密钥生成命令</td><td><code>openssl ecparam -name prime256v1 -genkey -noout</code></td></tr><tr><td>算法约束</td><td>文档明确"<strong>车辆仅支持 prime256v1 密钥</strong>"（即 P-256 ECDSA）</td></tr><tr><td>公钥托管</td><td><code>https://developer-domain.com/.well-known/appspecific/com.tesla.3p.public-key.pem</code>，且<strong>必须长期可用</strong></td></tr><tr><td>私钥禁令</td><td><code>private-key.pem</code> <strong>绝不可托管于域名</strong></td></tr><tr><td>云端注册</td><td>必须调用 Partner Account 注册端点把密钥登记到 Tesla</td></tr><tr><td>配对深链</td><td><code>https://tesla.com/_ak/&lt;developer-domain.com&gt;</code>（可选 <code>?vin=...</code>）</td></tr><tr><td>B2B 自动添加条件</td><td><strong>已配对密钥少于 20 把</strong>且不需要车辆命令协议</td></tr><tr><td>非 B2B 限制</td><td>非 B2B 渠道购买的车辆<strong>无法由 Tesla 远程添加密钥</strong></td></tr><tr><td>配对前置</td><td>用户已授予 <code>vehicle_device_data</code>、<code>vehicle_cmds</code> 或 <code>vehicle_location</code> 中至少一项</td></tr></tbody></table></div>
+<h4>12.3.4.2 三方密钥模型</h4>
+<p><strong>本报告判断</strong>（推测，非事实——把上表事实组织为一个模型，档案未使用"三方密钥模型"这一术语）：</p>
+<pre><code>        ┌─────────────────────────────┐
+        │  ① 应用私钥（private-key.pem）│
+        │  位置：应用服务器              │
+        │  用途：签名命令载荷 / 签名     │
+        │        Fleet Telemetry 配置   │
+        │  约束：绝不可托管于域名[A]      │
+        └──────────────┬──────────────┘
+                       │ 签名
+                       ▼
+        ┌─────────────────────────────┐
+        │  ② 车辆公钥（配对时装入）       │
+        │  位置：车辆                    │
+        │  装入方式：车主经配对深链       │
+        │           https://tesla.com/_ak/…[A]
+        │  来源：公钥托管于              │
+        │        /.well-known/appspecific/
+        │        com.tesla.3p.public-key.pem[A]
+        │  用途：验证载荷签名 [A]         │
+        └─────────────────────────────┘
+                       ▲
+                       │ 登记
+        ┌──────────────┴──────────────┐
+        │  ③ 云端 partner 注册          │
+        │  动作：调用 Partner Account   │
+        │        注册端点 [A]            │
+        │  作用：让 Tesla 知道这把密钥    │
+        │        属于哪个开发者域名       │
+        └─────────────────────────────┘</code></pre>
+<p><strong>这个模型的三个设计要点：</strong></p>
+<p><strong>要点一：私钥与公钥的物理隔离是"不可复制"的来源。</strong> 私钥在应用服务器、公钥在车辆，二者之间唯一的流通是公钥的托管与配对。攻击者若只攻破云端令牌存储，<strong>拿不到私钥，无法构造通过车端验签的载荷</strong>。这补齐了 12.3.1 中 Bearer 令牌的最大短板。</p>
+<p><strong>要点二：公钥托管要求"长期可用"是一个运维契约，也是一个可用性风险。</strong> 文档明载公钥文件<strong>必须长期可用</strong> <code>[A]</code>。<strong>本报告判断</strong>（推测，非事实）：这意味着该 URL 成了一个<strong>长期依赖的可用性单点</strong>——若开发者的域名到期、证书失效、well-known 路径被重定向，可能影响车辆侧对密钥的校验与重新配对流程。缓解手段是把公钥的可用性纳入 SLO 监控（注意：Tesla 文档未明载"公钥取不到时的行为"，因此在 12.10 中列为待补证）。</p>
+<p><strong>要点三：密钥数量上限（&lt; 20 把）是"影响范围控制"的工程手段。</strong> 文档明载 B2B 项目车辆可自动添加虚拟密钥的条件之一是<strong>已配对密钥少于 20 把</strong> <code>[A]</code>。<strong>本报告判断</strong>（推测，非事实）：这是一个<strong>上限型配额</strong>——它不阻止单个开发者添加密钥，但限制了"一台车最多被多少方同时持有命令签名能力"，从而限制了一台车的<strong>授权扇出（fan-out）</strong>。这是车端密钥治理中最直接的影响范围控制，值得与 Tesla 的另一条配额对照：<strong>单台车辆最多同时向 5 个第三方应用推流</strong> <code>[A]</code>（Fleet Telemetry）。</p>
+<h4>12.3.4.3 与 OAuth 令牌层的关系</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：虚拟密钥层与 OAuth 令牌层是<strong>串联</strong>而非并列的两道闸门：</p>
+<ul><li><strong>OAuth 层（scope）</strong> 控制"这个第三方应用能调用哪些云端 API"。撤销 scope → 云端调用被拒；Fleet Telemetry 配置被移除 <code>[A]</code>。</li><li><strong>虚拟密钥层（签名）</strong> 控制"这个应用能否让车辆执行命令/接受推流配置"。删除密钥 → 车辆拒绝未通过验签的载荷 <code>[A]</code>。</li></ul>
+<p>串联意味着<strong>任何一层失败都不能导致越权</strong>。反之亦意味着<strong>任何一层失败都会导致合法业务中断</strong>——这正是 12.9 中"授权层与命令层不同步"这类失败模式的来源。文档明载的配对前置条件（用户须先授予 <code>vehicle_device_data</code>/<code>vehicle_cmds</code>/<code>vehicle_location</code> 之一 <code>[A]</code>）说明两层之间存在<strong>顺序依赖</strong>：OAuth consent 是虚拟密钥配对的前提。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-18">
+  <div class="sec-head"><span class="sec-badge">05</span><h2>12.4 JWT 与不透明令牌的工程取舍</h2></div>
+<h3 id="sec-19">12.4.1 RFC 9068 <code>at+jwt</code> profile</h3>
+<h4>12.4.1.1 规范定位</h4>
+<p>信源档案 §2 对 RFC 9068（2021）的描述是：<strong>JWT Profile for OAuth 2.0 Access Tokens（<code>typ: at+jwt</code>、<code>aud</code>/<code>iss</code>/<code>exp</code> 校验要求）</strong> <code>[A]</code>。</p>
+<p>这条规范解决的是一个长期存在的实现问题：OAuth 2.0 从未规定访问令牌的格式，导致 JWT 格式的访问令牌与 id_token 在结构上高度相似，<strong>接受方容易混淆</strong>。</p>
+<h4>12.4.1.2 强制校验清单</h4>
+<p>RFC 9068 的核心价值在于把"应该校验什么"从最佳实践提升为 profile 要求。<strong>本报告判断</strong>（推测，非事实——下表是对规范校验点的工程化组织，档案条目仅概括为"<code>aud</code>/<code>iss</code>/<code>exp</code> 校验要求"）：</p>
+<div class="table-wrap"><table><thead><tr><th>校验项</th><th>校验内容</th><th>不校验的后果</th></tr></thead><tbody><tr><td><code>typ</code></td><td>必须为 <code>at+jwt</code></td><td>无法区分访问令牌与 id_token（见 12.4.3 第 4 条）</td></tr><tr><td><code>iss</code></td><td>必须等于预期的授权服务器标识</td><td>接受任意授权服务器签发的令牌（跨签发方混淆）</td></tr><tr><td><code>aud</code></td><td>必须包含当前资源的标识</td><td>令牌被用于非目标资源（令牌挪用途）</td></tr><tr><td><code>exp</code></td><td>当前时间应在 <code>exp</code> 之前</td><td>使用已过期令牌</td></tr><tr><td><code>nbf</code></td><td>当前时间应不早于 <code>nbf</code></td><td>使用尚未生效的令牌</td></tr><tr><td><code>sub</code></td><td>主体标识</td><td>授权决策无法归因</td></tr><tr><td><code>client_id</code></td><td>令牌由哪个客户端申请</td><td>无法做客户端级策略</td></tr><tr><td><code>jti</code></td><td>令牌唯一标识</td><td>无法做重放检测/去重</td></tr><tr><td><code>iat</code></td><td>签发时刻</td><td>无法评估令牌年龄</td></tr></tbody></table></div>
+<h4>12.4.1.3 <code>aud</code> 必须绑定 Fleet API base URL 的含义</h4>
+<p>信源档案 §7.1 有一条极其具体的 <code>[A]</code> 事实：Tesla 的 <code>/token</code> 换码参数含 <strong><code>audience</code>（必须是 Fleet API base URL，如 <code>https://fleet-api.prd.na.vn.cloud.tesla.com</code>）</strong> <code>[A]</code>。</p>
+<p><strong>这条事实的技术含义（本报告判断，推测，非事实）：</strong></p>
+<ol><li><strong>区域隔离</strong>：示例值中的 <code>na</code> 表明 base URL 携带区域信息。<code>aud</code> 绑定 base URL 意味着<strong>一个区域的令牌不能被用于另一个区域的端点</strong>。这是把"物理部署拓扑"编码进"授权语义"的做法。</li><li><strong>受众收敛</strong>：即使令牌泄露，它只能用于指定的 Fleet API 区域端点，不能被"挪"到 Tesla 的其他 API 面（例如授权端点本身、或未来的其他服务）。</li><li><strong><code>aud</code> 校验的失败模式</strong>：若资源服务器不校验 <code>aud</code>，则跨区域/跨服务的令牌重用成为可能——这正是 12.4.3 第 1 条。</li></ol>
+<p><strong>这是一个可推广的对标点</strong>：信源档案 §7.1 同时记录了 Tesla 的<strong>令牌端点与 API 端点分属不同主机</strong> <code>[A]</code>（<code>fleet-auth.prd.vn.cloud.tesla.com</code> 与 <code>fleet-api.prd.na.vn.cloud.tesla.com</code>），并说明 <code>/token</code> 调用"来自应用服务器、适用不同的限流" <code>[A]</code>。<strong>本报告判断</strong>（推测，非事实）：<strong>主机分离 + audience 绑定 + 差异化限流</strong>这三者组合，构成一个清晰的"授权平面与数据平面分离"架构。这是本章推荐其他车企对标的一个重要结构性实践。</p>
+<h3 id="sec-20">12.4.2 不透明令牌 + 内省 vs JWT 自校验</h3>
+<h4>12.4.2.1 两种形态的机制差异</h4>
+<div class="table-wrap"><table><thead><tr><th>形态</th><th>令牌内容</th><th>校验方式</th><th>规范依据</th></tr></thead><tbody><tr><td>JWT 访问令牌</td><td>自包含，含 <code>iss</code>/<code>aud</code>/<code>exp</code>/<code>sub</code> 等声明</td><td>资源服务器本地验签 + 校验声明</td><td>RFC 9068 <code>[A]</code>、RFC 7515 系列；本章依据信源档案 §2 的 RFC 9068 条目</td></tr><tr><td>不透明令牌</td><td>随机字符串，无自包含信息</td><td>每次调用资源服务器向授权服务器发起内省查询</td><td>RFC 7662 <code>[A]</code></td></tr></tbody></table></div>
+<h4>12.4.2.2 三维度对照表</h4>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>不透明令牌 + 内省（RFC 7662）</th><th>JWT 自校验（RFC 9068）</th></tr></thead><tbody><tr><td><strong>延迟</strong></td><td>每次资源访问引入一次（或缓存的）授权服务器往返</td><td>本地计算，无网络往返（公钥可缓存）</td></tr><tr><td><strong>可撤销性</strong></td><td><strong>强</strong>：内省即时反映吊销状态（受内省缓存窗口影响）</td><td><strong>弱</strong>：令牌在 <code>exp</code> 前始终有效，吊销无从传播（除非维护黑名单）</td></tr><tr><td><strong>密钥暴露面</strong></td><td>资源服务器<strong>不持有</strong>任何签名验证密钥</td><td>资源服务器需持有授权服务器的<strong>公钥</strong>（或 JWKS）</td></tr><tr><td>授权服务器可用性依赖</td><td><strong>高</strong>：内省端点故障 = 所有请求失败（除非缓存）</td><td><strong>低</strong>：仅在公钥刷新时需要</td></tr><tr><td>令牌大小</td><td>小（随机串）</td><td>大（含声明，可能随 scope 增长）</td></tr><tr><td>与 RFC 7009 吊销的配合</td><td>天然契合</td><td>需要额外机制（短 TTL / 黑名单 / 令牌版本号）</td></tr><tr><td>审计可观测性</td><td>每次内省是一次可记录的授权决策</td><td>决策发生在资源服务器本地，需自行埋点</td></tr></tbody></table></div>
+<h4>12.4.2.3 与 12.2.3 "吊销传播"的联动</h4>
+<p>把这张表与 12.2.3 的吊销传播时间线叠起来，可以得到一个工程结论：</p>
+<p><strong>本报告判断</strong>（推测，非事实）：<strong>"可撤销性"与"低延迟"在纯形态选择上是对立的</strong>。三种可用的折中：</p>
+<ol><li><strong>短 TTL + JWT</strong>：用小时级 TTL（如 Mercedes 的 3599 秒 <code>[A]</code>）替代实时吊销。代价是 12.2.3.3 图中的"已撤销但未到期"窗口。</li><li><strong>内省 + 短缓存</strong>：内省结果缓存数秒至数十秒。代价是吊销传播延迟等于缓存窗口。</li><li><strong>JWT + 令牌版本号/撤销列表</strong>：JWT 保持自包含，但携带一个可由资源服务器本地比对的版本号。代价是资源服务器需要一个近似实时的版本号同步通道。</li></ol>
+<p><strong>注意</strong>：这三种都是<strong>设计空间的描述</strong>，档案未记录任何车企在这三者间的选择。Tesla 的 scope 缩减规则（"仅对新签发访问令牌生效" <code>[A]</code>）与第 1 种折中的表现一致，但文档未明载其访问令牌是 JWT 还是不透明令牌，因此<strong>不能断言 Tesla 采用了哪一种形态</strong>——这是 12.10 补证清单的一条。</p>
+<h3 id="sec-21">12.4.3 常见实现缺陷清单</h3>
+<p>本节逐条给出「缺陷 → 可利用性 → 检测方法」。所有缺陷描述均为<strong>规范语义层面的常见实现错误</strong>（<strong>本报告判断</strong>，推测，非事实），不指向任何特定企业的实测缺陷。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>缺陷</th><th>可利用性</th><th>检测方法</th></tr></thead><tbody><tr><td>1</td><td><strong>未校验 <code>aud</code></strong></td><td>令牌可被用于非目标资源/跨区域/跨服务重用。攻击者获取一个低价值服务的令牌，用于高价值服务。若同一授权服务器签发多租户令牌，可能跨租户</td><td>用 A 服务的令牌调用 B 服务端点；检查令牌中 <code>aud</code> 是否被服务端读取；构造 <code>aud</code> 不匹配的令牌观察是否被拒</td></tr><tr><td>2</td><td><strong>未校验 <code>iss</code></strong></td><td>接受任意签发方的令牌。攻击者用自己控制的授权服务器签发令牌，伪造 <code>iss</code> 交给资源服务器</td><td>用自签密钥构造令牌（<code>iss</code> 设为任意值），观察是否通过；检查服务端 JWKS 来源是否固定</td></tr><tr><td>3</td><td><strong>接受 <code>alg: none</code> / 算法混淆</strong></td><td>攻击者把 <code>alg</code> 改为 <code>none</code> 并去掉签名，或用非对称公钥当作 HMAC 密钥（HS256）伪造签名（<strong>注</strong>：此为 JWT 生态的经典缺陷模式，本章按规范语义描述，无对应档案条目）</td><td>发送 <code>alg: none</code> 令牌；发送用 RSA 公钥作为 HMAC 密钥签出的 <code>HS256</code> 令牌；检查服务端是否固定允许的算法集合</td></tr><tr><td>4</td><td><strong>把 <code>id_token</code> 当 <code>access_token</code> 用</strong></td><td><code>id_token</code> 的 <code>aud</code> 是<strong>客户端</strong>而非资源服务器，且 <code>id_token</code> 语义是"认证某用户"，不含授权范围。若资源服务器接受它，则任何拿到 id_token 的方都能访问资源；且 scope 检查会落空</td><td>取一个 <code>id_token</code> 直接当 Bearer 使用，观察是否通过；检查资源服务器是否校验 <code>typ</code>（RFC 9068 要求 <code>at+jwt</code> <code>[A]</code>）</td></tr><tr><td>5</td><td><strong>忽略 <code>exp</code> 时钟偏移</strong></td><td>接受已过期令牌（偏移容忍过大），或拒绝有效期内的合法令牌（偏移过小导致服务中断）。偏移过大时可达分钟级窗口</td><td>发送过期 30s/5min/1h 的令牌，测量实际容忍窗口；对比服务端与授权服务器的时间源</td></tr><tr><td>6</td><td><strong>不校验 <code>nbf</code></strong></td><td>使用尚未生效的令牌。在预签发令牌的场景下可被提前使用</td><td>构造 <code>nbf</code> 在未来的令牌，观察是否被接受</td></tr><tr><td>7</td><td><strong>把令牌放入 URL 查询参数</strong></td><td>令牌进入服务器访问日志、浏览器历史、代理日志、Referer 头。泄露面显著扩大</td><td>检查日志中是否出现 <code>access_token=</code> 模式；检查 API 是否接受 query 参数形式的令牌</td></tr><tr><td>8</td><td><strong>刷新令牌无轮换（可无限复用）</strong></td><td>刷新令牌一旦泄露即长期有效，攻击者可无限期续命，且检测不到</td><td>用同一刷新令牌连续刷新两次，观察第二次是否成功（Tesla <code>[A]</code> 与 Mercedes <code>[A]</code> 均应拒绝）</td></tr><tr><td>9</td><td><strong>刷新令牌轮换后旧令牌无宽限期</strong></td><td>客户端并发/持久化失败导致强制重新登录（可用性故障，非安全故障）</td><td>并发发起两个刷新请求，观察是否一个失败</td></tr><tr><td>10</td><td><strong>接受非 <code>at+jwt</code> 的 <code>typ</code> 或缺失 <code>typ</code></strong></td><td>无法区分令牌类型，为第 4 条打开入口</td><td>检查 <code>typ</code> 头；发送 <code>typ: JWT</code>（id_token 常见值）的令牌</td></tr><tr><td>11</td><td><strong>JWKS 未固定来源或允许任意 <code>jku</code>/<code>jwk</code> 头</strong></td><td>攻击者提供自己的 JWKS URL（<code>jku</code>）或内嵌公钥（<code>jwk</code>），使令牌验签通过</td><td>构造带 <code>jku</code> 指向攻击者域名的令牌；检查服务端是否忽略这两个头</td></tr><tr><td>12</td><td><strong>虚拟密钥公钥文件未长期可用（车端场景特有）</strong></td><td>文档明载公钥须长期可用 <code>[A]</code>；若不可用，可能影响校验/重新配对流程（<strong>具体行为未取证</strong>）</td><td>对 <code>/.well-known/appspecific/com.tesla.3p.public-key.pem</code> 做长期可用性监控；模拟 404/重定向观察影响</td></tr><tr><td>13</td><td><strong><code>state</code> 未做校验或未绑定会话</strong></td><td>授权码流程的 CSRF。Tesla 文档把 <code>state</code> 描述为"用于校验的随机值" <code>[A]</code>——即其用途就是校验</td><td>篡改 <code>state</code> 观察是否被拒；检查 <code>state</code> 是否与会话绑定</td></tr></tbody></table></div>
+<blockquote><p>说明：第 3、5、11 条属于通用 JWT 实现缺陷模式，本章按规范语义描述其机理；信源档案未收录对应的企业实测条目，因此<strong>它们是"工程检查清单"，不是"某企业已发生的缺陷"</strong>。Tesla 的 Bugcrowd 赏金规则（信源档案 §7.1 <code>[A]</code>/<code>[B]</code>）显示其设有 Critical <code>$50,000–$100,000</code> 档位，但档案未记录任何已确认的具体漏洞类别。</p></blockquote>
+<hr>
+</section>
+<section class="rep-section" id="sec-22">
+  <div class="sec-head"><span class="sec-badge">06</span><h2>12.5 客户端认证与授权链</h2></div>
+<h3 id="sec-23">12.5.1 公共客户端 vs 机密客户端</h3>
+<h4>12.5.1.1 定义与判定</h4>
+<p><strong>本报告判断</strong>（推测，非事实——按 OAuth 2.0 生态通行语义组织）：</p>
+<div class="table-wrap"><table><thead><tr><th>类型</th><th>判定标准</th><th>车云场景中的例子</th></tr></thead><tbody><tr><td>机密客户端</td><td>能安全保存 <code>client_secret</code>（服务器侧，无用户可直接访问）</td><td>车企 TSP 服务器、第三方云端服务</td></tr><tr><td>公共客户端</td><td>无法安全保存 <code>client_secret</code>（用户设备上运行）</td><td>车主手机 App、车机应用</td></tr></tbody></table></div>
+<h4>12.5.1.2 RFC 7636 PKCE 的必须性</h4>
+<p>信源档案 §2 对 RFC 7636（2015）的描述是：<strong>PKCE（Proof Key for Code Exchange，公共客户端授权码拦截防护）</strong> <code>[A]</code>。</p>
+<p>PKCE 解决的问题（<strong>本报告判断</strong>，推测，非事实）：公共客户端无法用 <code>client_secret</code> 保护自己，因此授权码在重定向回客户端的过程中可能被同设备上的恶意应用拦截。PKCE 通过在授权请求中携带一个<strong>变换后的挑战值</strong>（<code>code_challenge</code>）并在换码时出示<strong>原始值</strong>（<code>code_verifier</code>），使得"拦截到授权码但没有原始 verifier"的方无法完成换码。</p>
+<p><strong>必须性的来源</strong>：信源档案 §2 明载 OAuth 2.1 草案 <code>draft-ietf-oauth-v2-1-16</code> 的核心方向之一是"<strong>强制 PKCE、废弃隐式流与密码模式</strong>" <code>[A]</code>。这意味着 PKCE 从"扩展"变成了下一代规范的基础要求。</p>
+<p><strong>本报告判断</strong>（推测，非事实）：因此对车云场景的推论是——<strong>任何在用户设备（手机、车机）上运行的授权码流程，PKCE 都不是可选项</strong>。而 Mercedes 的文档明载其采用"<strong>standard OAuth 2.0</strong>"（信源档案 §7.2 <code>[A]</code>），文档页面中本次<strong>未取得</strong> PKCE 的明确说明（信源档案未记录 PKCE 条目）——这是 12.10 的一条待补证项，<strong>不能据此推断 Mercedes 未实现 PKCE</strong>。</p>
+<h4>12.5.1.3 RFC 8252 与车机场景的推论</h4>
+<p>信源档案 §2 对 RFC 8252（2017）的描述是：<strong>OAuth 2.0 for Native Apps（原生 App 必须使用系统浏览器/外部用户代理，禁止内嵌 WebView）</strong> <code>[A]</code>。</p>
+<p><strong>规范要求的技术理由</strong>（<strong>本报告判断</strong>，推测，非事实）：内嵌 WebView 无法保证"用户看到的界面与用户实际授权的对象一致"——宿主应用可以在 WebView 中注入内容、读取输入、窃取授权码。使用系统浏览器则把这层控制在应用边界之外。</p>
+<p><strong>对车机场景的推论</strong>（<strong>本报告判断</strong>，推测，非事实）：车机是一个<strong>受限 UI 环境</strong>。把 RFC 8252 的"必须用系统浏览器"规则机械地套到车机上会遇到两个问题：</p>
+<ol><li>车机可能不存在"用户可信任的通用浏览器"这一概念（车机浏览器生态与手机不同）。</li><li>车辆账号往往不是车主个人账号，而是车辆绑定账号——授权的主体界定本身更复杂。</li></ol>
+<p>因此车机场景更可能采用 <strong>RFC 8628 设备授权流</strong>（见 12.6）——<strong>即把授权动作外移到车主手机上，车机只负责展示设备码</strong>。这是一个规范语义的推论；档案未记录任何车企车机场景的授权流实现（信源档案 §7 中，车机侧的 OAuth 授权流实现<strong>未找到公开来源</strong>）。</p>
+<h3 id="sec-24">12.5.2 客户端凭证的托管责任</h3>
+<h4>12.5.2.1 Mercedes 的明载要求</h4>
+<p>信源档案 §7.2 有一条极其清晰的 <code>[A]</code> 事实：Mercedes 文档要求客户端凭证必须保存在后端服务器，应用"<strong>不得</strong>向客户端暴露任何客户端凭证（client id、client secret、访问令牌）" <code>[A]</code>。同处还记录了客户端指引：在<strong>服务端应用</strong>缓存访问令牌与刷新令牌；访问令牌有效期内直接使用，失效后由缓存的刷新令牌换取 <code>[A]</code>。</p>
+<p><strong>这条要求的三个含义（本报告判断，推测，非事实）：</strong></p>
+<ol><li><strong>架构强制</strong>：它实际上排除了"App 直连 Mercedes API"的架构，强制引入一个后端中转。</li><li><strong>令牌不外流</strong>：访问令牌同样不得暴露给客户端——意味着后端不只是"代持密钥"，还要<strong>代理令牌</strong>。</li><li><strong>缓存位置</strong>：令牌缓存必须在服务端，客户端侧不持有可长期复用的凭证。</li></ol>
+<h4>12.5.2.2 Tesla 的对应事实</h4>
+<p>信源档案 §7.1 有两处 <code>[A]</code> 相关事实：</p>
+<ul><li><strong>授权端点不计费</strong>；<code>/token</code> 调用"<strong>来自应用服务器、适用不同的限流</strong>" <code>[A]</code>。</li><li>令牌端点与 API 端点<strong>分属不同主机</strong> <code>[A]</code>。</li></ul>
+<p><strong>本报告判断</strong>（推测，非事实）：Tesla 虽未像 Mercedes 那样给出"不得暴露动词"的显式禁令文本（本次未取证到同等表述），但"<code>/token</code> 来自应用服务器"这一描述与"令牌在服务端换取"的架构一致，且由<strong>主机分离</strong>提供了拓扑上的强制。</p>
+<h4>12.5.2.3 静态密钥路径的对照</h4>
+<p>信源档案 §7.6 / §7.7 记录了两种<strong>非 OAuth</strong> 的接入方式：</p>
+<div class="table-wrap"><table><thead><tr><th>平台</th><th>凭证形式</th><th>文档明载</th></tr></thead><tbody><tr><td>比亚迪 i迪桥</td><td><code>x-Gateway-APIKey</code>（应用 appKey），置于请求头</td><td>"用户创建应用 → 审核后生成 appKey 作为调用者身份识别" <code>[A]</code></td></tr><tr><td>蔚来 Open NSC</td><td><code>app-id</code> + <code>secret</code> 双凭证</td><td>"app-id 和 secret 是系统对接调用的唯一凭证……通过商务渠道获取" <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>（推测，非事实）：这两类的工程属性与 OAuth 令牌族不同——<strong>静态密钥没有 TTL、没有轮换协议、没有内省端点、没有 scope 收窄机制</strong>（至少在已取证文档中未见）。它们依赖"商务渠道 / 审核发放"作为授权控制，依赖"撤销密钥"作为吊销手段。<strong>必须重申信源档案 §7.10 的警告</strong>：</p>
+<ul><li>i迪桥是<strong>企业级 ESB 网关</strong>（供应链/研发/智造/营销/物流/品质/财务），<strong>不等于车控开放平台</strong>——不得将"比亚迪车云授权 = APIKey"作为结论。</li><li>蔚来 Open NSC 文档停留于 2019-08-13、业务范围为服务云（一键加电/维保/拖车/租车/代泊/航班），<strong>不含车控/数字钥匙 API</strong>，且站点自述"正在建设中"——不得以此代表蔚来当前架构。</li></ul>
+<p><strong>一个值得注意的正面观察</strong>：信源档案 §7.7 记录，蔚来 Open NSC 的<strong>接口规范正文本身受 token 保护</strong>——"请联系文档提供人获取文档访问 token" <code>[A]</code>。这是"把文档访问本身纳入授权控制"的做法，<strong>本报告判断</strong>（推测，非事实）：它在信息层形成了一道"需先获授权才能看到接口定义"的闸门，客观上降低了攻击者的信息收集效率。</p>
+<h3 id="sec-25">12.5.3 代理链与令牌交换</h3>
+<h4>12.5.3.1 RFC 8693 的核心构件</h4>
+<p>信源档案 §2 对 RFC 8693（2020）的描述是：<strong>OAuth 2.0 Token Exchange（<code>subject_token</code>/<code>actor_token</code>，代理链授权）</strong> <code>[A]</code>。</p>
+<p>两个令牌的角色（<strong>本报告判断</strong>，推测，非事实）：</p>
+<ul><li><code>subject_token</code>：代表<strong>谁</strong>的权限被使用（主体的身份/授权）。</li><li><code>actor_token</code>：代表<strong>谁在代替</strong>主体行事（代理方的身份）。</li></ul>
+<p>交换产出的新令牌中携带 <code>act</code> 声明，记录代理链。</p>
+<h4>12.5.3.2 车云"车企云 → 第三方 → 车"双层代理的 act 链路</h4>
+<p><strong>本报告判断</strong>（推测，非事实——这是基于 RFC 8693 语义对本报告动机中的链路结构的建模，档案未记录任何企业采用该机制）：</p>
+<pre><code>车主 (resource owner)
+  │ 授权
+  ▼
+第三方应用 (actor 1, subject = 车主)
+  │ 携带 subject_token = 车主授权、actor_token = 第三方身份
+  │ 调用车企云的令牌交换端点 → 得到新令牌 T1（含 act: {第三方}）
+  ▼
+车企云 (actor 2, subject = 车主, 已代理 1 层)
+  │ 携带 subject_token = T1、actor_token = 车企云服务身份
+  │ 交换 → 得到新令牌 T2（含 act: {第三方, 车企云}）
+  ▼
+车端网关
+  │ 验证 T2 的 act 链是否完整、是否被允许
+  ▼
+执行（或拒绝）</code></pre>
+<p><strong>act 链的价值（本报告判断，推测，非事实）：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>价值</th><th>说明</th></tr></thead><tbody><tr><td>审计归因</td><td>每条命令可追溯到完整的代理链，而非只有最终调用方</td></tr><tr><td>权限收窄</td><td>每一跳可在交换时收窄 scope（RFC 8693 语义 + RFC 9396 <code>[A]</code>）</td></tr><tr><td>授权撤销传播</td><td>若车主的原始授权失效，链路中任意一跳的交换都应失败</td></tr><tr><td>责任界定</td><td>"谁的命令"在协议层可验证，不依赖应用日志自述</td></tr></tbody></table></div>
+<p><strong>风险（本报告判断，推测，非事实）：</strong> 代理链越长，令牌交换的次数越多，<strong>每一跳都新增一个可被攻破的身份</strong>。若任一跳的 <code>actor_token</code> 管理不当，攻击者可以伪造某一跳的代理身份，导致 act 链被"污染"——最终的 act 链看起来合法，但其中一环是攻击者。缓解手段是每一跳的 <code>actor_token</code> 都必须由该跳自己独立持有（不可复用上游的凭证）。</p>
+<h4>12.5.3.3 RFC 7523 客户端断言</h4>
+<p>信源档案 §2 对 RFC 7523（2015）的描述是：<strong>JWT Profile for OAuth 2.0 Client Authentication and Authorization Grants（服务账号 + 客户端断言）</strong> <code>[A]</code>。</p>
+<p>它解决的问题是：<strong>服务间调用没有"用户"参与，用什么证明客户端身份？</strong> 两种用途：</p>
+<ol><li><strong>客户端认证</strong>：用 JWT 断言（含 <code>iss</code>/<code>sub</code>/<code>aud</code>/<code>exp</code>/<code>jti</code>）取代 <code>client_secret</code>，避免静态密钥。</li><li><strong>授权授予</strong>：用 JWT 断言直接换取访问令牌（服务账号流程）。</li></ol>
+<p><strong>本报告判断</strong>（推测，非事实）：RFC 7523 对车云场景的价值在于它是<strong>消除静态密钥（12.5.2.3 表中的 <code>secret</code>/<code>appKey</code>）的规范路径</strong>——把"长期有效的共享密钥"换成"短时有效的签名断言"。这正好落在信源档案 §2 所述 OAuth 2.1 草案"Bearer 令牌最小化"的方向上 <code>[A]</code>。</p>
+<h4>12.5.3.4 两种代理机制的取舍</h4>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>RFC 8693 令牌交换</th><th>RFC 7523 客户端断言</th></tr></thead><tbody><tr><td>主要用途</td><td>跨主体/跨信任域的权限代表</td><td>客户端身份认证 + 服务账号授权</td></tr><tr><td>是否表达代理链</td><td><strong>是</strong>（<code>act</code> 声明 <code>[A]</code>）</td><td>否</td></tr><tr><td>典型场景</td><td>车企云 → 第三方 → 车</td><td>服务间无用户调用</td></tr><tr><td>与车云的关系</td><td>双层代理的表达</td><td>服务间凭证去静态化</td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>（推测，非事实）：两者在车云中通常是<strong>串联使用</strong>——第三方用 RFC 7523 客户端断言认证自己的服务身份，再用 RFC 8693 交换出代表车主的令牌。</p>
+<h3 id="sec-26">12.5.4 步进认证：RFC 9470</h3>
+<h4>12.5.4.1 构件</h4>
+<p>信源档案 §2 对 RFC 9470（2023）的描述是：<strong>OAuth 2.0 Step Up Authentication Challenge Protocol（<code>acr</code>/<code>amr</code> 步进认证挑战）</strong> <code>[A]</code>。</p>
+<p>两个声明（<strong>本报告判断</strong>，推测，非事实）：<code>acr</code> 表示"认证上下文"，<code>amr</code> 表示"认证方法"。步进认证的机制是：资源服务器发现当前令牌的认证强度不足以完成某个操作时，返回一个挑战，要求客户端重新认证到更高的强度。</p>
+<h4>12.5.4.2 为高危车控命令引入二次认证的设计示例（推测设计）</h4>
+<p>以下<strong>完全为推测设计</strong>，档案未记录任何车企实现此机制：</p>
+<p><strong>设计假设</strong>：把车控命令按后果分级，为高危命令要求更高的 <code>acr</code>。</p>
+<div class="table-wrap"><table><thead><tr><th>命令类别</th><th>示例（依 Tesla scope 命名，信源档案 §7.1 <code>[A]</code>）</th><th>建议 <code>acr</code> 要求（设计建议）</th></tr></thead><tbody><tr><td>只读数据</td><td><code>vehicle_device_data</code> 覆盖的实时数据</td><td>常规（单因素即 OAuth consent）</td></tr><tr><td>非车主本人驾驶场景操作</td><td>添加/移除驾驶员（<code>vehicle_cmds</code> 覆盖）</td><td>常规</td></tr><tr><td>车辆解锁</td><td><code>vehicle_cmds</code> 覆盖的解锁 <code>[A]</code></td><td><strong>建议步进</strong>（要求二次认证）</td></tr><tr><td>远程启动</td><td><code>vehicle_cmds</code> 覆盖的远程启动 <code>[A]</code></td><td><strong>建议步进</strong></td></tr><tr><td>Live Camera 访问</td><td><code>vehicle_cmds</code> 覆盖的 Live Camera 访问 <code>[A]</code></td><td><strong>建议步进</strong>（隐私敏感）</td></tr><tr><td>精确位置流式</td><td><code>vehicle_location</code> 覆盖</td><td><strong>建议步进</strong>（隐私敏感）</td></tr></tbody></table></div>
+<p><strong>本报告判断</strong>（推测，非事实）：Tesla 的 scope 命名（<code>vehicle_cmds</code> 覆盖"添加/移除驾驶员、Live Camera 访问、解锁、唤醒、远程启动、预约软件更新" <code>[A]</code>）说明<strong>它是把多个不同后果的操作聚合在同一个 scope 下</strong>。这意味着<strong>仅靠 scope 无法对"解锁"与"预约软件更新"做差异化控制</strong>。步进认证正是补齐这一粒度缺口的机制。</p>
+<p><strong>风险与代价（本报告判断，推测，非事实）</strong>：步进认证在车云场景会遇到一个现实的可用性障碍——<strong>车主不一定在线</strong>。若车辆处于共享状态（代客泊车、维修、家人使用），远程解锁可能正是为了"让某人进入"，此时要求车辆持有者完成二次认证是合理的；但若要求的是"发起远程启动"的第三方应用持有者，则可能造成业务断裂。因此<strong>建议的落地方案是把步进认证与"命令风险等级 + 场景"联合判定，而非对所有高危命令一刀切</strong>。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-27">
+  <div class="sec-head"><span class="sec-badge">07</span><h2>12.6 设备授权与受限 UI：RFC 8628</h2></div>
+<h4>12.6.1 规范要点</h4>
+<p>信源档案 §2 对 RFC 8628（2019）的描述是：<strong>OAuth 2.0 Device Authorization Grant（无浏览器设备授权，车机/受限 UI 场景适用）</strong> <code>[A]</code>。</p>
+<p>流程骨架（<strong>本报告判断</strong>，推测，非事实）：设备向授权服务器发起请求 → 获得 <code>device_code</code>（设备用）与 <code>user_code</code>（人读用）→ 设备展示 <code>user_code</code> 与验证 URL → 用户在<strong>另一台设备</strong>（手机/电脑）上完成认证与授权 → 设备轮询令牌端点，直到获得令牌或超时。</p>
+<h4>12.6.2 轮询 <code>interval</code> 与 <code>slow_down</code> 语义</h4>
+<p>信源档案 §2 的 RFC 8628 条目概括提及设备码流程，<strong>未在本档案中记录 <code>interval</code>/<code>slow_down</code> 的数值语义</strong>。因此本节按规范语义描述（<strong>本报告判断</strong>，推测，非事实）：</p>
+<div class="table-wrap"><table><thead><tr><th>机制</th><th>语义</th><th>工程含义</th></tr></thead><tbody><tr><td><code>expires_in</code></td><td>设备码的有效期</td><td>用户在窗口内未完成授权则需重新发起</td></tr><tr><td><code>interval</code></td><td>设备轮询的最小间隔</td><td>设备必须遵守，否则触发 <code>slow_down</code></td></tr><tr><td><code>slow_down</code></td><td>轮询过快时的错误响应</td><td>设备应增大轮询间隔，而非重试同一间隔</td></tr><tr><td><code>authorization_pending</code></td><td>用户尚未完成授权</td><td>设备继续按间隔轮询</td></tr><tr><td><code>access_denied</code></td><td>用户拒绝</td><td>设备应停止轮询，终止流程</td></tr></tbody></table></div>
+<p><strong><code>slow_down</code> 的设计意图（本报告判断，推测，非事实）</strong>：它是<strong>服务端对客户端行为的自适应节流</strong>——服务端不硬性拒绝，而是通过错误码让客户端自己变慢。这在设备数量庞大（如车队）的场景中尤其重要，因为<strong>所有设备可能在同一批次中被激活</strong>，形成同步的轮询风暴。</p>
+<h4>12.6.3 与车内人机交互的安全权衡</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：RFC 8628 在车机场景中的核心权衡是：</p>
+<div class="table-wrap"><table><thead><tr><th>方案</th><th>安全性</th><th>可用性</th><th>推断理由</th></tr></thead><tbody><tr><td>车机上直接输入账号密码</td><td><strong>差</strong></td><td>中</td><td>车机键盘输入易被旁观（shoulder surfing）；账号密码暴露于共享设备</td></tr><tr><td>车机内嵌 WebView 走授权码</td><td><strong>差</strong></td><td>好</td><td>违反 RFC 8252 的"禁止内嵌 WebView"要求 <code>[A]</code></td></tr><tr><td><strong>RFC 8628 设备码（授权外移到车主手机）</strong></td><td><strong>好</strong></td><td>中</td><td>认证发生在受信任的设备上；车机只展示 <code>user_code</code></td></tr><tr><td>车主手机扫码完成授权</td><td>好</td><td>好</td><td>本质是设备码流程的一种 UI 形态（<strong>推测</strong>，档案无对应条目）</td></tr></tbody></table></div>
+<p><strong>车机场景的一个特有能力（本报告判断，推测，非事实）</strong>：车机可以向车主手机展示<strong>车架号（VIN）</strong>作为辅助信息——这使得"用户授权的对象是这辆具体的车"在 UI 层可验证。Tesla 的虚拟密钥配对深链明载支持可选 <code>?vin=...</code> 参数 <code>[A]</code>，这与该思路一致，但档案<strong>未记录</strong>车机 OAuth 授权流中 VIN 的展示，故不作断言。</p>
+<h4>12.6.4 与设备码相关的安全边界</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：RFC 8628 引入了一个在授权码流程中不存在的攻击面——<strong><code>user_code</code> 的猜测/社工</strong>。<code>user_code</code> 通常较短（便于人工输入），因此可能被暴力枚举或通过社工骗取。防护（规范语义）：</p>
+<ul><li><code>user_code</code> 有有效期（<code>expires_in</code>），窗口外失效。</li><li>用户完成授权时，授权界面应<strong>展示发起请求的设备信息</strong>，让用户确认"我是在为这个设备授权吗"。这在车机场景中尤其重要——如果用户看到的是一个陌生的设备标识，就应该拒绝。</li></ul>
+<p><strong>本报告判断</strong>（推测，非事实）：RFC 8628 的企业采用情况在档案中<strong>未找到公开来源</strong>——Tesla 与 Mercedes 的已读文档中均未见设备授权流的条目。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-28">
+  <div class="sec-head"><span class="sec-badge">08</span><h2>12.7 密钥生命周期管理（面向车云）</h2></div>
+<h3 id="sec-29">12.7.1 密钥分级</h3>
+<p>车云场景中，至少存在五类彼此独立的密钥，它们的信任根、用途与失效后果完全不同。</p>
+<div class="table-wrap"><table><thead><tr><th>级别</th><th>密钥类型</th><th>用途</th><th>信任根</th><th>依据/线索</th></tr></thead><tbody><tr><td>L1</td><td><strong>云端签名密钥</strong></td><td>令牌签名、配置签名、OTA 元数据签名</td><td>云侧 KMS/HSM</td><td>信源档案 §6 收录 TUF 的"阈值签名，防仓库/密钥泄露" <code>[B]</code>、Uptane 双仓库模型 <code>[A]</code></td></tr><tr><td>L2</td><td><strong>服务间 mTLS 密钥</strong></td><td>车企云 ↔ 第三方、车企云 ↔ TSP 的链路身份</td><td>企业 CA / 公信 CA</td><td>信源档案 §3 的 RFC 5280 <code>[A]</code>、§2 的 RFC 8705 <code>[A]</code></td></tr><tr><td>L3</td><td><strong>车端设备身份密钥</strong></td><td>车辆与云端的链路身份（车端证书）</td><td>车企设备 PKI</td><td>信源档案 §3 的 RFC 5280 / RFC 8555 <code>[A]</code>；§1 的 GB/T 45112-2024 <code>[A]</code>（C-V2X 证书管理系统）</td></tr><tr><td>L4</td><td><strong>虚拟密钥</strong></td><td>车端命令/推流配置的载荷签名</td><td>应用开发者（自持私钥）</td><td>Tesla <code>[A]</code>：P-256，公钥托管 <code>.well-known</code>，<code>&lt;20 把</code> 上限</td></tr><tr><td>L5</td><td><strong>数字钥匙密钥</strong></td><td>近场（BLE/UWB/NFC）车辆进入与启动</td><td>手机 SE + 车端 SE</td><td>CCC Digital Key Release 3.0 <code>[A]</code>：<strong>密钥存储于 Secure Element</strong>；GB/T 44402.1-2024 <code>[A]</code></td></tr></tbody></table></div>
+<h4>12.7.1.1 分级之间的关系</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：这五级构成了一个<strong>信任倒置</strong>的结构——级别越低（越接近物理车辆），其信任根越不依赖云端：</p>
+<ul><li>L1 的信任完全在云侧（HSM 保护，但云被攻破即失效）。</li><li>L4/L5 的信任锚点<strong>在车端</strong>——Tesla 文档明载"车辆在执行命令前验证载荷签名" <code>[A]</code>，且称虚拟密钥"甚至能阻止 Tesla 自己的后端访问这些能力" <code>[A]</code>。CCC Digital Key 的密钥存于 Secure Element <code>[A]</code>。</li></ul>
+<p><strong>这个倒置是车云安全的独有特征</strong>：云侧密钥泄露不会自动导致车端能力丧失，<strong>前提是车端有独立的验签/验密能力</strong>。<strong>本报告判断</strong>（推测，非事实）：因此评估一家车企的车云安全水平时，"云端令牌治理是否严密"与"车端是否有独立于云端的密钥校验"应当分开评估——前者决定数据与 API 的暴露面，后者决定物理车辆的可控性。</p>
+<h4>12.7.1.2 L5 数字钥匙的证据</h4>
+<p>信源档案 §5 的全部条目：</p>
+<ul><li><strong>CCC Digital Key Release 3.0 发布公告（2021-04-21）</strong>：新增 <strong>BLE + UWB</strong> 实现被动无钥匙进入与启动，NFC 保留为强制备用方案，<strong>密钥存储于 Secure Element</strong> —— <code>[A]</code>。</li><li>CCC Digital Key 主页面（跨 OS 生态、认证计划）<code>[A]</code>。</li><li>CCC Digital Key Release 3 v1.1 规范向公众开放 <code>[B]</code>。</li><li>CCC 与 FiRa Consortium 就 UWB 技术合作 <code>[B]</code>。</li><li>FiRa Consortium 2.0 技术规范（2023-11）<code>[B]</code>；FiRa Core 3.0（2025-01）<code>[B]</code>；FiRa Core 4.0（2025-12）<code>[B]</code>。</li><li>GB/T 44402.1-2024《卡及身份识别安全设备 数字钥匙系统 第 1 部分：参考架构》<code>[A]</code>——中国数字钥匙授权模型的国标参考架构。</li></ul>
+<p><strong>本报告判断</strong>（推测，非事实）：L5 与其他四级的关键差异在于它是<strong>唯一一个"物理接近性即授权"的密钥</strong>——BLE/UWB/NFC 的作用域是空间性的。因此它的失效后果不是"数据泄露"而是"车辆被开走"。这决定了 L5 的密钥必须存于 Secure Element（<code>[A]</code> 明载）而非普通存储，且必须具备<strong>中继攻击（relay attack）防护</strong>——这正是 UWB 精确定距被引入的原因（CCC Release 3.0 明载 BLE + UWB 组合 <code>[A]</code>）。</p>
+<p><strong>此处必须重申纪律</strong>：信源档案 §7.10 第 1 条明确记录，"蔚来 UWB+蓝牙+NFC 三合一数字钥匙"仅见新浪汽车等二手报道（<code>[C]</code>），蔚来官方未取得技术说明；无法确认是否 CCC 3.0、是否有 SE 保护。因此本章<strong>不将任何国内车企与 CCC 3.0 或 SE 存储关联</strong>。同理，Mercedes 的数字钥匙（CCC）在信源档案 §7.2 中明确列为<strong>未取到</strong>项。</p>
+<h3 id="sec-30">12.7.2 密钥生命周期</h3>
+<h4>12.7.2.1 规范依据</h4>
+<p>信源档案 §4 收录了两条与本小节直接对应的 <code>[A]</code> 规范：</p>
+<ul><li><strong>NIST SP 800-57 Part 1 Rev.5</strong>：标注为"<strong>密钥管理建议：密钥生命周期、密码周期</strong>" <code>[A]</code>。</li><li><strong>NIST SP 800-133</strong>：标注为"<strong>密钥生成</strong>" <code>[A]</code>。</li></ul>
+<p>此外还有 SP 800-90A Rev.1（确定性随机比特发生器）<code>[A]</code>——它是密钥生成的质量前提。</p>
+<h4>12.7.2.2 生命周期六阶段</h4>
+<p><strong>本报告判断</strong>（推测，非事实——按 SP 800-57 Part 1 Rev.5 的框架组织，档案条目标注其涵盖"密钥生命周期、密码周期"）：</p>
+<div class="table-wrap"><table><thead><tr><th>阶段</th><th>关键活动</th><th>车云场景的特殊关注点</th></tr></thead><tbody><tr><td><strong>生成</strong></td><td>在受保护环境产生密钥；RNG 质量（SP 800-90A <code>[A]</code>）；生成方法（SP 800-133 <code>[A]</code>）</td><td>车端密钥生成能力受算力/熵源限制；<strong>车载环境熵源质量</strong>是关键未知数（档案无对应条目）</td></tr><tr><td><strong>分发/装载</strong></td><td>把密钥安全送达使用点</td><td>车端密钥装载可能发生在产线；Tesla 的公钥经由 <code>.well-known</code> 托管 <code>[A]</code>，私钥不入域名 <code>[A]</code></td></tr><tr><td><strong>使用</strong></td><td>在受保护边界内使用；<strong>密码周期</strong>（cryptoperiod）限定使用时长</td><td>车端密钥的使用生命周期可能与车辆寿命同长（10 年以上），远超典型的密码周期建议</td></tr><tr><td><strong>存储</strong></td><td>密钥存储介质与保护强度</td><td>云端 → HSM（FIPS 140-3 <code>[A]</code>）；车端 → SE/TEE（GlobalPlatform <code>[A]</code>）；Tesla 虚拟密钥 → 应用服务器文件系统 <code>[A]</code></td></tr><tr><td><strong>轮换</strong></td><td>按策略或事件触发替换</td><td>见 12.2.4 与本节下表；车端轮换需 OTA/近场通道</td></tr><tr><td><strong>归档与销毁</strong></td><td>归档（保留用于验证历史签名）与销毁（不可恢复地抹除）</td><td>车辆转售/报废时的密钥销毁；<strong>本次未找到相关公开来源</strong></td></tr></tbody></table></div>
+<h4>12.7.2.3 密钥类型 × 生成位置 × 存储介质 × 轮换触发 × 销毁方式（大表）</h4>
+<p>下表为<strong>设计参考框架</strong>（<strong>本报告判断</strong>，推测，非事实），其中"依据"列标注了可回溯的事实点：</p>
+<div class="table-wrap"><table><thead><tr><th>密钥类型</th><th>生成位置（建议）</th><th>存储介质（建议）</th><th>轮换触发（建议）</th><th>销毁方式（建议）</th><th>可回溯依据</th></tr></thead><tbody><tr><td>云端令牌签名密钥</td><td>云侧 HSM</td><td>HSM（FIPS 140-3 认证模块）</td><td>定期 + 疑似泄露</td><td>HSM 内安全擦除</td><td>FIPS 140-3 <code>[A]</code>、FIPS 186-5 <code>[A]</code></td></tr><tr><td>云端配置签名密钥</td><td>云侧 HSM</td><td>HSM</td><td>定期 + 疑似泄露</td><td>HSM 内安全擦除</td><td>Tesla 配置由应用私钥签名 <code>[A]</code>（其密钥在应用侧而非 HSM，见下）</td></tr><tr><td>服务间 mTLS 密钥</td><td>云侧 KMS/HSM 或自动签发</td><td>服务节点的受保护存储</td><td>短周期自动（ACME）</td><td>证书过期 + 私钥擦除</td><td>RFC 8555 <code>[A]</code>、RFC 5280 <code>[A]</code></td></tr><tr><td>车端设备身份密钥</td><td><strong>车端/产线</strong>（不可导出理想）</td><td>TEE / SE / 车载 HSM</td><td>车辆生命周期内定期 + 失效事件</td><td>车辆报废时擦除</td><td>GlobalPlatform TEE <code>[A]</code>、GlobalPlatform SE 分类 <code>[A]</code>、EVITA 分级 <code>[B]</code></td></tr><tr><td><strong>应用私钥（Tesla 虚拟密钥）</strong></td><td>应用侧 <code>openssl ecparam -name prime256v1</code> <code>[A]</code></td><td><strong>应用服务器</strong>（文档未明载是否 HSM）</td><td><strong>文档未描述自动轮换</strong></td><td>删除本地文件 + 车辆 Locks 界面删除公钥 <code>[A]</code></td><td>Tesla <code>[A]</code></td></tr><tr><td>虚拟密钥公钥</td><td>由应用私钥派生</td><td>托管于 <code>/.well-known/appspecific/com.tesla.3p.public-key.pem</code>，<strong>须长期可用</strong> <code>[A]</code></td><td>随私钥轮换</td><td>停止托管 + 车辆端删除</td><td>Tesla <code>[A]</code></td></tr><tr><td>数字钥匙密钥</td><td>手机 SE / 车端 SE</td><td><strong>Secure Element</strong> <code>[A]</code></td><td>见 CCC 规范（本次未取证具体机制）</td><td>SE 内擦除</td><td>CCC Release 3.0 <code>[A]</code>、GB/T 44402.1-2024 <code>[A]</code></td></tr><tr><td>刷新令牌（对称/引用）</td><td>授权服务器</td><td>授权服务器存储 + 客户端缓存</td><td>每次使用（一次性）</td><td>RFC 7009 吊销</td><td>Tesla 3 个月 <code>[A]</code>、Mercedes 一次性 <code>[A]</code>、RFC 7009 <code>[A]</code></td></tr></tbody></table></div>
+<p><strong>必须注明的两个空白：</strong></p>
+<ol><li><strong>Tesla 虚拟密钥的"应用私钥是否受 HSM 保护"未取证。</strong> 文档明载生成命令（<code>openssl</code> 命令行）、明载存放位置（应用服务器）、明载"绝不可托管于域名" <code>[A]</code>，但<strong>未明载</strong>是否要求 HSM 保护。本章不补此空白。</li><li><strong>虚拟密钥的"轮换机制"未取证。</strong> 文档描述的吊销路径是"用户在车辆 Locks 界面删除密钥" <code>[A]</code>，这是<strong>人工、非周期</strong>的。档案未见任何自动轮换描述。因此 12.2.1.3 表中"命令授权层无自动过期"的判断成立，而其长期风险已在该节分析。</li></ol>
+<h3 id="sec-31">12.7.3 密钥强度与算法</h3>
+<h4>12.7.3.1 国际算法族的规范落点</h4>
+<p>信源档案中可用的 <code>[A]</code> 规范条目：</p>
+<div class="table-wrap"><table><thead><tr><th>规范</th><th>内容</th><th>在车云的适用点</th></tr></thead><tbody><tr><td>FIPS 186-5</td><td>数字签名标准（DSS）</td><td>ECDSA 签名生成/验签的算法基线</td></tr><tr><td>FIPS 197</td><td>AES</td><td>对称加密</td></tr><tr><td>SP 800-38D</td><td>GCM 模式</td><td>AEAD 加密（TLS 记录层）</td></tr><tr><td>SP 800-90A Rev.1</td><td>确定性随机比特发生器</td><td>密钥生成、nonce、IV 的随机性来源</td></tr><tr><td>SP 800-133</td><td>密钥生成</td><td>密钥生成方法的合规要求</td></tr><tr><td>SP 800-57 Part 1 Rev.5</td><td>密钥管理建议</td><td>密码周期与密钥状态机</td></tr><tr><td>FIPS 140-3</td><td>密码模块安全要求</td><td>HSM / 密码模块的认证基线</td></tr><tr><td>RFC 5480</td><td>ECDSA/EC 公钥在 X.509 中的表示</td><td>车端证书的公钥编码</td></tr><tr><td>RFC 6090</td><td>ECDSA/ECC 基础</td><td>算法基础</td></tr><tr><td>RFC 8017</td><td>PKCS #1 RSA</td><td>若使用 RSA 的规范落点</td></tr></tbody></table></div>
+<h4>12.7.3.2 P-256 在车云中的实际位置</h4>
+<p>信源档案 §7.1 有一条<strong>极为具体的 <code>[A]</code> 事实</strong>：Tesla 虚拟密钥的生成命令为 <code>openssl ecparam -name prime256v1 -genkey -noout</code>，且文档明确"<strong>车辆仅支持 prime256v1 密钥</strong>"（即 P-256 ECDSA）<code>[A]</code>。</p>
+<p><strong>这条事实的四层含义（本报告判断，推测，非事实）：</strong></p>
+<ol><li><strong>算法约束来自车端</strong>：不是"应用想用什么"，而是"车辆只支持什么"。文档明载的"仅支持"是硬约束。</li><li><strong>曲线选择与性能相关</strong>：P-256 在嵌入式验签性能与安全性之间是均衡点。<strong>本报告判断</strong>（推测，非事实）：车辆 ECU 的验签算力、功耗与延迟要求，使得更高安全等级的曲线（如 P-384/P-521）验签成本更高。档案未记录 Tesla 车辆的验签性能数据。</li><li><strong>ECDSA 的随机数要求</strong>：ECDSA 签名的安全性依赖每次签名使用唯一且不可预测的随机数 <code>k</code>（<code>k</code> 复用会导致私钥被直接恢复）。<strong>本报告判断</strong>（推测，非事实）：因此应用侧的签名实现必须依赖合规的 RNG（SP 800-90A <code>[A]</code>），且必须防止并发签名复用 <code>k</code>。这是"算法合规 ≠ 实现合规"的典型例子。</li><li><strong>与证书体系的衔接</strong>：RFC 5480 <code>[A]</code> 定义了 EC 公钥在 X.509 中的表示，因此若车端设备证书也使用 P-256，则算法族统一，便于统一密码模块（FIPS 140-3 <code>[A]</code>）的验证范围。</li></ol>
+<h4>12.7.3.3 国密算法族与 RFC 8998</h4>
+<p>信源档案 §1.2 收录了完整的国密算法国家标准 <code>[A]</code>：</p>
+<ul><li>GB/T 32918.1~.5-2016/2017《SM2 椭圆曲线公钥密码算法》（总则/数字签名/密钥交换/公钥加密/参数定义）</li><li>GB/T 32905-2016《SM3 密码杂凑算法》</li><li>GB/T 32907-2016《SM4 分组密码算法》</li><li>GB/T 35275-2017《SM2 密码算法加密签名消息语法规范》</li><li>GB/T 35276-2017《SM2 密码算法使用规范》</li></ul>
+<p>信源档案 §3 收录 <strong>RFC 8998（2021）ShangMi (SM) Cipher Suites for TLS 1.3</strong>，标注为"<strong>国密 TLS 在国际标准层面的唯一落点，国产车云链路合规的关键</strong>"，并列出的构件为：<strong>SM2 签名、AEAD_SM4_GCM / AEAD_SM4_CCM、SM3</strong> <code>[A]</code>。</p>
+<p><strong>本报告判断</strong>（推测，非事实）：RFC 8998 的意义在于它把国密算法<strong>接入了 TLS 1.3 的框架</strong>（RFC 8446 <code>[A]</code>）。这意味着国密合规路径与 TLS 1.3 的现代特性（1-RTT 握手、前向保密）不冲突。若不使用 RFC 8998 而自建国密 TLS，则需要注意避免重蹈早期 TLS 版本的问题（如缺乏前向保密、握手可降级）。</p>
+<p><strong>合规路径上的一个交叉点（本报告判断，推测，非事实）</strong>：信源档案 §1.2 收录 <strong>GB/T 45112-2024《基于 LTE 的车联网无线通信技术 安全证书管理系统技术要求》</strong> <code>[A]</code>，标注为"中国 C-V2X 证书管理体系，是'车-云-车'证书体系的国家级规范"。这与 §1.2 的 <strong>GB/T 44402.1-2024 数字钥匙参考架构</strong> <code>[A]</code> 一起，说明国内的"车-云-车"与"数字钥匙"两条证书/密钥体系都有国标参考架构。<strong>但信源档案 §7.10 第 5 条明确警告：9 家国内车企本次全部未取得关于"国密 SM2/SM3/SM4"的任何官方一手来源</strong>——因此本章只能写"国家标准提供了国密路径"，<strong>不能写任何国内车企采用了国密</strong>。</p>
+<h4>12.7.3.4 算法与合规基线的关系</h4>
+<p>信源档案 §1.1 记录了 GB 44495-2024《汽车整车信息安全技术要求》（发布 2024-08-23，实施 2026-01-01）与 GB 44496-2024《汽车软件升级通用技术要求》，两者均为<strong>强制性</strong>国标，标注为"中国车云与 OTA 安全的合规基线，2026-01-01 起对新车型强制适用" <code>[A]</code>。§1.2 还收录了 <strong>GB/T 47324-2026《车联网平台网络安全防护要求》</strong>（发布 2026-03-31，实施 2026-10-01），标注为"<strong>直接命中本报告主题：车联网云平台侧的防护要求</strong>" <code>[A]</code>，以及 <strong>GB/T 47467-2026《车联网安全管理接口规范》</strong>（发布 2026-04-30，实施 2026-11-01），标注为"<strong>接口层规范，与授权/访问控制的 API 治理直接相关</strong>" <code>[A]</code>。</p>
+<p><strong>本报告判断</strong>（推测，非事实）：这批 2026 年发布/实施的国标意味着"车云授权治理"在中国已从最佳实践转为<strong>有明确规范载体</strong>的领域。但注意信源档案只记录了标准编号、名称、发布/实施日期与官方 URL <code>[A]</code>——<strong>标准正文的技术要求内容本次未取证</strong>（信源档案 §1 的条目均为"国家标准全文公开系统"的一手元数据页）。因此本章不得引用 GB 44495 / GB/T 47324 / GB/T 47467 的具体条款——这是 12.10 的一条补证项。</p>
+<h3 id="sec-32">12.7.4 HSM 与 FIPS 140-3 认证等级对车云的适用性</h3>
+<h4>12.7.4.1 FIPS 140-3 作为基线</h4>
+<p>信源档案 §4 收录 <strong>NIST FIPS 140-3（密码模块安全要求，HSM 认证基线）</strong> <code>[A]</code>。信源档案未记录 FIPS 140-3 的<strong>具体等级划分与其要求内容</strong>（如 Level 1–4 的差异），因此本节<strong>不描述等级细节</strong>（避免编造），只做适用性讨论。</p>
+<h4>12.7.4.2 EVITA 分级对照</h4>
+<p>信源档案 §4 收录 <strong>EVITA 项目</strong>（E-safety Vehicle Intrusion Protected Applications），标注为"<strong>定义车载 HSM 的 Full / Medium / Light 三级分级</strong>" <code>[B]</code>。</p>
+<div class="table-wrap"><table><thead><tr><th>EVITA 级别</th><th>定位（据档案条目概括）</th><th>车云场景中的推断用途（<strong>本报告判断，推测</strong>）</th></tr></thead><tbody><tr><td><strong>Full</strong></td><td>最高级别</td><td>需要高性能非对称密码的车载节点。<strong>推断</strong>：可作为车端"验签网关"的候选，承担对云端下发的签名载荷、证书的验签</td></tr><tr><td><strong>Medium</strong></td><td>中等级别</td><td>需要对称密码与基本非对称能力。<strong>推断</strong>：T-BOX/网关等需要参与链路认证与安全存储的节点</td></tr><tr><td><strong>Light</strong></td><td>最低级别</td><td>成本敏感的 ECU。<strong>推断</strong>：用于对称认证（如 SecOC 类的消息认证），不具备承担完整验签链的能力</td></tr></tbody></table></div>
+<p><strong>必须注明</strong>：EVITA 分级条目本身为 <code>[B]</code>（信源档案 §4），且档案<strong>未记录各级的具体密码能力/性能指标</strong>。上表的"推断用途"栏全部为<strong>本报告判断（推测，非事实）</strong>，不构成对任何车型硬件配置的断言。信源档案 §4 中 Infineon AURIX、NXP S32、Renesas RH850、TI Jacinto TDA4VM 分别标为 <code>[C]</code> 或 <code>[未验证]</code>，<strong>不适合作为"某车型使用某芯片"的证据</strong>。</p>
+<h4>12.7.4.3 车端密码模块与云端密码模块的差异</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：</p>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>云端 HSM</th><th>车端密码模块（TEE/SE/HSM）</th></tr></thead><tbody><tr><td>物理防护</td><td>数据中心机柜、防拆封、环境监测</td><td>需耐受温度、振动、电压波动、长期断电</td></tr><tr><td>生命周期</td><td>数年（随硬件代际更新）</td><td><strong>与车辆同寿命</strong>（10 年以上）</td></tr><tr><td>更新能力</td><td>可整机替换、固件可升级</td><td>固件升级受 OTA 通道约束；出现算法弱点时<strong>难以更换硬件</strong></td></tr><tr><td>认证路径</td><td>FIPS 140-3 <code>[A]</code>（NIST 体系）</td><td>GlobalPlatform TEE <code>[A]</code> / SE 分类 <code>[A]</code>；EVITA 分级 <code>[B]</code></td></tr><tr><td>关键威胁</td><td>远程攻击、运维误操作</td><td><strong>物理接触攻击</strong>（车辆可被物理接近）</td></tr></tbody></table></div>
+<p><strong>最重要的差异是"不可更新性"</strong>（<strong>本报告判断</strong>，推测，非事实）：车辆的密码模块一旦装车，其算法与密钥长度在车辆全生命周期内基本固定。这意味着车端算法选择必须考虑<strong>未来 10 年以上的密码学演进</strong>（例如对后量子迁移的预留）。档案中<strong>未找到</strong>任何车端密码模块的"密码敏捷性（crypto-agility）"设计条目——这是一个真实的披露缺口，列入 12.10。</p>
+<h4>12.7.4.4 与 3 层密钥作用的对应</h4>
+<p><strong>本报告判断</strong>（推测，非事实）：把 12.3.4 的三方密钥模型与本节的分级对起来：</p>
+<pre><code>① 应用私钥（云端/应用服务器）  →  应由云端 HSM/KMS 或至少受保护存储承载
+                                  【文档未明载 Tesla 是否要求 HSM】
+② 车辆公钥（车端验签）         →  需要车端具备验签能力
+                                  候选承载：TEE / SE / 车载 HSM（EVITA Full/Medium）
+③ 云端 partner 注册            →  云端身份管理，非密码模块，但与 ① 的公钥绑定</code></pre>
+<p><strong>本报告判断</strong>（推测，非事实）：<strong>②决定了整个车端可信基的强度</strong>。若车端验签发生在普通应用处理器（而非 TEE/SE）上，则"车辆验证载荷签名"这一控制可能被同处理器上的更高权限代码绕过——此时虚拟密钥的"能阻止 Tesla 后端访问"的文档主张 <code>[A]</code> 就依赖于车端的隔离强度。<strong>档案未记录 Tesla 车端验签的执行环境</strong>（是否在 TEE/SE 中），因此这是 12.10 的一条待补证项，且是一条<strong>高价值</strong>的待补证项。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-33">
+  <div class="sec-head"><span class="sec-badge">09</span><h2>12.8 工程实现片段</h2></div>
+<blockquote><p><strong>本节全部代码为示意代码（pseudocode），不是可部署实现，也不是对任何企业实现的还原。</strong> 目的仅为把前面各节的机制落到可讨论的工程形态上。所有伪代码中的具体数值、超时、阈值均为<strong>设计建议值</strong>，不是文档明载值。</p></blockquote>
+<h3 id="sec-34">12.8.1 令牌校验中间件伪代码</h3>
+<p>功能覆盖：<code>aud</code> / <code>iss</code> / <code>exp</code> / <code>nbf</code> 校验 + <code>cnf</code> 指纹比对 + 内省兜底 + 授权决策钩子。</p>
+<pre><code># ─────────────────────────────────────────────────────────────
+# 令牌校验中间件（示意代码）
+# 设计目标：把 12.4.1 的强制校验清单、12.3.2 的 cnf 绑定、
+#           12.4.2 的内省兜底、12.5.3 的 act 链，收敛为一个函数
+# ─────────────────────────────────────────────────────────────
+
+function authorize(request):
+    raw = extract_bearer(request.headers[&quot;Authorization&quot;])
+    # 依据：RFC 6750 —— Bearer 令牌通过 Authorization 头传输
+    if raw is null:
+        return reject(401, &quot;missing_token&quot;)
+
+    # ── 第 1 步：令牌形态判定 ─────────────────────────────
+    token = try_parse_jwt(raw)
+    if token is null:
+        # 不透明令牌路径：直接走内省（RFC 7662）
+        return introspect_then_authorize(raw, request)
+
+    # ── 第 2 步：JWT 形态的结构校验 ───────────────────────
+    # 依据：RFC 9068 —— typ 必须为 at+jwt，强制校验 aud/iss/exp
+    if token.header.typ != &quot;at+jwt&quot;:
+        # 注意：缺这一条就无法区分访问令牌与 id_token（见 12.4.3 第 4 条）
+        return reject(401, &quot;invalid_token_type&quot;)
+
+    # 算法白名单（防止 alg 混淆，见 12.4.3 第 3 条）
+    if token.header.alg not in ALLOWED_ALGS:   # 例如仅允许 ES256
+        return reject(401, &quot;alg_not_allowed&quot;)
+
+    # 签名验证：从固定的 JWKS 来源取公钥（不信任 jku/jwk 头）
+    jwks = JWKS_CACHE.get(issuer=token.claims.iss)   # 固定映射，非令牌自述
+    if not verify_signature(token, jwks):
+        return reject(401, &quot;bad_signature&quot;)
+
+    # ── 第 3 步：声明校验 ─────────────────────────────────
+    now = trusted_now()   # 依据：RFC 3161 提供可信时间基准
+    clock_skew = 60       # 设计建议值：秒
+
+    if token.claims.iss != EXPECTED_ISSUER:
+        return reject(401, &quot;bad_issuer&quot;)
+
+    if request.resource_audience not in as_list(token.claims.aud):
+        # 依据：RFC 9068 —— aud 必须包含目标资源
+        # 车云含义：Tesla 的 audience 必须是 Fleet API base URL
+        return reject(401, &quot;audience_mismatch&quot;)
+
+    if now &gt; token.claims.exp + clock_skew:
+        return reject(401, &quot;expired&quot;)
+
+    if token.claims.nbf and now &lt; token.claims.nbf - clock_skew:
+        return reject(401, &quot;not_yet_valid&quot;)
+
+    # ── 第 4 步：发送方约束校验（RFC 8705 / RFC 9449）──────
+    cnf = token.claims.get(&quot;cnf&quot;)
+    if cnf is not null:
+        if &quot;x5t#S256&quot; in cnf:
+            # mTLS 证书绑定：比对当前 TLS 连接的客户端证书指纹
+            actual = sha256(request.tls.client_certificate)
+            if !constant_time_eq(actual, cnf[&quot;x5t#S256&quot;]):
+                return reject(401, &quot;cnf_cert_mismatch&quot;)
+            # 注意：证书轮换窗口内会在此失配（见 12.2.4.3 / 12.9）
+        if &quot;jkt&quot; in cnf:
+            # DPoP JWK 指纹绑定：校验 DPoP 头 + jti 去重 + nonce
+            proof = request.headers.get(&quot;DPoP&quot;)
+            if proof is null:
+                return reject(401, &quot;dpop_proof_missing&quot;)
+            if !verify_dpop(proof, expected_jkt=cnf[&quot;jkt&quot;],
+                            seen_jti=JTI_STORE, required_nonce=SERVER_NONCE):
+                return reject(401, &quot;dpop_invalid&quot;)
+            # nonce 挑战（RFC 9449 语义，见 12.3.3.3）
+            if proof.nonce != SERVER_NONCE:
+                return reject(401, &quot;use_dpop_nonce&quot;,
+                              nonce=SERVER_NONCE)   # 要求重试
+            JTI_STORE.mark_seen(proof.jti, ttl=proof_ttl)
+
+    # ── 第 5 步：内省兜底（高风险操作强制实时校验）─────────
+    if is_high_risk(request) or token_age(token) &gt; FRESHNESS_LIMIT:
+        # 依据：RFC 7662 内省；RFC 7009 吊销
+        intro = introspect(raw)
+        if !intro.active:
+            return reject(401, &quot;token_revoked&quot;)
+        if intro.scope != token.claims.scope:
+            return reject(401, &quot;scope_changed&quot;)   # 授权变更检测
+
+    # ── 第 6 步：授权决策钩子 ─────────────────────────────
+    ctx = {
+        &quot;subject&quot;:   token.claims.sub,
+        &quot;client_id&quot;: token.claims.client_id,
+        &quot;scope&quot;:     parse_scope(token.claims.scope),
+        &quot;act_chain&quot;: token.claims.get(&quot;act&quot;),        # RFC 8693 代理链
+        &quot;resource&quot;:  request.resource,               # 例如 {&quot;vehicle_id&quot;: &quot;...&quot;}
+        &quot;auth_time&quot;: token.claims.iat,
+    }
+    decision = POLICY_ENGINE.decide(ctx, request.action)
+    # 依据：RFC 9470 —— 若认证强度不足，返回步进认证挑战
+    if decision.verdict == &quot;step_up_required&quot;:
+        return reject(401, &quot;insufficient_user_authentication&quot;,
+                      acr_values=decision.required_acr)
+    if decision.verdict != &quot;allow&quot;:
+        return reject(403, &quot;policy_denied&quot;, reason=decision.reason)
+
+    return next(request, with_context=ctx)</code></pre>
+<p><strong>这份伪代码中每一条注释对应的前文小节</strong>：<code>typ</code>/<code>aud</code>/<code>iss</code>/<code>exp</code>/<code>nbf</code> → 12.4.1；alg 白名单 → 12.4.3 第 3 条；<code>cnf.x5t#S256</code> → 12.3.2；<code>cnf.jkt</code> + DPoP nonce → 12.3.3；内省兜底 → 12.4.2；<code>act</code> 链 → 12.5.3；<code>acr</code> 步进 → 12.5.4。</p>
+<p><strong>一个实现细节的强调</strong>：第 4 步的 <code>constant_time_eq</code> 是必需的——指纹比对本应是固定长度字节比较，若用短路比较会引入时序侧信道。<strong>本报告判断</strong>（推测，非事实）：这是令牌绑定校验中最容易出的实现错误之一。</p>
+<h3 id="sec-35">12.8.2 令牌与车辆绑定的请求体示意（JSON）</h3>
+<p><strong>示意代码。</strong> 在纯 scope 模型（如 Tesla 的 <code>vehicle_cmds</code> <code>[A]</code>）之上，若要做<strong>资源级</strong>绑定，需要请求体中携带资源标识。下列 JSON 为设计示意，<strong>不是任何 API 的实际格式</strong>：</p>
+<pre><code class="language-json">{
+  &quot;_comment&quot;: &quot;示意：车控命令请求体（设计示意，非任何企业实际格式）&quot;,
+
+  &quot;command&quot;: &quot;unlock&quot;,
+  &quot;vehicle&quot;: {
+    &quot;vin&quot;: &quot;EXAMPLEVIN00000000&quot;,
+    &quot;region&quot;: &quot;na&quot;,
+    &quot;_note&quot;: &quot;audience 需与令牌 aud 一致；Tesla 文档明载 audience 必须是 Fleet API base URL&quot;
+  },
+
+  &quot;actor&quot;: {
+    &quot;subject&quot;: &quot;owner-consent-id&quot;,
+    &quot;client_id&quot;: &quot;third-party-app-id&quot;,
+    &quot;act&quot;: {
+      &quot;_note&quot;: &quot;RFC 8693 act 链：谁在代替谁行事&quot;,
+      &quot;sub&quot;: &quot;third-party-app-id&quot;,
+      &quot;act&quot;: { &quot;sub&quot;: &quot;oem-cloud-service-id&quot; }
+    }
+  },
+
+  &quot;authorization&quot;: {
+    &quot;scope&quot;: [&quot;openid&quot;, &quot;offline_access&quot;, &quot;vehicle_cmds&quot;, &quot;vehicle_device_data&quot;],
+    &quot;_note&quot;: &quot;scope 名称取自 Tesla 文档明载值（信源档案 §7.1）&quot;
+  },
+
+  &quot;channel&quot;: {
+    &quot;sender_constrained&quot;: true,
+    &quot;binding&quot;: {
+      &quot;type&quot;: &quot;dpop_jkt&quot;,
+      &quot;jkt&quot;: &quot;BASE64URL-SHA256-JWK-THUMBPRINT&quot;
+    },
+    &quot;_note&quot;: &quot;或 type=mTLS，携带 x5t#S256 指纹；见 RFC 8705 / RFC 9449&quot;
+  },
+
+  &quot;proof&quot;: {
+    &quot;alg&quot;: &quot;ES256&quot;,
+    &quot;signature&quot;: &quot;BASE64URL-ECDSA-P256-SIGNATURE-OVER-CANONICAL-PAYLOAD&quot;,
+    &quot;_note&quot;: &quot;车端在执行命令前验证载荷签名（Tesla 文档明载）；签名覆盖范围必须含&quot;
+  },
+
+  &quot;replay_protection&quot;: {
+    &quot;nonce&quot;: &quot;UNIQUE-PER-REQUEST&quot;,
+    &quot;timestamp&quot;: &quot;2026-09-28T23:47:00Z&quot;,
+    &quot;timestamp_authority&quot;: &quot;RFC3161-TSA&quot;,
+    &quot;_note&quot;: &quot;时间基准不依赖车端本地时钟（见 12.2.4.2）&quot;
+  },
+
+  &quot;step_up&quot;: {
+    &quot;required_acr&quot;: &quot;urn:example:acr:otp&quot;,
+    &quot;achieved_acr&quot;: &quot;urn:example:acr:pwd&quot;,
+    &quot;_note&quot;: &quot;RFC 9470 语义；设计示意，见 12.5.4&quot;
+  }
+}</code></pre>
+<p><strong>三个绑定层的顺序（本报告判断，推测，非事实）</strong>：<code>channel.binding</code>（连接/应用层绑定）→ <code>proof.signature</code>（命令载荷签名）→ <code>authorization.scope</code>（业务授权）。三层必须<strong>同时</strong>通过；任何一层的缺失都会让对应类型的攻击路径打开。</p>
+<h3 id="sec-36">12.8.3 刷新令牌轮换的并发安全实现示意</h3>
+<p>针对 12.2.2.2 描述的并发竞态。设计要点：<strong>分布式锁 + 宽限期判定 + 幂等键</strong>。</p>
+<pre><code># ─────────────────────────────────────────────────────────────
+# 刷新令牌轮换的安全刷新器（示意代码）
+# 目标：消除 12.2.2.2 的并发竞态；覆盖 12.2.2.3 的三种策略之一
+# 注意：这是【设计建议】，不是对 Tesla / Mercedes 行为的断言
+# ─────────────────────────────────────────────────────────────
+
+class TokenRefresher:
+    def __init__(self, store, lock, api):
+        self.store = store      # 共享持久化存储（多副本安全）
+        self.lock  = lock       # 分布式锁（按 client_id 粒度）
+        self.api   = api
+
+    def get_access_token(self, client_id):
+        # ── 快速路径：本地缓存的访问令牌仍有效 ──────────────
+        cur = self.store.load(client_id)
+        if cur.access_token_valid(skew_seconds=60):
+            # 依据：Mercedes 文档指引 —— 有效期内直接使用
+            return cur.access_token
+
+        # ── 慢速路径：需要刷新，先取锁 ─────────────────────
+        with self.lock.acquire(client_id, ttl_seconds=30):
+            # 双检：拿到锁后重新读，可能已被其他实例刷新
+            cur = self.store.load(client_id)
+            if cur.access_token_valid(skew_seconds=60):
+                return cur.access_token
+
+            # ── 幂等键：同一把刷新令牌并发刷新只做一次 ───────
+            idem = derive_idempotency_key(cur.refresh_token)
+            cached = self.store.get_idempotent_result(idem)
+            if cached is not None:
+                # 说明本进程外已有人用同一 RT 刷新过；直接复用结果
+                self.store.save(client_id, cached)
+                return cached.access_token
+
+            # ── 真正的刷新调用 ─────────────────────────────
+            try:
+                resp = self.api.refresh(
+                    grant_type=&quot;refresh_token&quot;,
+                    refresh_token=cur.refresh_token,
+                    client_id=client_id,
+                )
+                new = Tokens(
+                    access_token=resp.access_token,
+                    refresh_token=resp.refresh_token,   # 轮换后的新 RT
+                    expires_in=resp.expires_in,
+                )
+                # 原子写入：新令牌整体落库，避免半写
+                self.store.save_atomic(client_id, new)
+                self.store.put_idempotent_result(idem, new, ttl=300)
+                return new.access_token
+            except RefreshRejected as e:
+                # ── 失败恢复分派（见 12.2.2.4）────────────────
+                if e.reason == &quot;already_used&quot;:
+                    # 可能落在宽限期外；再读一次存储，看是否
+                    # 其他实例已经写入了更新的令牌
+                    latest = self.store.reload(client_id)
+                    if latest.refresh_token != cur.refresh_token:
+                        return self.get_access_token(client_id)  # 重试一次
+                    raise LoginRequired(&quot;refresh_token_superseded&quot;)
+                if e.reason == &quot;expired&quot;:
+                    raise LoginRequired(&quot;refresh_token_expired&quot;)
+                if e.reason == &quot;user_password_reset&quot;:
+                    # Tesla 文档明载：用户重置密码会触发 401 login_required
+                    raise LoginRequired(&quot;user_password_reset&quot;)
+                raise</code></pre>
+<p><strong>设计说明（本报告判断，推测，非事实）：</strong></p>
+<div class="table-wrap"><table><thead><tr><th>设计动作</th><th>解决的问题</th><th>对应前文</th></tr></thead><tbody><tr><td>快速路径（本地有效期判定）</td><td>减少刷新调用频率，降低并发概率</td><td>12.2.1</td></tr><tr><td>分布式锁（按 <code>client_id</code>）</td><td>保证同一时刻只有一个刷新在途</td><td>12.2.2.2</td></tr><tr><td>取锁后双检</td><td>避免"等待锁的实例在拿到锁后重复刷新"</td><td>12.2.2.2 步骤 4</td></tr><tr><td>幂等键（由刷新令牌派生）</td><td>同一把 RT 的并发刷新复用同一结果</td><td>12.2.2.3 策略二</td></tr><tr><td><code>save_atomic</code></td><td>避免"新 AT 写了、新 RT 没写"的半写状态</td><td>12.2.2.2 步骤 5</td></tr><tr><td>失败后 reload + 重试一次</td><td>覆盖"宽限期竞态导致 already_used"</td><td>12.2.2.4</td></tr></tbody></table></div>
+<p><strong>必须注意的边界</strong>：这份实现<strong>不解决</strong>"授权被撤销"的场景——那需要重新走授权码流程（12.2.2.4 第三行）。伪代码中的 <code>user_password_reset</code> 分支直接抛出 <code>LoginRequired</code>，不做任何自动重试，这是刻意的：<strong>因授权基础变化而失败时，任何自动重试都是错误行为</strong>。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-37">
+  <div class="sec-head"><span class="sec-badge">10</span><h2>12.9 失败模式与严重度</h2></div>
+<p>严重度口径沿用 <code>00-engagement-plan.md</code> §3.3：<strong>Critical</strong>（授权链可被绕过导致任意车辆车控/位置未授权访问，或根密钥可远程提取）/ <strong>High</strong>（单一应用或凭证被攻破可横向影响同账号其他车辆或平台其他租户）/ <strong>Medium</strong>（令牌生命周期管理不当导致影响范围扩大）/ <strong>Low</strong>（文档与可观测性缺失）/ <strong>Informational</strong>（架构观察）。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>失败模式</th><th>后果</th><th>严重度</th><th>缓解控制</th><th>依据/来源</th></tr></thead><tbody><tr><td>1</td><td>访问令牌泄露且为 Bearer 形态、无发送方约束</td><td>攻击者可在令牌有效期内以授权范围调用 API；若含车控 scope 则可达车控</td><td><strong>Critical</strong></td><td>发送方约束令牌（RFC 8705 <code>[A]</code> / RFC 9449 <code>[A]</code>）；短 TTL</td><td>规范语义；RFC 8705/9449 <code>[A]</code></td></tr><tr><td>2</td><td>云端令牌被攻破且车端无独立验签能力</td><td>直接获得车控能力</td><td><strong>Critical</strong></td><td>车端载荷签名验证（Tesla 明载 <code>[A]</code>）；车端密钥存于 TEE/SE</td><td>Tesla §7.1 <code>[A]</code>；GlobalPlatform <code>[A]</code></td></tr><tr><td>3</td><td>应用私钥泄露（虚拟密钥场景）</td><td>攻击者可构造通过车端验签的命令载荷</td><td><strong>Critical</strong></td><td>私钥不离域、不入域名托管 <code>[A]</code>；密钥存储加护；密钥数量上限 <code>&lt; 20 把</code> <code>[A]</code></td><td>Tesla §7.1 <code>[A]</code></td></tr><tr><td>4</td><td>数字钥匙密钥以明文存于手机普通存储</td><td>密钥被提取后车辆可被未授权进入/启动</td><td><strong>Critical</strong></td><td>密钥存于 <strong>Secure Element</strong> <code>[A]</code></td><td>CCC Release 3.0 <code>[A]</code></td></tr><tr><td>5</td><td><code>vehicle_specs</code> / <code>vehicle_pricing_info</code> 类"仅 Partner Token 且对任意车辆无需车主同意"的路径被滥用</td><td>退出逐车主同意模型的资源访问；单一凭证被攻破影响面超出预期</td><td><strong>High</strong></td><td>契约约束 + 审计 + 限流；令牌最小权限</td><td>Tesla §7.1 <code>[A]</code>（<code>vehicle_specs</code>/<code>vehicle_pricing_info</code> 仅 Partner Token 可用、任意车辆、无需车主授权）；<code>00-engagement-plan.md</code> §3.3 CSO 判定示例</td></tr><tr><td>6</td><td>刷新令牌未轮换（可无限复用）</td><td>泄露后攻击者长期续命，且无检测</td><td><strong>High</strong></td><td>一次性刷新令牌 + 轮换（Tesla <code>[A]</code> / Mercedes <code>[A]</code>）</td><td>Tesla §7.1 <code>[A]</code>；Mercedes §7.2 <code>[A]</code></td></tr><tr><td>7</td><td>刷新令牌轮换后无宽限期，客户端持久化失败</td><td>合法用户被强制重新登录（可用性），并在高并发下形成"掉线"体验</td><td><strong>High</strong></td><td>宽限期（Tesla 明载 24 小时 <code>[A]</code>）；客户端原子持久化</td><td>Tesla §7.1 <code>[A]</code></td></tr><tr><td>8</td><td>令牌绑定与证书轮换不同步（<code>cnf</code> 指纹失配）</td><td>证书轮换瞬间批量拒绝合法请求，服务中断</td><td><strong>High</strong></td><td>轮换重叠窗口；同时接受新旧指纹的令牌</td><td>「本报告判断」（推测，非事实）；RFC 8555 <code>[A]</code> / RFC 8705 <code>[A]</code></td></tr><tr><td>9</td><td>未校验 <code>aud</code></td><td>令牌可在区域/服务/租户间挪用</td><td><strong>High</strong></td><td>强制 <code>aud</code> 校验，绑定 Fleet API base URL（Tesla 明载 audience 规则 <code>[A]</code>）</td><td>RFC 9068 <code>[A]</code>；Tesla §7.1 <code>[A]</code></td></tr><tr><td>10</td><td>未校验 <code>iss</code></td><td>接受攻击者自建授权服务器的令牌</td><td><strong>High</strong></td><td>固定签发方；JWKS 来源固定，不信任 <code>jku</code>/<code>jwk</code></td><td>RFC 9068 <code>[A]</code>；「本报告判断」</td></tr><tr><td>11</td><td>接受 <code>alg: none</code> 或算法混淆</td><td>签名可被伪造，令牌校验形同虚设</td><td><strong>High</strong></td><td>算法白名单；不用令牌自述的 <code>alg</code> 决定验签方式</td><td>「本报告判断」（通用 JWT 缺陷模式）</td></tr><tr><td>12</td><td>把 <code>id_token</code> 当 <code>access_token</code> 用</td><td>绕过 scope 检查；认证凭证被当授权凭证</td><td><strong>High</strong></td><td>强制 <code>typ: at+jwt</code>（RFC 9068 <code>[A]</code>）；<code>aud</code> 区分</td><td>RFC 9068 <code>[A]</code>；「本报告判断」</td></tr><tr><td>13</td><td>静态共享密钥（<code>appKey</code> / <code>secret</code>）无轮换、无内省</td><td>泄露即长期裸调用；无法检测滥用</td><td><strong>High</strong></td><td>改用具 TTL 的令牌；RFC 7523 客户端断言替代静态密钥</td><td>BYD <code>[A]</code>；NIO <code>[A]</code>；RFC 7523 <code>[A]</code></td></tr><tr><td>14</td><td>scope 缩减仅对新签发访问令牌生效 → "已撤销但未到期"窗口</td><td>撤销后旧令牌在到期前仍可调用被撤销能力</td><td><strong>Medium</strong></td><td>缩短访问令牌 TTL；高风险操作强制内省兜底</td><td>Tesla §7.1 <code>[A]</code>（明载规则）；「本报告判断」（窗口含义）</td></tr><tr><td>15</td><td>长期有效且无自动过期的命令授权（虚拟密钥直到手动删除）</td><td>授权扇出长期存在；无自动收敛</td><td><strong>Medium</strong></td><td>密钥数量上限 <code>[A]</code>；建议引入周期性重新配对（设计建议）</td><td>Tesla §7.1 <code>[A]</code>；「本报告判断」</td></tr><tr><td>16</td><td>令牌/配置签名时间基准依赖车端本地时钟</td><td>时钟被操纵时防重放失效</td><td><strong>Medium</strong></td><td>引入 RFC 3161 可信时间戳</td><td>RFC 3161 <code>[A]</code>；「本报告判断」</td></tr><tr><td>17</td><td>Fleet Telemetry 配置的移除原因不可区分（授权撤销 vs 计费超限）</td><td>运维无法定位根因；误判为安全事件或反之</td><td><strong>Low</strong></td><td>为两种路径建立可区分的审计事件</td><td>Tesla §7.1 <code>[A]</code>（超限会移除推流配置且不恢复）；「本报告判断」</td></tr><tr><td>18</td><td>车端密码模块不可更新，算法敏捷性未设计</td><td>算法弱点暴露时无法在存量车辆上迁移</td><td><strong>Medium</strong></td><td>车端硬件预留密码敏捷性；算法分层设计</td><td>「本报告判断」（推测，非事实）；档案<strong>未找到</strong>车端 crypto-agility 条目</td></tr><tr><td>19</td><td>授权决策无日志（不含"为什么允许/拒绝"）</td><td>事后无法归因；无法证明控制有效</td><td><strong>Low</strong></td><td>记录决策依据（scope、<code>act</code> 链、policy 版本）</td><td>「本报告判断」；<code>00-engagement-plan.md</code> §3.3 Low 判据</td></tr><tr><td>20</td><td>公钥托管 URL（<code>/.well-known/appspecific/com.tesla.3p.public-key.pem</code>）不可用</td><td>可能影响车辆侧密钥校验/重新配对流程（<strong>具体行为未取证</strong>）</td><td><strong>Medium</strong></td><td>长期可用性监控 + SLO；域名/证书到期管理</td><td>Tesla §7.1 <code>[A]</code>（文档明载须长期可用）</td></tr><tr><td>21</td><td>代理链中某一跳的 <code>actor_token</code> 管理不当</td><td>act 链被污染；命令归因错误</td><td><strong>High</strong></td><td>每跳独立持有凭证；act 链完整性校验</td><td>RFC 8693 <code>[A]</code>；「本报告判断」</td></tr><tr><td>22</td><td>文档访问本身无访问控制（对比参照）</td><td>攻击者可直接读取接口定义，提高攻击效率</td><td><strong>Informational</strong></td><td>文档访问纳入授权（NIO 做法：需获取文档访问 token <code>[A]</code>）</td><td>NIO §7.7 <code>[A]</code>（正面参照）</td></tr><tr><td>23</td><td>已授予 <code>vehicle_location</code> 但资源级策略进一步收窄（双层控制）</td><td>——（<strong>正面控制案例</strong>，非失败）</td><td><strong>Informational</strong></td><td>双层授权控制：scope 层 + 资源策略层</td><td>Tesla §7.1 <code>[A]</code>（<code>granular_access.hide_private=true</code> 时仍拿不到位置且无法流式传输）；<code>00-engagement-plan.md</code> §3.3 CSO 判定示例</td></tr><tr><td>24</td><td>平台限流不足，凭单一账号扇出影响大量车辆</td><td>单账号被滥用时形成规模化的资源占用</td><td><strong>High</strong></td><td>按账号按设备限流并<strong>多应用共享限额</strong></td><td>Tesla §7.1 <code>[A]</code>（实时数据 60 次/分；唤醒 3 次/分；设备命令 30 次/分；同账号多应用共享限额）</td></tr></tbody></table></div>
+<p><strong>关于第 24 行的一点分析（本报告判断，推测，非事实）</strong>：Tesla 明载"同账号多应用<strong>共享</strong>限额" <code>[A]</code>。这个设计的含义是——<strong>限流的作用域是账号而不是应用</strong>，因此"多创建几个应用来绕过限额"不可行。这是一个把"影响范围控制"做在身份维度的做法，与虚拟密钥的"&lt;20 把"上限（做在资源维度）形成互补。</p>
+<p><strong>关于第 5 行的处理纪律</strong>：<code>00-engagement-plan.md</code> §3.3 的 CSO 判定示例已明确将 <code>vehicle_specs</code> / <code>vehicle_pricing_info</code> 的路径归为 <strong>High</strong>，并要求"在报告中显式标注为'退出逐车主同意模型'的路径，并建议以契约与审计补偿"。本章遵循该判定，且不对此作价值判断——它是文档明载的授权模型设计 <code>[A]</code>，其风险取决于使用该路径的合作伙伴的治理水平。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-38">
+  <div class="sec-head"><span class="sec-badge">11</span><h2>12.10 本章待补证清单</h2></div>
+<p>本节逐条给出「检索对象 / 结果 / 建议补证动作」。所有"未找到公开来源"的表述<strong>均不构成能力缺失的判断</strong>（AC-11、信源档案 §0）。</p>
+<div class="table-wrap"><table><thead><tr><th>#</th><th>检索对象</th><th>结果</th><th>建议补证动作</th></tr></thead><tbody><tr><td>1</td><td>Tesla 访问令牌 TTL</td><td>信源档案已读页面<strong>仅有</strong>刷新令牌 3 个月 + 24 小时宽限；"约 8 小时"一说被档案显式列为未能证实</td><td>实机走一遍 token 响应读取 <code>expires_in</code>（信源档案 §8 已给出该方式）</td></tr><tr><td>2</td><td>Tesla 访问令牌形态（JWT vs 不透明）</td><td><strong>未找到公开来源</strong>；文档未明载</td><td>观察 token 响应结构；检查是否有 <code>.well-known/jwks</code>；沙箱换取一次令牌检查 <code>typ</code></td></tr><tr><td>3</td><td>Tesla 刷新令牌宽限期内行为（可重复签发 vs 幂等返回）</td><td><strong>未找到公开来源</strong></td><td>沙箱内用同一刷新令牌在宽限窗口内连续刷新两次，观察两次返回的新令牌是否相同</td></tr><tr><td>4</td><td>Tesla 应用私钥是否要求 HSM/KMS 保护</td><td><strong>未找到公开来源</strong>；文档仅明载生成命令与存放位置</td><td>阅读 Tesla Partner 安全要求全文；向 developer 支持渠道发问</td></tr><tr><td>5</td><td>Tesla 虚拟密钥公钥文件不可用时的车端行为</td><td><strong>未找到公开来源</strong>；文档仅明载"必须长期可用"</td><td>沙箱实验：令公钥 URL 返回 404/重定向，观察配对/命令签名的失败模式</td></tr><tr><td>6</td><td>Tesla 虚拟密钥的周期性重新配对机制</td><td><strong>未找到公开来源</strong>；文档仅描述用户手动删除</td><td>阅读 Tesla 车辆端配对流程文档；检查固件变更记录</td></tr><tr><td>7</td><td>Mercedes-Benz PKCE 实现情况</td><td><strong>未取得</strong>；信源档案 §7.2 记录平台自称"standard OAuth 2.0"，未取证 PKCE 条目</td><td>在授权端点请求中观察 <code>code_challenge</code>/<code>code_challenge_method</code> 参数；阅读 get-started 全文</td></tr><tr><td>8</td><td>Mercedes-Benz 刷新令牌绝对有效期</td><td><strong>未找到公开来源</strong>；仅知为一次性</td><td>沙箱内长期观察刷新令牌的失效时间；阅读产品文档全文</td></tr><tr><td>9</td><td>Mercedes-Benz 数字钥匙（CCC）</td><td>信源档案 §7.2 明确列为<strong>未取到</strong></td><td>检索 CCC 认证计划成员页；申请开发者沙箱</td></tr><tr><td>10</td><td>Mercedes-Benz mTLS / 证书固定</td><td>信源档案 §7.2 明确列为<strong>未取到</strong></td><td>对 API 端点做 TLS 握手观察（仅记录，不含攻击）；阅读安全白皮书</td></tr><tr><td>11</td><td>车企（Tesla / Mercedes）的 mTLS 证书绑定令牌实现</td><td>已读文档中<strong>未取得</strong> RFC 8705 相关条目</td><td>检查令牌中是否含 <code>cnf</code> 声明；观察是否要求客户端证书</td></tr><tr><td>12</td><td>车企的 DPoP 实现</td><td><strong>未找到公开来源</strong></td><td>检查授权服务器元数据（<code>.well-known/oauth-authorization-server</code>，RFC 8414 <code>[A]</code>）中的 <code>dpop_signing_alg_values_supported</code> 字段</td></tr><tr><td>13</td><td>国内 9 家车企的国密 SM2/SM3/SM4 使用</td><td>信源档案 §7.10 第 5 条：<strong>全部未取得官方一手来源</strong></td><td>向车企发起 RFI；采购安全白皮书；查招标文件与专利</td></tr><tr><td>14</td><td>国内 9 家车企的 mTLS / 证书轮换</td><td>同上，<strong>未找到公开来源</strong></td><td>同上</td></tr><tr><td>15</td><td>国内 9 家车企的 HSM/SE/TEE 实现</td><td>信源档案 §8 覆盖度局限表：已检索官网、开放平台、隐私政策、SRC 页，<strong>未找到公开一手来源</strong></td><td>T-BOX 拆解分析；芯片厂 Design Win 公告；器件选型逆向</td></tr><tr><td>16</td><td>小鹏开放平台鉴权细节</td><td><code>open.xiaopeng.com</code> 对所有请求 <strong>HTTP 403（openresty）</strong></td><td>商务渠道申请沙箱账号</td></tr><tr><td>17</td><td>华为鸿蒙座舱安全与数字车钥匙</td><td><code>developer.huawei.com</code> 文档返回 JS 空壳（1749 字节），<strong>正文不可取</strong></td><td>用带 JS 渲染的抓取（须登录）</td></tr><tr><td>18</td><td>BMW CarData OAuth / scope / 令牌 TTL</td><td><code>developer.bmwgroup.com</code> 为占位页"no content deployed"；bmw.com/bmwgroup.com 区域封锁</td><td>换出口 IP 或代理后重跑</td></tr><tr><td>19</td><td>Rivian Fleet API / OAuth / 数字钥匙</td><td><code>rivian.com</code> 返回 CloudFront 403（区域封锁）；<code>developer.rivian.com</code> 无 DNS</td><td>换出口 IP</td></tr><tr><td>20</td><td>车端密码模块的密码敏捷性（crypto-agility）设计</td><td><strong>未找到公开来源</strong></td><td>检索车规芯片厂商的 HSM 文档；查 EVITA 后续项目资料</td></tr><tr><td>21</td><td>车端验签的执行环境（是否在 TEE/SE 中）</td><td><strong>未找到公开来源</strong>（针对 Tesla 虚拟密钥验签）</td><td>阅读 Tesla 车辆安全架构说明；查车辆固件安全白皮书</td></tr><tr><td>22</td><td>GB 44495-2024 / GB/T 47324-2026 / GB/T 47467-2026 的技术要求正文</td><td>信源档案 §1 条目均为元数据页（编号/名称/日期/URL <code>[A]</code>），<strong>正文内容未取证</strong></td><td>通过国家标准全文公开系统下载正文；或采购标准文本</td></tr><tr><td>23</td><td>R155/R156 条款号与强制时间表</td><td><code>unece.org</code> 被 Cloudflare 全站拦截，<code>[未验证]</code></td><td>恢复检索额度；或用官方 PDF 直链</td></tr><tr><td>24</td><td>ISO 21434 / 24089 / 15118 正文</td><td><code>iso.org</code> Cloudflare 拦截，<code>[未验证]</code></td><td>通过标准购买渠道或 SAE 页面补</td></tr><tr><td>25</td><td>UMA 2.0 规范正文</td><td>Kantara 站点 curl 超时，<code>[未验证]</code></td><td>会员渠道或镜像获取</td></tr><tr><td>26</td><td>车企是否采用 RFC 8628 设备授权流</td><td><strong>未找到公开来源</strong></td><td>观察车机授权界面的 URL 形态；阅读车机端文档</td></tr><tr><td>27</td><td>车企是否采用 RFC 9470 步进认证</td><td><strong>未找到公开来源</strong></td><td>在高风险操作上触发，观察是否返回 <code>insufficient_user_authentication</code> 与 <code>acr_values</code></td></tr><tr><td>28</td><td>车企是否采用 RFC 8693 令牌交换</td><td><strong>未找到公开来源</strong>（双层代理链的 act 声明）</td><td>检查令牌声明中是否含 <code>act</code></td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-39">
+  <div class="sec-head"><span class="sec-badge">12</span><h2>12.11 本章小结</h2></div>
+<h3 id="sec-40">12.11.1 事实层结论（全部可回溯至信源档案 <code>[A]</code> 条目）</h3>
+<ol><li><strong>令牌轮换已是主流的强约束实现。</strong> Tesla 的刷新令牌一次性且 3 个月过期、最近使用的刷新令牌 24 小时内仍有效 <code>[A]</code>；Mercedes 的刷新令牌一次性且刷新返回新访问令牌与新刷新令牌 <code>[A]</code>。两家都实现了轮换。</li><li><strong>访问令牌时长是部署决策，规范不规定。</strong> Mercedes 明载默认 <code>expires_in=3599</code> 秒 <code>[A]</code>；Tesla 的访问令牌 TTL 在本次已读页面中<strong>未证实</strong> <code>[A]</code>（档案列为待补证）。</li><li><strong>吊销传播是多路径、非同时的。</strong> Tesla 有五条可用证据：车主撤销入口 URL <code>[A]</code>、scope 缩减仅对新签发访问令牌生效 <code>[A]</code>、Fleet Telemetry 配置因 scope 撤销被从车辆移除 <code>[A]</code>、虚拟密钥由车主在 Locks 界面删除 <code>[A]</code>、超限会移除推流配置且不恢复 <code>[A]</code>。</li><li><strong>车端存在独立的第二道闸门。</strong> Tesla 车辆在执行命令前或接受 Fleet Telemetry 配置前验证载荷签名 <code>[A]</code>；公钥经 <code>.well-known/appspecific/com.tesla.3p.public-key.pem</code> 托管且须长期可用 <code>[A]</code>；私钥不入域名 <code>[A]</code>；算法被约束为 prime256v1（P-256）<code>[A]</code>；B2B 自动添加条件为已配对密钥少于 20 把 <code>[A]</code>。文档称虚拟密钥"甚至能阻止 Tesla 自己的后端访问这些能力" <code>[A]</code>。</li><li><strong>授权平面与数据平面可分离。</strong> Tesla 的令牌端点与 API 端点分属不同主机 <code>[A]</code>；<code>/token</code> 来自应用服务器、限流策略不同 <code>[A]</code>；<code>audience</code> 必须是 Fleet API base URL <code>[A]</code>。</li><li><strong>客户端凭证托管责任已被明确写入部分车企文档。</strong> Mercedes 明载不得向客户端暴露 client id / client secret / 访问令牌 <code>[A]</code>。</li><li><strong>存在"退出逐车主同意模型"的授权路径。</strong> <code>vehicle_specs</code> 与 <code>vehicle_pricing_info</code> 仅 Partner Token 可用、对任意车辆可用、无需车主授权 <code>[A]</code>。按 <code>00-engagement-plan.md</code> §3.3 归为 <strong>High</strong>。</li><li><strong>存在双层授权控制的正面案例。</strong> 带 <code>granular_access.hide_private=true</code> 的车辆共享即使被授予 <code>vehicle_location</code> 也拿不到任何位置、且无法流式传输位置字段 <code>[A]</code>；位置类字段在 <code>hide_private</code> 车辆上会返回 <strong>HTTP 403 "location access not granted"</strong> <code>[A]</code>。归为 Informational→正面控制案例。</li><li><strong>静态密钥路径与令牌路径在不同平台并存。</strong> BYD i迪桥为 <code>x-Gateway-APIKey</code>（appKey）<code>[A]</code>；NIO Open NSC 为 <code>app-id</code> + <code>secret</code> <code>[A]</code>。<strong>但 i迪桥是企业级 ESB 网关、NIO 文档停留于 2019-08-13，两者的证据不能推广为"这些企业的车云授权模型"</strong>（信源档案 §7.10 第 3、4 条）。</li><li><strong>规范底座完整。</strong> 本章使用的 OAuth 2.x 族（RFC 6749 / 6750 / 7009 / 7523 / 7636 / 7662 / 8252 / 8414 / 8628 / 8693 / 8705 / 9068 / 9396 / 9470 / 9449 / 9635）、OIDC Core、PKI 族（RFC 5280 / 6960 / 3161 / 8555 / 8446 / 5480 / 8017 / 6090 / 8998）、NIST 族（FIPS 140-3 / 186-5 / 197、SP 800-57 Pt1 R5 / 800-38D / 800-90A R1 / 800-133）均为 <code>[A]</code> 一手条目。</li></ol>
+<h3 id="sec-41">12.11.2 判断层结论（本章标注为推测，非事实）</h3>
+<p>以下四条是本章由规范语义与已取证事实推导出的工程判断，<strong>不构成对任何企业的技术陈述</strong>：</p>
+<ol><li><strong>车云场景对发送方约束令牌的需求强度高于一般 API 场景</strong>，因为令牌持有链长且每跳可信度不同（12.3.1.1）。</li><li><strong>令牌轮换与证书轮换必须同步设计</strong>，否则在证书轮换瞬间会出现批量授权拒绝（12.2.4.3、12.9 第 8 行）。</li><li><strong>"命令授权层无自动过期"是最易被忽视的暴露面决定因素</strong>——系统有效暴露面由最长的那个凭证周期决定（12.2.1.3）。</li><li><strong>端点分离 + audience 绑定 + 差异化限流</strong>三者组合，构成可对标的结构性实践（12.4.1.3）。</li></ol>
+<h3 id="sec-42">12.11.3 缺口层陈述（不得反向解读）</h3>
+<ul><li>信源档案 §7.10 第 5 条记录：<strong>9 家国内车企本次全部未取得关于"国密 SM2/SM3/SM4"、"mTLS 双向证书"、"证书轮换"、"HSM/SE/TEE"的任何官方一手来源</strong>。因此本章在 12.7.3.3（国密）、12.3.2（mTLS）、12.2.4（证书轮换）、12.7.4（HSM/SE）四个方向<strong>均未对国内车企作出任何陈述</strong>。</li><li>BMW 与 Rivian 因网络/区域封锁未取到开发者文档（信源档案 §7.4 / §7.5），本章未对其作出任何令牌/密钥治理层面的陈述。</li><li><strong>所有这些"未找到公开来源"都是本次披露缺口的陈述，绝不等同于相应能力缺失</strong>（AC-11、<code>00-engagement-plan.md</code> §3.2 红线第 4 条）。</li></ul>
+<h3 id="sec-43">12.11.4 与相邻章节的接口</h3>
+<div class="table-wrap"><table><thead><tr><th>相邻文件</th><th>本章向其输出的内容</th><th>本章从其接收的约束</th></tr></thead><tbody><tr><td><code>10-authz-00-intro.md</code></td><td>令牌谱系、密钥分级作为总论的具体化</td><td>分层框架与术语</td></tr><tr><td><code>11-authz-10-protocols.md</code></td><td>令牌在协议流中的生命周期与轮换/吊销语义</td><td>各 RFC 协议流的完整描述</td></tr><tr><td><code>13-authz-30-resource-authz.md</code></td><td><code>aud</code> 绑定、资源级绑定（12.8.2）、双层控制案例（12.9 第 23 行）</td><td>RFC 9396 的 <code>authorization_details</code> 结构化权限模型</td></tr><tr><td><code>14-authz-40-threat-model.md</code></td><td>12.9 的 24 条失败模式与严重度</td><td>STRIDE / OWASP API Security Top 10 映射口径</td></tr><tr><td><code>15-authz-50-engineering.md</code></td><td>12.8 的三段示意代码与设计说明</td><td>工程实现的完整落地框架</td></tr><tr><td><code>18-authz-80-compliance-audit.md</code></td><td>12.9 中 Low 级项（无授权决策日志、移除原因不可区分）</td><td>GB 44495 / GB/T 47324 / GB/T 47467 的条款级映射</td></tr><tr><td><code>19-authz-90-reference-tables.md</code></td><td>12.1 令牌大表、12.2.1.2 数值对照表、12.7.2.3 密钥大表</td><td>全报告统一参考表的编号体系</td></tr></tbody></table></div>
+<hr>
+<p><strong>本章证据等级使用统计</strong>：<code>[A]</code> 一手条目（RFC 规范、NIST 规范、OEM 官方开发者文档）为本章主体；<code>[B]</code> 用于 EVITA 分级、CCC 部分条目、TUF/SPDX 等第三方权威页；<code>[C]</code> 仅用于 Infineon AURIX / Renesas / TI 等硬件型号页，且<strong>本章未据此作任何车型硬件断言</strong>；<code>[未验证]</code> 用于 ISO 21434 / 24089 / 15118 / UMA 2.0 / TPM 2.0 / AUTOSAR / NXP S32 等站点不可达对象。凡档案无直接来源而由规范语义推导者，均以"<strong>本报告判断</strong>（推测，非事实）"显式标注，共出现在 12.0.3、12.2.1.2、12.2.1.3、12.2.2.1、12.2.2.2、12.2.2.3、12.2.2.4、12.2.3.3、12.2.3.4、12.2.4.1、12.2.4.2、12.2.4.3、12.3.1.1、12.3.1.2、12.3.2.2、12.3.2.3、12.3.2.4、12.3.3.3、12.3.3.4、12.3.4.2、12.3.4.3、12.4.1.2、12.4.1.3、12.4.2.3、12.4.3、12.5.1.1、12.5.1.2、12.5.1.3、12.5.2.1、12.5.2.2、12.5.2.3、12.5.3.1、12.5.3.2、12.5.3.3、12.5.3.4、12.5.4.1、12.5.4.2、12.6.1、12.6.2、12.6.3、12.6.4、12.7.1.1、12.7.1.2、12.7.2.2、12.7.2.3、12.7.3.2、12.7.3.3、12.7.3.4、12.7.4.2、12.7.4.3、12.7.4.4、12.8.1、12.8.2、12.8.3、12.9 逐行、12.11.2 等位置。引用单篇原文（如 Tesla 文档短语、Mercedes 错误字符串）均为短句摘录，累计远低于本节篇幅 5% 的上限。</p>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 67,219 字符</div>
+  </div>
+</footer>
+</body>
+</html>
