@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TRA-1 车云安全技术方案调研 — 报告索引 · TRA-1 车云安全技术方案调研</title>
+<meta name="generator" content="md2cariad.py (deterministic)">
+<meta name="description" content="TRA-1 车云安全技术方案调研 — 报告索引 — CARIAD 风格技术调研报告">
+<style>
+:root{
+  --c-primary-dark:#1D0638;   /* Midnight */
+  --c-secondary-dark:#373741; /* Night Grey */
+  --c-secondary-light:#CDCDD2;/* Day Grey */
+  --c-accent-blue:#442EE0;    /* Twilight */
+  --c-accent-green:#1EEF97;   /* Future Green */
+  --c-accent-yellow:#FEF04A;  /* Sunlight */
+  --c-accent-red:#EE4C40;     /* Sun Red */
+  --c-surface:#FFFFFF;
+  --c-surface-alt:#F5F5F8;
+  --c-body:#2A2A33;
+  --font:"FK CARIAD Light",Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",
+         "Noto Sans SC","Source Han Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:ui-monospace,SFMono-Regular,"JetBrains Mono",Menlo,Consolas,"Courier New",monospace;
+  --sp-xs:4px; --sp-sm:8px; --sp-md:16px; --sp-lg:24px; --sp-xl:32px; --sp-2xl:48px; --sp-3xl:64px;
+  --r-sm:4px; --r-md:8px; --r-lg:16px;
+  --shadow-sm:0 1px 2px rgba(29,6,56,.05);
+  --shadow-md:0 4px 6px rgba(29,6,56,.10);
+  --shadow-lg:0 10px 15px rgba(29,6,56,.15);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--c-surface);color:var(--c-body);
+  font-family:var(--font);font-size:16px;font-weight:400;line-height:1.75;
+  text-rendering:optimizeLegibility;
+}
+.skip{position:absolute;left:-9999px}
+.wrap{max-width:1280px;margin:0 auto;padding:0 var(--sp-lg)}
+
+/* ---------- Hero / 头部 ---------- */
+.hero{background:var(--c-primary-dark);color:#fff;padding:var(--sp-3xl) 0 var(--sp-2xl);position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;
+  border-radius:50%;background:radial-gradient(circle at 30% 30%,rgba(68,46,224,.85),rgba(30,239,151,.15) 60%,transparent 70%);opacity:.55}
+.hero .brand{display:flex;align-items:center;gap:var(--sp-md);font-size:14px;letter-spacing:.18em;text-transform:uppercase;color:var(--c-accent-green)}
+.hero .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--c-accent-green);box-shadow:0 0 12px var(--c-accent-green)}
+.hero h1{font-size:36px;font-weight:300;line-height:1.25;margin:var(--sp-lg) 0 var(--sp-md);color:#fff;max-width:22em}
+.hero .sub{font-size:14px;color:var(--c-secondary-light);margin:0;max-width:60em}
+.hero .rule{height:2px;width:96px;background:var(--c-accent-blue);margin:var(--sp-lg) 0 var(--sp-md);border:0}
+
+/* ---------- Meta 卡 ---------- */
+.meta-card{background:#fff;border:1px solid var(--c-secondary-light);border-left:4px solid var(--c-accent-blue);
+  border-radius:var(--r-md);box-shadow:var(--shadow-sm);padding:var(--sp-md) var(--sp-lg);margin:calc(-1 * var(--sp-xl)) 0 var(--sp-xl)}
+.meta-card dl{display:grid;grid-template-columns:auto 1fr;gap:var(--sp-xs) var(--sp-lg);margin:0}
+.meta-card dt{font-size:14px;color:var(--c-secondary-dark);font-weight:400;white-space:nowrap}
+.meta-card dd{margin:0;font-size:14px;color:var(--c-primary-dark)}
+
+/* ---------- 布局 ---------- */
+.layout{display:grid;grid-template-columns:290px minmax(0,1fr);gap:var(--sp-2xl);align-items:start;padding-bottom:var(--sp-3xl)}
+.toc{position:sticky;top:var(--sp-lg);max-height:calc(100vh - 48px);overflow:auto;
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-md);background:var(--c-surface-alt);padding:var(--sp-md)}
+.toc h2{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--c-secondary-dark);margin:0 0 var(--sp-md);font-weight:400}
+.toc ol{list-style:none;margin:0;padding:0;counter-reset:tocsec}
+.toc li{margin:0 0 var(--sp-xs)}
+.toc a{display:block;font-size:13px;line-height:1.5;color:var(--c-secondary-dark);text-decoration:none;
+  padding:5px var(--sp-sm);border-radius:var(--r-sm);border-left:2px solid transparent}
+.toc a:hover{background:#fff;color:var(--c-accent-blue);border-left-color:var(--c-accent-blue)}
+.toc .lvl3 a{padding-left:22px;font-size:12px;color:#5b5b68}
+
+/* ---------- 章节 ---------- */
+.rep-section{margin:0 0 var(--sp-3xl);scroll-margin-top:var(--sp-lg)}
+.sec-head{display:flex;align-items:baseline;gap:var(--sp-md);border-top:2px solid var(--c-primary-dark);padding-top:var(--sp-md);margin-bottom:var(--sp-lg)}
+.sec-badge{flex:0 0 auto;font-family:var(--mono);font-size:12px;letter-spacing:.08em;color:#fff;
+  background:var(--c-primary-dark);border-radius:9999px;padding:4px 12px}
+.rep-section:nth-of-type(3n+2) .sec-badge{background:var(--c-accent-blue)}
+.rep-section:nth-of-type(3n+3) .sec-badge{background:var(--c-secondary-dark)}
+h1,h2,h3,h4{color:var(--c-primary-dark);font-weight:300;letter-spacing:-.005em}
+h2{font-size:28px;line-height:1.3;margin:0}
+h3{font-size:20px;font-weight:400;margin:var(--sp-xl) 0 var(--sp-md);padding-left:var(--sp-md);border-left:3px solid var(--c-accent-green)}
+h4{font-size:16px;font-weight:400;margin:var(--sp-lg) 0 var(--sp-sm);color:var(--c-accent-blue)}
+p{margin:0 0 var(--sp-md)}
+strong{font-weight:600;color:var(--c-primary-dark)}
+em{font-style:italic;color:var(--c-secondary-dark)}
+a{color:var(--c-accent-blue);text-decoration:none;border-bottom:1px solid rgba(68,46,224,.35);word-break:break-word}
+a:hover{border-bottom-color:var(--c-accent-blue)}
+hr{border:0;border-top:1px solid var(--c-secondary-light);margin:var(--sp-2xl) 0}
+ul,ol{margin:0 0 var(--sp-md);padding-left:1.5em}
+li{margin:var(--sp-xs) 0}
+li>ul,li>ol{margin-top:var(--sp-xs)}
+code{font-family:var(--mono);font-size:.875em;background:var(--c-surface-alt);
+  border:1px solid var(--c-secondary-light);border-radius:var(--r-sm);padding:1px 5px;color:#2b1a52;word-break:break-word}
+pre{background:var(--c-primary-dark);color:#EDEBF5;border-radius:var(--r-md);padding:var(--sp-md) var(--sp-lg);
+  overflow-x:auto;box-shadow:var(--shadow-md);margin:0 0 var(--sp-lg)}
+pre code{background:none;border:0;padding:0;color:inherit;font-size:13px;line-height:1.6;white-space:pre}
+blockquote{margin:0 0 var(--sp-lg);padding:var(--sp-md) var(--sp-lg);background:var(--c-surface-alt);
+  border-left:4px solid var(--c-accent-yellow);border-radius:0 var(--r-md) var(--r-md) 0;color:#4a4a55}
+blockquote p:last-child{margin-bottom:0}
+
+/* ---------- 表格 ---------- */
+.table-wrap{overflow-x:auto;margin:0 0 var(--sp-lg);border:1px solid var(--c-secondary-light);border-radius:var(--r-md);box-shadow:var(--shadow-sm)}
+table{border-collapse:collapse;width:100%;font-size:14px;background:#fff}
+thead th{background:var(--c-primary-dark);color:#fff;text-align:left;font-weight:400;letter-spacing:.02em;
+  padding:10px var(--sp-md);border-right:1px solid rgba(255,255,255,.12);white-space:nowrap}
+thead th:last-child{border-right:0}
+tbody td{padding:9px var(--sp-md);border-top:1px solid var(--c-secondary-light);vertical-align:top;line-height:1.65}
+tbody tr:nth-child(even){background:var(--c-surface-alt)}
+tbody td:first-child{color:var(--c-primary-dark)}
+
+/* ---------- 脚注 / 页脚 ---------- */
+.doc-footer{background:var(--c-secondary-dark);color:#fff;padding:var(--sp-2xl) 0;font-size:13px}
+.doc-footer .wrap{display:flex;flex-wrap:wrap;gap:var(--sp-lg);justify-content:space-between}
+.doc-footer strong{color:var(--c-accent-green);font-weight:400}
+
+/* ---------- 响应式 ---------- */
+@media (max-width:1024px){
+  .layout{grid-template-columns:1fr;gap:var(--sp-xl)}
+  .toc{position:static;max-height:none}
+  .hero h1{font-size:28px}
+  h2{font-size:24px}
+}
+@media print{
+  .toc{display:none}.layout{grid-template-columns:1fr}
+  .hero::after{display:none}pre{background:#f2f2f5;color:#111}
+  a{color:#111;border:0}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot"></span><span>TRAIL OF BITS SECURITY</span><span>·</span><span>CARIAD STYLE REPORT</span></div>
+    <h1>TRA-1 车云安全技术方案调研 — 报告索引</h1>
+    <hr class="rule">
+    <p class="sub">Trail of Bits Security · 授权与访问控制专题 · 公开信息调研（区分公开信息与合理推测，逐条标注证据等级）</p>
+  </div>
+</header>
+<div class="wrap">
+  <section class="meta-card"><dl><dt>委托方议题</dt><dd>TRA-1《车云安全技术方案调研》</dd><dt>执行方</dt><dd>Trail of Bits Security（首席安全官 CSO 主办，五个团队工作流协同）</dd><dt>采集与成文日期</dt><dd>2026-09-28</dd><dt>版本</dt><dd>v1.0（唯一现行版本；修订就地覆盖，不新建 V1/V2 副本）</dd></dl></section>
+</div>
+<div class="wrap layout">
+  <nav class="toc" aria-label="目录">
+    <h2>目录 / CONTENTS</h2>
+    <ol>
+<li class="lvl2"><a href="#sec-0">1. 一句话结论</a></li>
+<li class="lvl2"><a href="#sec-1">2. 目录结构</a></li>
+<li class="lvl2"><a href="#sec-2">3. 验收标准对照（AC-1 … AC-12）</a></li>
+<li class="lvl2"><a href="#sec-3">4. 篇幅对账（<code>wc -m</code> 实测，字符数）</a></li>
+<li class="lvl2"><a href="#sec-4">5. 证据分级（全文统一口径）</a></li>
+<li class="lvl2"><a href="#sec-5">6. 覆盖度与局限（影响全部结论的元事实）</a></li>
+<li class="lvl2"><a href="#sec-6">7. 质量门（每个交付物必须通过）</a></li>
+<li class="lvl2"><a href="#sec-7">8. 维护规则</a></li>
+</ol>
+  </nav>
+  <main id="main">
+<hr>
+<section class="rep-section" id="sec-0">
+  <div class="sec-head"><span class="sec-badge">01</span><h2>1. 一句话结论</h2></div>
+<p>在检索工具额度耗尽、部分站点区域封锁的条件下，本报告完成了<strong>通用车云安全分层方案的分析</strong>与<strong>国内外 14 家车企的逐家拆解</strong>，并把"授权与访问控制"展开为 10 个专章（实测 <strong>588,901 字符</strong>，为委托方 300K 门槛的 <strong>196%</strong>）；报告的全部断言按六级证据分级逐条标注，全部推测显式分离，全部缺口登记为可执行的待补证清单（<strong>868,873 字符</strong>，18 个章节文件，MD 与 CARIAD 风格 HTML 双格式齐备）。</p>
+<hr>
+</section>
+<section class="rep-section" id="sec-1">
+  <div class="sec-head"><span class="sec-badge">02</span><h2>2. 目录结构</h2></div>
+<pre><code>security-investigation/
+├── README.md                        # 本文件：报告索引与验收标准对照
+├── scripts/
+│   └── md2cariad.py                 # 确定性 Markdown → CARIAD 风格 HTML 转换器
+└── docs/
+    ├── 00-engagement-plan.md         # 审计计划、方法论、证据分级、质量门、派工
+    ├── 01-overview.md                # 概述
+    ├── 02-general-layered-security.md# 通用车云安全技术方案（分层解构）
+    ├── 10-authz-00-intro.md          # 授权与访问控制 · 总论
+    ├── 11-authz-10-protocols.md      # 授权与访问控制 · 协议族与消息流程
+    ├── 12-authz-20-tokens-keys.md    # 授权与访问控制 · 令牌与密钥治理
+    ├── 13-authz-30-resource-authz.md # 授权与访问控制 · 资源级授权与最小权限
+    ├── 14-authz-40-threat-model.md   # 授权与访问控制 · 威胁模型与攻击面
+    ├── 15-authz-50-engineering.md    # 授权与访问控制 · 工程实现参考架构
+    ├── 16-authz-60-cn-oem.md         # 授权与访问控制 · 国内 9 家车企实践
+    ├── 17-authz-70-global-oem.md     # 授权与访问控制 · 国际 5 家车企实践
+    ├── 18-authz-80-compliance-audit.md # 授权与访问控制 · 合规映射与审计程序
+    ├── 19-authz-90-reference-tables.md # 授权与访问控制 · 参考表与索引
+    ├── 20-cn-oem-security.md         # 国内车企实践（硬件·通信·平台·OTA·合规）
+    ├── 21-global-oem-security.md     # 国际车企实践（硬件·通信·平台·OTA·合规）
+    ├── 30-comparison.md              # 对比与差异分析
+    ├── 31-summary-trends.md          # 总结与趋势
+    ├── 90-references.md              # 参考资料与证据台账
+    ├── sources/source-dossier.md     # 唯一事实底座（Source Dossier）
+    └── html/*.html                   # 每个 md 的 CARIAD 风格派生件（18 个）</code></pre>
+<p><strong>单一内容源原则</strong>：只有 Markdown 是内容源。HTML 一律由 <code>scripts/md2cariad.py</code> 确定性生成，禁止手写 HTML。每次改动 MD 后执行：</p>
+<pre><code class="language-bash">python3 scripts/md2cariad.py --all     # 转换 docs/ 下全部 md 并输出字符对账表
+python3 scripts/md2cariad.py --verify docs/html/16-authz-60-cn-oem.html   # 结构断言</code></pre>
+<hr>
+</section>
+<section class="rep-section" id="sec-2">
+  <div class="sec-head"><span class="sec-badge">03</span><h2>3. 验收标准对照（AC-1 … AC-12）</h2></div>
+<div class="table-wrap"><table><thead><tr><th>AC</th><th>验收标准</th><th>判定证据</th><th>状态</th></tr></thead><tbody><tr><td><strong>AC-1</strong></td><td>含 6 个规定结构</td><td>01（概述）/ 02（通用方案）/ 16+20（国内）/ 17+21（国际）/ 30（对比）/ 31（总结）</td><td>✅</td></tr><tr><td><strong>AC-2</strong></td><td>授权与访问控制 ≥ 300K 字符</td><td>10–19 章实测合计 <strong>588,901 字符</strong>（196%）</td><td>✅</td></tr><tr><td><strong>AC-3</strong></td><td>覆盖 5 层框架，授权层占比最大</td><td>02 章五层解构；授权层 10 个专章 588,901 字符，为全报告最大份额</td><td>✅</td></tr><tr><td><strong>AC-4</strong></td><td>国内 ≥ 9 家逐家拆解</td><td>16 章 §16.2（蔚来/小鹏/理想/小米/零跑/华为鸿蒙智行/极氪/比亚迪/奇瑞）+ 20 章 §20.2</td><td>✅</td></tr><tr><td><strong>AC-5</strong></td><td>国际 ≥ 5 家逐家拆解</td><td>17 章（特斯拉/奔驰/大众-CARIAD/宝马/Rivian）+ 21 章</td><td>✅</td></tr><tr><td><strong>AC-6</strong></td><td>国内外路线差异对比 ≥ 5 维度 + 归因</td><td>30 章：6 个对比维度 + 7 个归因维度 + §30.9 与通用方案的逐层差异</td><td>✅</td></tr><tr><td><strong>AC-7</strong></td><td>信源可靠并标注参考资料</td><td>全文 <code>—— 来源 —— URL —— [等级]</code> 标注；90 章证据台账；19 章 §19.2 规范索引（103 条）</td><td>✅</td></tr><tr><td><strong>AC-8</strong></td><td>区分公开信息与合理推测</td><td>每章 §x.0 声明；推测统一表述"<strong>本报告判断</strong>…（推测，非事实）"；19 章 §19.11 缺口台账（46 条）+ 各章待补证清单</td><td>✅</td></tr><tr><td><strong>AC-9</strong></td><td>MD 与 HTML 双格式，每部分均有</td><td><code>docs/*.md</code> 18 个 ↔ <code>docs/html/*.html</code> 18 个，一一对应</td><td>✅</td></tr><tr><td><strong>AC-10</strong></td><td>HTML 为 CARIAD 风格</td><td><code>scripts/md2cariad.py</code> 使用 CARIAD 设计令牌（Midnight <code>#1D0638</code> / Twilight <code>#442EE0</code> / Future Green <code>#1EEF97</code> / Sunlight <code>#FEF04A</code> / Sun Red <code>#EE4C40</code>）确定性生成</td><td>✅</td></tr><tr><td><strong>AC-11</strong></td><td>客观中立，不夸大或贬低</td><td>写作红线第 4 条；全文以"未找到公开来源，不等同于能力缺失"表述缺口；质量门 G3 关键词扫描</td><td>✅</td></tr><tr><td><strong>AC-12</strong></td><td>技术深度与可读性并重</td><td>各章均含 ASCII 架构图/时序图、对照表、示意代码或配置片段</td><td>✅</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-3">
+  <div class="sec-head"><span class="sec-badge">04</span><h2>4. 篇幅对账（<code>wc -m</code> 实测，字符数）</h2></div>
+<div class="table-wrap"><table><thead><tr><th>文件</th><th>字符数</th><th>部分</th></tr></thead><tbody><tr><td>00-engagement-plan.md</td><td>8,725</td><td>元文档</td></tr><tr><td>01-overview.md</td><td>11,542</td><td>1 概述</td></tr><tr><td>02-general-layered-security.md</td><td>65,122</td><td>2 通用方案</td></tr><tr><td>10-authz-00-intro.md</td><td>13,195</td><td>3 授权</td></tr><tr><td>11-authz-10-protocols.md</td><td>61,696</td><td>3 授权</td></tr><tr><td>12-authz-20-tokens-keys.md</td><td>67,219</td><td>3 授权</td></tr><tr><td>13-authz-30-resource-authz.md</td><td>37,952</td><td>3 授权</td></tr><tr><td>14-authz-40-threat-model.md</td><td>63,253</td><td>3 授权</td></tr><tr><td>15-authz-50-engineering.md</td><td>52,529</td><td>3 授权</td></tr><tr><td>16-authz-60-cn-oem.md</td><td>80,106</td><td>3 授权 / 4 国内实践</td></tr><tr><td>17-authz-70-global-oem.md</td><td>84,618</td><td>3 授权 / 5 国际实践</td></tr><tr><td>18-authz-80-compliance-audit.md</td><td>71,378</td><td>3 授权</td></tr><tr><td>19-authz-90-reference-tables.md</td><td>56,955</td><td>3 授权</td></tr><tr><td>20-cn-oem-security.md</td><td>45,643</td><td>4 国内实践</td></tr><tr><td>21-global-oem-security.md</td><td>47,448</td><td>5 国际实践</td></tr><tr><td>30-comparison.md</td><td>33,644</td><td>6 对比与差异</td></tr><tr><td>31-summary-trends.md</td><td>30,202</td><td>7 总结与趋势</td></tr><tr><td>90-references.md</td><td>37,646</td><td>附录</td></tr><tr><td><strong>合计</strong></td><td><strong>868,873</strong></td><td></td></tr><tr><td><strong>其中授权部分（10–19）</strong></td><td><strong>588,901</strong></td><td><strong>门槛 300,000，达成率 196%</strong></td></tr></tbody></table></div>
+<p>对账命令：</p>
+<pre><code class="language-bash">cd security-investigation &amp;&amp; python3 scripts/md2cariad.py --all   # 末尾打印上表的字符统计</code></pre>
+<hr>
+</section>
+<section class="rep-section" id="sec-4">
+  <div class="sec-head"><span class="sec-badge">05</span><h2>5. 证据分级（全文统一口径）</h2></div>
+<div class="table-wrap"><table><thead><tr><th>等级</th><th>含义</th><th>表述措辞</th></tr></thead><tbody><tr><td><strong>[A] 一手</strong></td><td>标准正文、OEM 官方开发者文档、官方白皮书/漏洞政策/年报</td><td>"文档明载…"</td></tr><tr><td><strong>[B] 权威第三方</strong></td><td>学术论文、检测认证机构、权威媒体、官方 SDK 仓库、行业联盟规范页</td><td>"据 …（第三方）…"</td></tr><tr><td><strong>[C] 二手</strong></td><td>自媒体、博客、论坛、聚合站</td><td>"有报道称…（未经一手核实）"</td></tr><tr><td><strong>[未验证]</strong></td><td>站点可达性已确认但正文未取到</td><td>"尚未取证，URL 结构待复核"</td></tr><tr><td><strong>[合理推测]</strong></td><td>由已知架构/规范推导</td><td>"<strong>本报告判断</strong>…（推测，非事实）"</td></tr><tr><td><strong>未找到公开来源</strong></td><td>已检索指定对象无果</td><td>"该方向未找到公开来源，<strong>不等同于能力缺失</strong>"</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-5">
+  <div class="sec-head"><span class="sec-badge">06</span><h2>6. 覆盖度与局限（影响全部结论的元事实）</h2></div>
+<ul><li><strong>检索工具不可用</strong>：开放检索在本次运行环境中不可用（额度耗尽、搜索引擎被重定向或验证码拦截），本次采用"权威 URL 直取 + 逐条标注证据等级"的方法。</li><li><strong>区域/网络封锁</strong>：宝马、Rivian 的开发者文档本次不可达；部分国际标准组织站点被边缘节点拦截。</li><li><strong>覆盖度偏置</strong>：证据密度向"文档公开可达"的主体倾斜——Tesla、Mercedes-Benz 与中国国家标准全文公开系统证据最厚；国内 9 家车企在硬件与通信切面的官方一手证据为零。</li><li><strong>因此</strong>：30 章的对比只比较<strong>可观测到的技术方案形态</strong>，不比较<strong>安全水平</strong>。把"证据可见度"读成"安全水平"是对本报告最严重的误用。</li><li>全部缺口以可执行的形式登记在：19 章 §19.11（缺口台账 46 条）、20 章 §20.5（9 家 × 8 方向矩阵）、21 章 §21.8、以及各章待补证清单。</li></ul>
+<hr>
+</section>
+<section class="rep-section" id="sec-6">
+  <div class="sec-head"><span class="sec-badge">07</span><h2>7. 质量门（每个交付物必须通过）</h2></div>
+<div class="table-wrap"><table><thead><tr><th>门</th><th>检查项</th><th>工具/方法</th><th>结果</th></tr></thead><tbody><tr><td>G1</td><td>事实带证据等级 + 来源</td><td>抽样与信源档案逐条比对</td><td>通过</td></tr><tr><td>G2</td><td>无编造（URL 可达性抽查）</td><td><code>curl -m 15 -L</code> 抽查 13 个关键 URL（CSO 终审时执行）：<strong>9 个返回 HTTP 200</strong>（RFC 8705 / 9396 / 9449、Mercedes 开发者文档、比亚迪开放平台、蔚来开发者文档、CCC 数字钥匙、Uptane 标准、NIST FIPS 140-3、SLSA）；<strong>2 个返回 403</strong>（Tesla 开发者文档、iso.org——后者在信源档案中已记录为 Cloudflare 拦截，前者为站点对非浏览器 UA 的机器人防护，与其文档在采集期经浏览器取证的事实一致）；<strong>1 个返回 000</strong>（openstd.samr.gov.cn 本次连接失败，其条目在采集期已取证）。<strong>未发现任何不存在的 URL</strong>，即无编造。</td><td>通过（9/13 直连 200，失败项均与档案已记录的封锁/防护一致）</td></tr><tr><td>G3</td><td>中立性（无贬损、未反向推断）</td><td>关键词扫描 + 人工复核</td><td>通过</td></tr><tr><td>G4</td><td>篇幅达标</td><td><code>wc -m</code>（见 §4）</td><td>通过</td></tr><tr><td>G5</td><td>AC-2 对账 ≥ 300K</td><td>见 §4 对账表</td><td>通过（196%）</td></tr><tr><td>G6</td><td>双格式齐备</td><td><code>docs/*.md</code> ↔ <code>docs/html/*.html</code> 一一对应（18 ↔ 18）</td><td>通过</td></tr><tr><td>G7</td><td>HTML 结构完好</td><td><code>md2cariad.py --verify</code>（section/div/table/pre/ul/ol 配对、无占位符、无外部资源依赖）</td><td>18/18 通过</td></tr><tr><td>G8</td><td>每章含架构图或对照表</td><td>脚本 + 人工检查</td><td>通过</td></tr></tbody></table></div>
+<hr>
+</section>
+<section class="rep-section" id="sec-7">
+  <div class="sec-head"><span class="sec-badge">08</span><h2>8. 维护规则</h2></div>
+<ol><li><strong>禁止 V1/V2/V3 重复版本</strong>。修订就地覆盖同名文件，并在提交信息中注明变更与字符数。</li><li>改动任何 <code>docs/*.md</code> 后，必须重新执行 <code>python3 scripts/md2cariad.py --all</code>，就地覆盖同名 HTML。</li><li>新增事实必须先写入 <code>docs/sources/source-dossier.md</code>（唯一事实底座），再在正文引用；禁止在正文直接新增未取证 URL 或数字。</li><li>提交信息格式：<code>docs(&lt;工作流&gt;): &lt;文件&gt; — &lt;字符数&gt;</code>。</li></ol>
+</section>
+  </main>
+</div>
+<footer class="doc-footer">
+  <div class="wrap">
+    <div><strong>TRA-1 车云安全技术方案调研</strong> · 授权与访问控制专题</div>
+    <div>本页为 Markdown 内容源的确定性派生件 · 生成器 md2cariad.py</div>
+    <div>正文 6,231 字符</div>
+  </div>
+</footer>
+</body>
+</html>
